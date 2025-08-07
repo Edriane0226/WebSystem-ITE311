@@ -15,7 +15,7 @@
             <ul class="navbar-nav flex-row ms-auto">
                 <li class="nav-item mx-2">
                     <a href="#" class="nav-link"> <i class="fa-brands fa-github"></i> </a>
-                </li>
+                </li>   
                 <li class="nav-item mx-2">
                     <a href="#" class="nav-link"> <i class="fa-brands fa-reddit"></i> </a>
                 </li>
@@ -26,7 +26,7 @@
 
             <ul class="nav nav-underline">
                 <li class="nav-item mx-4">
-                    <a href="#" class="nav-link text-white" aria-current="page"> <i class="fas fa-home"></i> Home</a>
+                    <a href="#" class="nav-link text-white"> <i class="fas fa-home"></i> Home</a>
                 </li>
                 <li class="nav-item mx-4">
                     <a href="#" class="nav-link text-white"> <i class="fas fa-box"></i> Package</a>
