@@ -11,25 +11,35 @@ class CreateUsersTable extends Migration
         $this -> forge -> addField([
             'userID' => [
                 'type' => 'INT',
-                'constraint' => 10,
+                'constraint' => 5,
                 'unsigned' => true,
                 'auto_increment' => true
             ],
-            'firstName' => [
+            // 'firstName' => [
+            //     'type' => 'VARCHAR',
+            //     'constraint' => 25,
+            //     'null' => false
+            // ],
+            // 'lastname' => [
+            //     'type' => 'VARCHAR',
+            //     'constraint' => 25,
+            //     'null' => false
+            // ],
+            // 'middleName' => [    
+            //     'type' => 'VARCHAR',
+            //     'constraint' => 25,
+            //     'null' => false
+            // ],
+            'name' => [
                 'type' => 'VARCHAR',
-                'constraint' => 25,
+                'constraint' => 100,
                 'null' => false
             ],
-            'lastname' => [
+            'password' => [
                 'type' => 'VARCHAR',
-                'constraint' => 25,
+                'constraint' => 255,
                 'null' => false
-            ],
-            'middleName' => [
-                'type' => 'VARCHAR',
-                'constraint' => 25,
-                'null' => false
-            ],
+            ],  
             'email' => [
                 'type' => 'VARCHAR',
                 'constraint' => 50,
@@ -40,11 +50,14 @@ class CreateUsersTable extends Migration
                 'constraint' => ['student', 'instructor', 'admin'],
                 'default' => 'student'
             ],
-            'password' => [
-                'type' => 'VARCHAR',
-                'constraint' => 255,
-                'null' => false
-            ]  
+            'created_at' => [
+                'type' => 'DATETIME',
+                'null' => true
+            ],
+            'updated_at' => [
+                'type' => 'DATETIME',
+                'null' => true
+            ]
             ]);
 
             $this->forge->addKey('userID');

@@ -34,6 +34,9 @@
                 <li class="nav-item mx-4">
                     <a href="<?= base_url('contact')?>" class="nav-link text-white"> <i class="fa-solid fa-envelope"></i> Contact</a>
                 </li>
+                <li class="nav-item mx-4">
+                    <a class="btn btn-outline-light" href="<?= base_url('login') ?>" role="button">Login</a>
+                </li>
             </ul>
                 <!-- <ul class="navbar-nav">
                 <li class="nav-item dropdown">

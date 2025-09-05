@@ -5,7 +5,31 @@ use CodeIgniter\Router\RouteCollection;
 /**
  * @var RouteCollection $routes
  */
+
+// Home Page
 $routes->get('/', 'Home::index');
 $routes->get('/home', 'Home::index');
+
+// About Page
 $routes->get('/about', 'Home::about');
+
+// Contact Page
 $routes->get('/contact', 'Home::contact');
+
+ 
+//Lab Exe 4
+
+//Register
+$routes->get('register', 'Auth::register'); 
+$routes->post('register', 'Auth::procRegister');
+
+//Login
+$routes->get('login', 'Auth::login');
+$routes->post('login', 'Auth::loginAttempt');
+
+
+//Logout
+$routes->get('logout', 'Auth::logout'); 
+
+//Dashboard
+$routes->get('dashboard', 'Auth::dashboard'); 
