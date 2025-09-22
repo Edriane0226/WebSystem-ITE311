@@ -12,19 +12,17 @@ class UserSeeder extends Seeder
             [
             'name' => 'Edriane O. Bangonon',
             'email' => 'edriane@gmail.com',
-            'role' => 'student',
+            'role' => 'user',
             'password' => password_hash('edriane1109', PASSWORD_DEFAULT)
             ],
             [
             'name' => 'Juan Two Three',
             'email' => 'Jua@gmail.com',
-            'role' => 'instructor',
+            'role' => 'user',
             'password' => password_hash('kobe1109', PASSWORD_DEFAULT)
             ],
             [
-            'firstName' => 'Max',
-            'lastName' => 'Verstappem',
-            'middleName' => 'Emillian',
+            'name' => 'Max Verstappen',
             'email' => 'maxVerstappen@gmail.com',
             'role' => 'admin',
             'password' => password_hash('max1109', PASSWORD_DEFAULT)

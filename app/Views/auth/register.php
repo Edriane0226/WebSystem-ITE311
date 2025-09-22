@@ -31,28 +31,28 @@
 
           <div class="mb-3">
               <label class="form-label">Name</label>
-              <input type="text" name="name" class="form-control" value="<?= set_value('name') ?>">
+              <input type="text" name="name" id="name" class="form-control" value="<?= set_value('name') ?>">
           </div>
           <div class="mb-3">
               <label class="form-label">Email</label>
-              <input type="email" name="email" class="form-control" value="<?= set_value('email') ?>">
+              <input type="email" name="email" id="email" class="form-control" value="<?= set_value('email') ?>">
           </div>
           <div class="mb-3">
               <label class="form-label">Password</label>
-              <input type="password" name="password" class="form-control">
+              <input type="password" name="password" class="form-control" required>
           </div>
           <div class="mb-3">
               <label class="form-label">Confirm Password</label>
-              <input type="password" name="password_confirm" class="form-control">
+              <input type="password" name="password_confirm" class="form-control" required>
           </div>
-          <div class="mb-3">
+          <!-- <div class="mb-3">
               <label class="form-label">Category</label>
               <select name="role" class="form-control">
                   <option value="">-- Select Role --</option>
-                  <option value="student" <?= set_select('role', 'student') ?>>Student</option>
-                  <option value="admin" <?= set_select('role', 'admin') ?>>Admin</option>
+                  <option value="student" >Student</option>
+                  <option value="admin" >Admin</option>
               </select>
-          </div>
+          </div> -->
           <div class="d-grid">
               <button type="submit" class="btn btn-primary">Register</button>
           </div>

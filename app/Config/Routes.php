@@ -21,11 +21,11 @@ $routes->get('/contact', 'Home::contact');
 
 //Register
 $routes->get('register', 'Auth::register'); 
-$routes->post('register', 'Auth::procRegister');
+$routes->post('register', 'Auth::register');
 
 //Login
 $routes->get('login', 'Auth::login');
-$routes->post('login', 'Auth::loginAttempt');
+$routes->post('login', 'Auth::login');
 
 
 //Logout

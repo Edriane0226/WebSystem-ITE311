@@ -21,20 +21,20 @@
     <div class="col-md-6 d-flex flex-column justify-content-center p-5 bg-white">
       <h2 class="mb-4 text-center">Login</h2>
 
-      <?php if(isset($validation)): ?>
-        <div class="alert alert-danger"><?= $validation->listErrors() ?></div>
-      <?php endif; ?>
-
       <form action="<?= base_url('login')?>" method="post">
+
         <div class="mb-3">
           <label class="form-label">Email</label>
           <input type="email" name="email" class="form-control" value="<?= set_value('email') ?>">
         </div>
+
         <div class="mb-3">
           <label class="form-label">Password</label>
           <input type="password" name="password" class="form-control">
         </div>
+
         <button type="submit" class="btn btn-primary w-100">Login</button>
+
         <p class="mt-3 text-center">
           Don’t have an account? 
           <a href="<?= base_url('register') ?>">Register</a>
@@ -47,6 +47,16 @@
         <div class="alert alert-success">
           <?= session()->getFlashdata('success') ?>
         </div>
+      <?php endif; ?>
+
+      <?php if(session()->getFlashdata('error')): ?>
+          <div class="alert alert-danger">
+            <?= session()->getFlashdata('error') ?>
+          </div>
+      <?php endif; ?>
+
+      <?php if(isset($validation)): ?>
+        <div class="alert alert-danger"><?= $validation->listErrors() ?></div>
       <?php endif; ?>
     </div>
 

@@ -10,15 +10,8 @@ class Auth extends Controller
     public function register()
     {
         helper(['form']);
-        return view('auth/register');
-    }
 
-    public function procRegister()
-    {
-        helper(['form']);
-        $session = session();
-        $userModel = new UserModel();
-
+        if ($this->request->getMethod() == 'POST') {
         $rules = [
             // 'first_Name'     => 'required|min_length[3]',
             // 'last_Name'      => 'required|min_length[3]',
@@ -28,13 +21,11 @@ class Auth extends Controller
             'password'  => 'required|min_length[6]',
             'password_confirm' => 'matches[password]'
         ];
+    
 
-        if (!$this->validate($rules)) {
-            return view('auth/register', [
-                'validation' => $this->validator
-            ]);
-        }
+        if ($this->validate($rules)) {
         // Iinsert na sa Users Table
+        $userModel = new UserModel();
         $userModel->save([
             // 'first_Name'      => $this->request->getVar('first_Name'),
             // 'last_Name'       => $this->request->getVar('last_Name'),
@@ -42,48 +33,52 @@ class Auth extends Controller
             'name'       => $this->request->getVar('name'),
             'email'      => $this->request->getVar('email'),
             'password'   => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
-            'role'       => $this->request->getVar('role'),
+            'role'       => 'User',
         ]);
-        $session->setFlashdata('success', 'Registration successful. Please login.');
-        return redirect()->to('login');
+        
+        return redirect()->to('login')->with('success', 'Registration Successful. Please login.');
+        } else {
+            return view('auth/register', ['validation' => $this->validator]);
+        }
+      }
+      return view('auth/register');
     }
 
     public function login()
     {
         helper(['form']);
+
+        if ($this->request->getMethod() == 'POST') {
+            $session = session();
+            $userModel = new UserModel();
+            
+            $rules = [
+                'email'    => 'required|valid_email',
+                'password' => 'required|min_length[6]',
+            ];
+
+            if (!$this->validate($rules)) {
+                return view('auth/login', ['validation' => $this->validator]);
+            }
+
+            $user = $userModel->where('email', $this->request->getVar('email'))->first();
+
+            if ($user && password_verify($this->request->getVar('password'), $user['password'])) {
+                $session->set([
+                    'userID'    => $user['userID'],
+                    'name'      => $user['name'],
+                    'email'     => $user['email'],
+                    'role'      => $user['role'],
+                    'isLoggedIn'=> true
+                ]);
+                $session->setFlashdata('success', 'Welcome ' . $user['name']);
+                return redirect()->to('dashboard');
+            }
+
+            $session->setFlashdata('error', 'Invalid login credentials');
+            return redirect()->back();
+        }
         return view('auth/login');
-    }
-
-    public function loginAttempt()
-    {
-        helper(['form']);
-        $session = session();
-        $userModel = new UserModel();
-
-        $rules = [
-            'email'    => 'required|valid_email',
-            'password' => 'required|min_length[6]',
-        ];
-
-        if (!$this->validate($rules)) {
-            return view('auth/login', ['validation' => $this->validator]);
-        }
-
-        $user = $userModel->where('email', $this->request->getVar('email'))->first();
-
-        if ($user && password_verify($this->request->getVar('password'), $user['password'])) {
-            $session->set([
-                'userID'    => $user['userID'],
-                'email'     => $user['email'],
-                'role'      => $user['role'],
-                'isLoggedIn'=> true
-            ]);
-            $session->setFlashdata('success', 'Welcome ' . $user['name']);
-            return redirect()->to('dashboard');
-        }
-
-        $session->setFlashdata('error', 'Invalid login credentials');
-        return redirect()->back();
     }
 
     public function logout()
