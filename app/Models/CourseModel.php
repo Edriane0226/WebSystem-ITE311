@@ -14,4 +14,8 @@ class CourseModel extends Model
     public function getCourses($user_id) {
         return $this->where('teacherID', $user_id)->findAll();
     }
+    // Get all courses
+    public function getAllCourses() {
+        return $this->findAll();
+    }
 }

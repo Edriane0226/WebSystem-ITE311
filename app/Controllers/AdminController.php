@@ -6,23 +6,22 @@ use App\Models\UserModel;
 use App\Models\CourseModel; 
 use CodeIgniter\Controller;
 
-Class AdminController extends BaseController {
+Class AdminController extends Controller {
 
     public function dashboard() {
 
         $session = session();
 
-        if (!$session->get('role') == 'admin') {
+        if ($session->get('role') !== 'admin') {
             return redirect()->to('/login');
         }
-
         $UserModel = new UserModel();
-        $courseModel = new CourseModel();
+        $CourseModel = new CourseModel();
         
         $admins = $UserModel->getUsersByRole('admin');
         $teachers = $UserModel->getUsersByRole('teacher');  
         $students = $UserModel->getUsersByRole('student');
-        $courses = $courseModel->getCourses();
+        $courses = $CourseModel->getAllCourses();
 
         $data = [
             'admin' => $admins,
@@ -30,7 +29,7 @@ Class AdminController extends BaseController {
             'student' => $students,
             'courses' => $courses
         ];
-
+        
         return view('admin/dashboard', $data);
     }
 }

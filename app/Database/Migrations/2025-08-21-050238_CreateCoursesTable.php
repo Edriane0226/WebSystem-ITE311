@@ -26,7 +26,7 @@ class CreateCoursesTable extends Migration
             ],
         ]);
         $this->forge->addKey('courseID');
-        $this->forge->addForeignKey('instructorID', 'users', 'userID', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('teacherID', 'users', 'userID', 'CASCADE', 'CASCADE');
         $this->forge->createTable('courses');
     }
 

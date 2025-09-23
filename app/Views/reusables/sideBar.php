@@ -13,8 +13,41 @@
     <h4 class="mt-3 text-white">Learning Management</h4>
     <ul class="nav nav-pills flex-column mb-auto">
       <li class="nav-item">
-        <a href="#" class="nav-link active mt-4">Dashboard</a>
+        <?php if (session()->get('role') == 'admin'): ?>
+          <li class="nav-item">
+            <a href="<?= base_url('admin/users') ?>" class="nav-link text-white">Admin Dashboard</a>
+          </li>
+        <?php endif; ?>
+        <?php if (session()->get('role') == 'teacher'): ?>
+          <li class="nav-item">
+            <a href="<?= base_url('teacher/users') ?>" class="nav-link text-white">Teacher Dashboard</a>
+          </li>
+        <?php endif; ?>
+        <?php if (session()->get('role') == 'student'): ?>
+          <li class="nav-item">
+            <a href="<?= base_url('student/users') ?>" class="nav-link text-white">Student Dashboard</a>
+          </li>
+        <?php endif; ?>
       </li>
+
+      <li class="nav-item">
+          <?php if (session()->get('role') == 'admin'): ?>
+          <li class="nav-item">
+            <a href="<?= base_url('admin/users') ?>" class="nav-link text-white">Admin Dashboard</a>
+          </li>
+        <?php endif; ?>
+        <?php if (session()->get('role') == 'teacher'): ?>
+          <li class="nav-item">
+            <a href="<?= base_url('teacher/users') ?>" class="nav-link text-white">Teacher Dashboard</a>
+          </li>
+        <?php endif; ?>
+        <?php if (session()->get('role') == 'student'): ?>
+          <li class="nav-item">
+            <a href="<?= base_url('student/users') ?>" class="nav-link text-white">Student Dashboard</a>
+          </li>
+        <?php endif; ?>
+      </li>
+
     </ul>
     <hr>
     <a href="<?= base_url('logout')?>" class="nav-link text-danger">Logout</a>

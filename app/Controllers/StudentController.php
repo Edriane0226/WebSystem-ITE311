@@ -1,28 +1,26 @@
 <?php
-
 namespace App\Controllers;
 
-use App\Models\UserModel;
 use App\Models\CourseModel;
 use App\Models\EnrollmentModel; 
 use CodeIgniter\Controller;
 
-Class AdminController extends BaseController {
+Class StudentController extends Controller {
 
     public function dashboard() {
 
         $session = session();
 
-        if (!$session->get('role') == 'student') {
+        if ($session->get('role') !== 'student') {
             return redirect()->to('/login');
         }
 
-        $user_id = $session->get('user_id');
 
+        $user_id = $session->get('userID');
         $CourseModel = new CourseModel();
         $EnrollmentModel = new EnrollmentModel();
         
-        $courses = $CourseModel->getCourses();
+        $courses = $CourseModel->getAllCourses();
         $enrollments = $EnrollmentModel->getEnrollmentsByStudent($user_id);
 
         $data = [
