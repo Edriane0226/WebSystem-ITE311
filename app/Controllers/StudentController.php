@@ -25,9 +25,10 @@ Class StudentController extends Controller {
 
         $data = [
             'courses' => $courses,
-            'enrollments' => $enrollments
+            'enrollments' => $enrollments,
+            'role' => $session->get('role')
         ];
 
-        return view('student/dashboard', $data);
+        return view('auth/dashboard', $data);
     }
 }

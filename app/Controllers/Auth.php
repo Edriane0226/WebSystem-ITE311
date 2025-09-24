@@ -95,12 +95,12 @@ class Auth extends Controller
         $userRole = session()->get('role');
         
         if ($userRole == 'admin') {
-            return view('admin/dashboard');
+            return redirect()->to('/admin');
         } elseif ($userRole == 'teacher') {
-            return view('teacher/dashboard');
+            return redirect()->to('/teacher');
         } elseif ($userRole == 'student') {
-            return view('student/dashboard');
-        }   
+            return redirect()->to('/student');
+        }
     }
 
     /* 

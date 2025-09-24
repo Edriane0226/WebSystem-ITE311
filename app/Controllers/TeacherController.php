@@ -25,14 +25,14 @@ Class TeacherController extends Controller {
 
         $students = $UserModel->getUsersByRole('student');
         $courses = $CourseModel->getCourses($user_id);
-        $enrollments = $EnrollmentModel->getEnrollmentsByCourse($courses);
+        //$enrollments = $EnrollmentModel->getEnrollmentsByCourse($courses);
 
         $data = [
             'students' => $students,
             'courses' => $courses,
-            'enrollments' => $enrollments
+            'role' => $session->get('role')
         ];
 
-        return view('teacher/dashboard', $data);
+        return view('auth/dashboard', $data);
     }
 }

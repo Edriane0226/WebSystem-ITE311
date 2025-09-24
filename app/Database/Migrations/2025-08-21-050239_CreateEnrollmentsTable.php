@@ -15,7 +15,7 @@ class CreateEnrollmentsTable extends Migration
                 'unsigned' => true,
                 'auto_increment' => true
             ],
-            'userID' => [
+            'studentID' => [
                 'type' => 'INT',
                 'constraint' => 10,
                 'unsigned' => true
@@ -32,7 +32,7 @@ class CreateEnrollmentsTable extends Migration
         ]);
 
         $this->forge->addKey('enrollmentID');
-        $this->forge->addForeignKey('userID', 'users', 'userID', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('studentID', 'users', 'userID', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('courseID', 'courses', 'courseID', 'CASCADE', 'CASCADE');
         $this->forge->createTable('enrollments');
     }

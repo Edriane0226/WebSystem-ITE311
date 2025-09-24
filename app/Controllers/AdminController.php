@@ -30,6 +30,6 @@ Class AdminController extends Controller {
             'courses' => $courses
         ];
         
-        return view('admin/dashboard', $data);
+        return view('auth/dashboard', $data);
     }
 }

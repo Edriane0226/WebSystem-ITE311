@@ -6,13 +6,13 @@ use CodeIgniter\Model;
 class EnrollmentModel extends Model {
     protected $table = 'enrollments';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['student_id', 'course_id'];
+    protected $allowedFields = ['studentID', 'courseID'];
 
     public function getEnrollmentsByStudent($studentId) {
-        return $this->where('student_id', $studentId)->findAll();
+        return $this->where('studentID', $studentId)->findAll();
     }
 
     public function getEnrollmentsByCourse($courseId) {
-        return $this->where('course_id', $courseId)->findAll();
+        return $this->where('courseID', $courseId)->findAll();
     }
 }

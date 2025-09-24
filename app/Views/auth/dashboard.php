@@ -8,30 +8,34 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>Student Dashboard</title>
+    <title> Dashboard</title>
 </head>
 <body class="d-flex">
     <div class="container p-3">
-        <h3>Student Dashboard</h3>
+        <h3>Dashboard</h3>
+        <h4 class="mt-3 text-muted">Welcome, <?= esc($role) ?>!</h4>
     
         <div class="row">
-            <div class="col-md-3">
-                <div class="card mt-5">
-                    <div class="card-body">
-                        <h3 class="card-title">Title</h3>
-                        <h6 class="card-subtitle mb-2 text-muted">Subtitle?</h6>
-                    </div>
-                </div>
-            </div>
+            <?php if($role == 'student'): ?>
 
-             <div class="col-md-3">
+             <div class="col-md-4">
                 <div class="card mt-5">
                     <div class="card-body">
-                        <h3 class="card-title">Title</h3>
+                        <h4 class="card-title">Subject 1</h4>
                         <h6 class="card-subtitle mb-2 text-muted">Subtitle?</h6>
                     </div>
                 </div>
             </div>
+            <?php elseif($role == 'teacher'): ?>
+            <div class="col-md-3 ms-5 mt-4">
+                <h4>ahhhh</h4>
+                </div>
+            </div>
+            <?php elseif($role == 'admin'): ?>
+            <div class="col-md-3 ms-5 mt-4">
+                <h4>ahhhh</h4>
+                </div>
+            <?php endif; ?>
         </div>
         
 
