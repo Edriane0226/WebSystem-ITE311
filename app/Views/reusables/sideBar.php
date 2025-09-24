@@ -15,7 +15,7 @@
     <ul class="nav nav-pills flex-column mb-auto">
       <?php if (session()->get('role') == 'admin'): ?>
         <li class="nav-item">
-          <a href="<?= base_url('admin/users') ?>" class="nav-link text-white bg-primary rounded px-3">
+          <a href="<?= base_url('admin/users') ?>" class="nav-link text-white bg-info rounded px-3">
             Admin Dashboard
           </a>
         </li>
@@ -23,7 +23,7 @@
 
       <?php if (session()->get('role') == 'teacher'): ?>
         <li class="nav-item">
-          <a href="<?= base_url('teacher/users') ?>" class="nav-link text-white bg-success rounded px-3">
+          <a href="<?= base_url('teacher/users') ?>" class="nav-link text-white bg-info rounded px-3">
             Teacher Dashboard
           </a>
         </li>
@@ -31,8 +31,15 @@
 
       <?php if (session()->get('role') == 'student'): ?>
         <li class="nav-item">
-          <a href="<?= base_url('student/users') ?>" class="nav-link text-white bg-info rounded px-3">
+          <a href="<?= base_url('') ?>" class="nav-link text-white bg-info rounded px-3">
             Student Dashboard
+          </a>
+        </li>
+      <?php endif; ?>
+      <?php if (session()->get('role') == 'admin' || session()->get('role') == 'teacher'): ?>
+        <li class="nav-item">
+          <a href="<?= base_url('') ?>" class="nav-link text-white bg-info rounded px-3 mt-3">
+            User Management
           </a>
         </li>
       <?php endif; ?>

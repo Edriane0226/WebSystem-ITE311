@@ -28,7 +28,8 @@ Class StudentController extends Controller {
             'enrollments' => $enrollments,
             'role' => $session->get('role')
         ];
-
+        
+        include  'app\Views\reusables\sideBar.php';
         return view('auth/dashboard', $data);
     }
 }

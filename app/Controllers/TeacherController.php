@@ -32,7 +32,8 @@ Class TeacherController extends Controller {
             'courses' => $courses,
             'role' => $session->get('role')
         ];
-
+        
+        include  'app\Views\reusables\sideBar.php';
         return view('auth/dashboard', $data);
     }
 }

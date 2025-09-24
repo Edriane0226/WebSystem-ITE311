@@ -1,7 +1,3 @@
-<?php
-    // Temporary sa to see the sidebar in making the Design
-    include  'app\Views\reusables\sideBar.php'
-?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,23 +14,90 @@
         <div class="row">
             <?php if($role == 'student'): ?>
 
-             <div class="col-md-4">
-                <div class="card mt-5">
-                    <div class="card-body">
-                        <h4 class="card-title">Subject 1</h4>
-                        <h6 class="card-subtitle mb-2 text-muted">Subtitle?</h6>
+                <div class="col-md-4">
+                    <div class="card mt-5">
+                        <div class="card-body">
+                            <h4 class="card-title">Subject 1</h4>
+                            <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
+                        </div>
                     </div>
                 </div>
-            </div>
+
+                <div class="col-md-4">
+                    <div class="card mt-5">
+                        <div class="card-body">
+                            <h4 class="card-title">Subject 1</h4>
+                            <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                            <h5 class="mb-2 text-muted">Assignments</h5>
+                        </div>
+                    </div>
+                </div>
+
             <?php elseif($role == 'teacher'): ?>
-            <div class="col-md-3 ms-5 mt-4">
-                <h4>ahhhh</h4>
+
+                <div class="col-md-8">
+                    <div class="card mt-5">
+                        <div class="card-body">
+                            <h4 class="card-title">Subjects</h4>
+                            <!-- br sa ahahha -->
+                            <br><br><br><br><br><br> 
+                            <button class="btn btn-primary">Add Subject</button>
+                        </div>
+                    </div>
                 </div>
-            </div>
+
+                <div class="col-md-3 ms-5 mt-4">
+                    <h4>Notifications</h4>
+                </div>
+
+                <div class="col-md-8">
+                    <div class="card mt-5">
+                        <div class="card-body">
+                            <h4 class="card-title">Courses</h4>
+                            <!-- br sa ahahha -->
+                            <br><br><br><br><br><br> 
+                            <button class="btn btn-primary">Add Course</button>
+                        </div>
+                    </div>
+                </div>
+
             <?php elseif($role == 'admin'): ?>
-            <div class="col-md-3 ms-5 mt-4">
-                <h4>ahhhh</h4>
+                
+                <h2 class="mt-3">Statistics</h2>
+                <div class="col-md-6">
+                    <div class="card mt-2">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Users</h4>
+                            <table class="table">
+                                <tr>
+                                    <th>User ID</th>
+                                    <th>Name</th>
+                                    <th>Role</th>
+                                </tr>
+                            </table> 
+                        </div>
+                    </div>
                 </div>
+                <div class="col-md-6">
+                    <div class="card mt-2">
+                        <div class="card-body">
+                            <h4 class="card-title">Total Courses</h4>
+                            <table class="table">
+                                <tr>
+                                    <th>Course ID</th>
+                                    <th>Name</th>
+                                    <th>Date Published</th>
+                                </tr>
+                            </table> 
+                        </div>
+                    </div>
+                </div>
+                
             <?php endif; ?>
         </div>
         

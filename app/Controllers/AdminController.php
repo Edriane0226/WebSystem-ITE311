@@ -27,9 +27,11 @@ Class AdminController extends Controller {
             'admin' => $admins,
             'teacher' => $teachers,
             'student' => $students,
-            'courses' => $courses
+            'courses' => $courses,
+            'role' => $session->get('role')
         ];
         
+        include  'app\Views\reusables\sideBar.php';
         return view('auth/dashboard', $data);
     }
 }
