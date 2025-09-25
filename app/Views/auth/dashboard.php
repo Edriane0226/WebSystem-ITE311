@@ -9,10 +9,10 @@
 <body class="d-flex">
     <div class="container p-3">
         <h3>Dashboard</h3>
-        <h4 class="mt-3 text-muted">Welcome, <?= esc($role) ?>!</h4>
+        <h4 class="mt-3 text-muted">Welcome, <?= $name ?>!</h4>
     
         <div class="row">
-            <?php if($role == 'student'): ?>
+            <?php if( $role == 'student' ): ?>
 
                 <div class="col-md-4">
                     <div class="card mt-5">
@@ -38,7 +38,7 @@
                     </div>
                 </div>
 
-            <?php elseif($role == 'teacher'): ?>
+            <?php elseif( $role == 'teacher' ): ?>
 
                 <div class="col-md-8">
                     <div class="card mt-5">
@@ -66,7 +66,7 @@
                     </div>
                 </div>
 
-            <?php elseif($role == 'admin'): ?>
+            <?php elseif( $role == 'admin' ): ?>
                 
                 <h2 class="mt-3">Statistics</h2>
                 <div class="col-md-6">

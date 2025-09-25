@@ -14,8 +14,4 @@ class UserModel extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
 
-    // Method to get users by role akong gi set
-    public function getUsersByRole($role) {
-        return $this->where('role', $role)->findAll();
-    }
 }

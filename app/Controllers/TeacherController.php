@@ -17,23 +17,6 @@ Class TeacherController extends Controller {
             return redirect()->to('/login');
         }
 
-        $user_id = $session->get('user_id');
-
-        $UserModel = new UserModel();
-        $CourseModel = new CourseModel();
-        $EnrollmentModel = new EnrollmentModel();
-
-        $students = $UserModel->getUsersByRole('student');
-        $courses = $CourseModel->getCourses($user_id);
-        //$enrollments = $EnrollmentModel->getEnrollmentsByCourse($courses);
-
-        $data = [
-            'students' => $students,
-            'courses' => $courses,
-            'role' => $session->get('role')
-        ];
-        
-        include  'app\Views\reusables\sideBar.php';
-        return view('auth/dashboard', $data);
+        return view('reusables/sidebar') . view('auth/dashboard');
     }
 }

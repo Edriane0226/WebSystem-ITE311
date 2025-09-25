@@ -92,18 +92,48 @@ class Auth extends Controller
         if (!session()->get('isLoggedIn')) {
             return redirect()->to('login');
         }
-        $userRole = session()->get('role');
-        
-        if ($userRole == 'admin') {
-            return redirect()->to('/admin');
-        } elseif ($userRole == 'teacher') {
-            return redirect()->to('/teacher');
-        } elseif ($userRole == 'student') {
-            return redirect()->to('/student');
-        }
-    }
 
-    /* 
+        //Old Lab 5 Manual
+        // $userRole = session()->get('role');
+        
+        // if ($userRole == 'admin') {
+        //     return redirect()->to('/admin');
+        // } elseif ($userRole == 'teacher') {
+        //     return redirect()->to('/teacher');
+        // } elseif ($userRole == 'student') {
+        //     return redirect()->to('/student');
+        // }
+        
+        $session = session();
+        $userModel = new UserModel();
+        if($session->get('role') == 'admin'){
+            $role = $session->get('role');
+
+            $data = [
+                'name' => $session->get('name'),
+                'email' => $session->get('email'),
+                'role' => $session->get('role')
+            ];
+        }elseif($session->get('role') == 'teacher'){
+            $role = $session->get('role');
+
+            $data = [
+                'name' => $session->get('name'),
+                'email' => $session->get('email'),
+                'role' => $session->get('role')
+            ];
+        }elseif($session->get('role') == 'student'){
+            $role = $session->get('role');
+
+            $data = [
+                'name' => $session->get('name'),
+                'email' => $session->get('email'),
+                'role' => $session->get('role')
+            ];
+        }
+        return view('templates/header', $data) . view('auth/dashboard', $data);
+    }
+    /*
         Guides I see
         Models: https://codeigniter.com/user_guide/models/model.html
         Helpers: https://codeigniter.com/user_guide/helpers/index.html

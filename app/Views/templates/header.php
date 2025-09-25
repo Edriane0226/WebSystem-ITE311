@@ -7,13 +7,12 @@
 </head>
 <body class="d-flex">
 
-  <!-- Sidebar -->
+  <!-- Sidebar gyud siya sir sayang man -->
   <div class="d-flex flex-column flex-shrink-0 p-3 bg-dark vh-100" style="width: 220px;">
-    <h4 class="text-white text-center">Welcome</h4>
-    <h6 class="text-white text-center p-2"><?= session()->get('name') ?></h6>
+    <h4 class="text-white text-center mb-5">LMS</h4>
     
     <ul class="nav nav-pills flex-column mb-auto">
-      <?php if (session()->get('role') == 'admin'): ?>
+      <?php if ($role == 'admin'): ?>
         <li class="nav-item">
           <a href="<?= base_url('admin/users') ?>" class="nav-link text-white bg-info rounded px-3">
             Admin Dashboard
@@ -21,7 +20,7 @@
         </li>
       <?php endif; ?>
 
-      <?php if (session()->get('role') == 'teacher'): ?>
+      <?php if ($role == 'teacher'): ?>
         <li class="nav-item">
           <a href="<?= base_url('teacher/users') ?>" class="nav-link text-white bg-info rounded px-3">
             Teacher Dashboard
@@ -29,17 +28,26 @@
         </li>
       <?php endif; ?>
 
-      <?php if (session()->get('role') == 'student'): ?>
+      <?php if ($role == 'student'): ?>
         <li class="nav-item">
           <a href="<?= base_url('') ?>" class="nav-link text-white bg-info rounded px-3">
             Student Dashboard
           </a>
         </li>
       <?php endif; ?>
-      <?php if (session()->get('role') == 'admin' || session()->get('role') == 'teacher'): ?>
+      <?php if ($role == 'admin'): ?>
         <li class="nav-item">
-          <a href="<?= base_url('') ?>" class="nav-link text-white bg-info rounded px-3 mt-3">
-            User Management
+          <!-- # sa -->
+          <a href="#" class="nav-link text-white bg-info rounded px-3 mt-3">
+            Manage Users
+          </a>
+        </li>
+      <?php endif; ?>
+      <?php if ($role == 'teacher'): ?>
+        <li class="nav-item">
+          <!-- # sa -->
+          <a href="#" class="nav-link text-white bg-info rounded px-3 mt-3">
+             Manage Students
           </a>
         </li>
       <?php endif; ?>

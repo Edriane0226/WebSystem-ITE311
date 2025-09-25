@@ -9,13 +9,4 @@ class CourseModel extends Model
     protected $table      = 'courses';
     protected $primaryKey = 'courseID';
     protected $allowedFields = ['title', 'description', 'teacherID'];
-
-    // Method to get all courses na ginatudluan sa specific nga teacher
-    public function getCourses($user_id) {
-        return $this->where('teacherID', $user_id)->findAll();
-    }
-    // Get all courses
-    public function getAllCourses() {
-        return $this->findAll();
-    }
 }

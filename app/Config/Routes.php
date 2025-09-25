@@ -34,6 +34,8 @@ $routes->get('logout', 'Auth::logout');
 //Dashboard
 $routes->get('dashboard', 'Auth::dashboard'); 
 
-$routes->get('/admin', 'AdminController::dashboard'); 
-$routes->get('/teacher', 'TeacherController::dashboard'); 
-$routes->get('/student', 'StudentController::dashboard'); 
+
+// Sa daan na manual
+// $routes->get('/admin', 'AdminController::dashboard'); 
+// $routes->get('/teacher', 'TeacherController::dashboard'); 
+// $routes->get('/student', 'StudentController::dashboard'); 
