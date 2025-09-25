@@ -19,7 +19,7 @@
           </a>
         </li>
 
-      <?php if ($role == 'teacher'): ?>
+      <?php elseif ($role == 'teacher'): ?>
         <li class="nav-item">
           <a href="<?= base_url('teacher/users') ?>" class="nav-link text-white bg-info rounded px-3">
             Teacher Dashboard
@@ -33,7 +33,8 @@
           </a>
         </li>
       <?php endif; ?>
-      <?php elseif ($role == 'admin'): ?>
+
+      <?php if ($role == 'admin'): ?>
         <li class="nav-item">
           <!-- # sa -->
           <a href="#" class="nav-link text-white bg-info rounded px-3 mt-3">
