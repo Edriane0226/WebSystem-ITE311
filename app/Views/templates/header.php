@@ -18,7 +18,6 @@
             Admin Dashboard
           </a>
         </li>
-      <?php endif; ?>
 
       <?php if ($role == 'teacher'): ?>
         <li class="nav-item">
@@ -26,24 +25,23 @@
             Teacher Dashboard
           </a>
         </li>
-      <?php endif; ?>
 
-      <?php if ($role == 'student'): ?>
+      <?php elseif ($role == 'student'): ?>
         <li class="nav-item">
           <a href="<?= base_url('') ?>" class="nav-link text-white bg-info rounded px-3">
             Student Dashboard
           </a>
         </li>
       <?php endif; ?>
-      <?php if ($role == 'admin'): ?>
+      <?php elseif ($role == 'admin'): ?>
         <li class="nav-item">
           <!-- # sa -->
           <a href="#" class="nav-link text-white bg-info rounded px-3 mt-3">
             Manage Users
           </a>
         </li>
-      <?php endif; ?>
-      <?php if ($role == 'teacher'): ?>
+
+      <?php elseif ($role == 'teacher'): ?>
         <li class="nav-item">
           <!-- # sa -->
           <a href="#" class="nav-link text-white bg-info rounded px-3 mt-3">
