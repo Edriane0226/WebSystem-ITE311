@@ -105,32 +105,12 @@ class Auth extends Controller
         // }
         
         $session = session();
-        $userModel = new UserModel();
-        if($session->get('role') == 'admin'){
-            $role = $session->get('role');
 
             $data = [
                 'name' => $session->get('name'),
                 'email' => $session->get('email'),
                 'role' => $session->get('role')
             ];
-        }elseif($session->get('role') == 'teacher'){
-            $role = $session->get('role');
-
-            $data = [
-                'name' => $session->get('name'),
-                'email' => $session->get('email'),
-                'role' => $session->get('role')
-            ];
-        }elseif($session->get('role') == 'student'){
-            $role = $session->get('role');
-
-            $data = [
-                'name' => $session->get('name'),
-                'email' => $session->get('email'),
-                'role' => $session->get('role')
-            ];
-        }
         return view('templates/header', $data) . view('auth/dashboard', $data);
     }
     /*
