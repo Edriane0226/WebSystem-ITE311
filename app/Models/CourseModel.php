@@ -8,5 +8,5 @@ class CourseModel extends Model
 {
     protected $table      = 'courses';
     protected $primaryKey = 'courseID';
-    protected $allowedFields = ['title', 'description', 'teacherID'];
+    protected $allowedFields = ['courseTitle', 'description', 'teacherID'];
 }

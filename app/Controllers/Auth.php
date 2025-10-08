@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\UserModel; 
 use App\Models\EnrollmentModel;
+use App\Models\CourseModel;
 use CodeIgniter\Controller;
 
 class Auth extends Controller
@@ -104,7 +105,7 @@ class Auth extends Controller
         // } elseif ($userRole == 'student') {
         //     return redirect()->to('/student');
         // }
-        
+        $course = new CourseModel();
         $enrollment = new EnrollmentModel();
         $session = session();
 
@@ -112,8 +113,10 @@ class Auth extends Controller
                 'name' => $session->get('name'),
                 'email' => $session->get('email'),
                 'role' => $session->get('role'),
-                'courses' => $enrollment->getUserEnrollments($session->get('userID'))
+                'enrollments' => $enrollment->getUserEnrollments($session->get('userID')),
+
             ];
+
         return view('templates/header', $data) . view('auth/dashboard', $data);
     }
     /*

@@ -1,3 +1,4 @@
+<?php dd($courses); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,9 +23,9 @@
                             <div class="col-md-4">
                             <div class="card mt-5">
                                     <div class="card-body">
-                                        <h4 class="card-title"><?= $course['name'] ?></h4>
+                                        <h4 class="card-title"><?= $course['courseTitle'] ?></h4>
                                         <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
-                                        <p><?= $course['description'] ?></p>
+                                        <p><?= $course['courseDescription'] ?></p>
                                         <button class="btn btn-primary">Enroll</button>
                                     </div>
                                 </div>
