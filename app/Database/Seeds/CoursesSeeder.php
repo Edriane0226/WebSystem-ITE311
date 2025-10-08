@@ -10,30 +10,32 @@ class CoursesSeeder extends Seeder
     {
         $data = [
             [
-                'name' => 'Mathematics 101',
-                'description' => 'Basic concepts of algebra, geometry, and calculus.',
-                'date_published' => '2023-01-15'
+                'courseTitle' => 'Mathematics 101',
+                'courseDescription' => 'Basic concepts of algebra, geometry, and calculus.',
+                'teacherID' => 2
             ],
             [
-                'name' => 'Introduction to Programming',
-                'description' => 'Fundamentals of programming using Python.',
-                'date_published' => '2023-02-20'
+                'courseTitle' => 'Introduction to Programming',
+                'courseDescription' => 'Fundamentals of programming using Python.',
+                'teacherID' => 2
             ],
             [
-                'name' => 'Web Development',
-                'description' => 'Building websites using HTML, CSS, and JavaScript.',
-                'date_published' => '2023-03-10'
+                'courseTitle' => 'Web Development',
+                'courseDescription' => 'Building websites using HTML, CSS, and JavaScript.',
+                'teacherID' => 2
             ],
             [
-                'name' => 'Database Management',
-                'description' => 'Introduction to SQL and database design principles.',
-                'date_published' => '2023-04-05'
+                'courseTitle' => 'Database Management',
+                'courseDescription' => 'Introduction to SQL and database design principles.',
+                'teacherID' => 2
             ],
             [
-                'name' => 'Data Structures and Algorithms',
-                'description' => 'Understanding data structures and algorithmic techniques.',
-                'date_published' => '2023-05-12'
+                'courseTitle' => 'Data Structures and Algorithms',
+                'courseDescription' => 'Understanding data structures and algorithmic techniques.',
+                'teacherID' => 2
             ]
         ];
+
+        $this->db->table('courses')->insertBatch($data);
     }
 }

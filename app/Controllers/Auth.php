@@ -113,6 +113,7 @@ class Auth extends Controller
                 'name' => $session->get('name'),
                 'email' => $session->get('email'),
                 'role' => $session->get('role'),
+                'courses' => $course->findAll(),
                 'enrollments' => $enrollment->getUserEnrollments($session->get('userID')),
 
             ];

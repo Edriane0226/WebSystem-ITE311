@@ -1,4 +1,3 @@
-<?php dd($courses); ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
