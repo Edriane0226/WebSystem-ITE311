@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.7/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!--Tanggal nako CDN kay naa naman sa header.php-->
     <title> Dashboard</title>
 </head>
 <body class="d-flex">
@@ -13,31 +13,32 @@
     
         <div class="row">
             <?php if( $role == 'student' ): ?>
-
-                <div class="col-md-4">
+                <div class="col-md-8">
                     <div class="card mt-5">
                         <div class="card-body">
-                            <h4 class="card-title">Subject 1</h4>
-                            <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
+                            <h4 class="card-title">Available Courses</h4>
+                            
+                            <?php foreach ($courses as $course):?>
+                            <div class="col-md-4">
+                            <div class="card mt-5">
+                                    <div class="card-body">
+                                        <h4 class="card-title"><?= $course['name'] ?></h4>
+                                        <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
+                                        <p><?= $course['description'] ?></p>
+                                        <button class="btn btn-primary">Enroll</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach;?>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-4">
-                    <div class="card mt-5">
-                        <div class="card-body">
-                            <h4 class="card-title">Subject 1</h4>
-                            <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col-md-4">
+                <div class="col-md-4 , mt-5">
                             <h5 class="mb-2 text-muted">Assignments</h5>
                         </div>
                     </div>
                 </div>
-
             <?php elseif( $role == 'teacher' ): ?>
 
                 <div class="col-md-8">

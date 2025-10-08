@@ -15,9 +15,8 @@ Class Course extends BaseController
         $user_id = session()->get('userID');
         $course_id = $this->request->getPost('course_id');
         
-
         if ($enrollmentModel->isAlreadyEnrolled($user_id, $course_id)) {
-            return redirect()->back()->with('nah', 'Enrolled naman ka');
+            return $this->response->setJSON('Enrolled Naman ka ani nga course');
         }
         $data = [
             'user_id' => $user_id,
@@ -25,6 +24,6 @@ Class Course extends BaseController
             'enrollment_date' => date('Y-m-d'),
         ];
         $enrollmentModel->enrollUser($data);
-        return redirect()->back()->with('Enrolled', 'Enrolled naka woaw!');
+        return $this->response->setJSON('Enrolled Naka woaw');
     }
 }

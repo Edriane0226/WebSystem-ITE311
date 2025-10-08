@@ -3,6 +3,7 @@
 namespace App\Controllers;
 
 use App\Models\UserModel; 
+use App\Models\EnrollmentModel;
 use CodeIgniter\Controller;
 
 class Auth extends Controller
@@ -104,12 +105,14 @@ class Auth extends Controller
         //     return redirect()->to('/student');
         // }
         
+        $enrollment = new EnrollmentModel();
         $session = session();
 
             $data = [
                 'name' => $session->get('name'),
                 'email' => $session->get('email'),
-                'role' => $session->get('role')
+                'role' => $session->get('role'),
+                'courses' => $enrollment->getUserEnrollments($session->get('userID'))
             ];
         return view('templates/header', $data) . view('auth/dashboard', $data);
     }
