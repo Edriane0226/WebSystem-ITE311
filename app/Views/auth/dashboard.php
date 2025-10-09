@@ -17,28 +17,45 @@
                     <div class="card mt-5">
                         <div class="card-body">
                             <h4 class="card-title">Available Courses</h4>
-                            
-                            <?php foreach ($courses as $course):?>
-                            <div class="col-md-4">
-                                <div class="card mt-5 courseCard" data-course_id="<?= $course['courseID'] ?>">
-                                    <div class="card-body">
-                                        <h4 class="card-title"><?= $course['courseTitle'] ?></h4>
-                                        <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
-                                        <p><?= $course['courseDescription'] ?></p>
-                                        <button class="btn btn-primary enroll">Enroll</button>
+                            <div class="row">
+                                <?php foreach ($courses as $course):?>
+                                <div class="col-md-4">
+                                    <div class="card mt-5 courseCard" data-course_id="<?= $course['courseID'] ?>">
+                                        <div class="card-body">
+                                            <h4 class="card-title"><?= $course['courseTitle'] ?></h4>
+                                            <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
+                                            <p><?= $course['courseDescription'] ?></p>
+                                            <button class="btn btn-primary enroll">Enroll</button>
+                                        </div>
                                     </div>
                                 </div>
+                                <?php endforeach; ?>
                             </div>
-                        <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-4 mt-5">
-                            <h5 class="mb-2 text-muted">Assignments</h5>
+                <div class="col-md-8">
+                    <div class="card mt-5">
+                        <div class="card-body">
+                            <h4 class="card-title">Enrolled Courses</h4>
+                            <div class="row" id="enrolledCourses">
+                                <?php foreach ($enrollments as $enrolled):?>
+                                <div class="col-md-4">
+                                    <div class="card mt-5">
+                                        <div class="card-body">
+                                            <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
+                                            <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
+                                            <p><?= $enrolled['courseDescription'] ?></p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <?php endforeach; ?>
+                            </div>
                         </div>
                     </div>
                 </div>
+
             <?php elseif( $role == 'teacher' ): ?>
 
                 <div class="col-md-8">
@@ -106,7 +123,6 @@
     </div>
 </body>
 </html>
-
 <script>
 $(".enroll").click(function(e){
     e.preventDefault();
@@ -114,16 +130,29 @@ $(".enroll").click(function(e){
     var bttn = $(this);
     var courseCard = bttn.closest(".courseCard");
     var courseID = courseCard.data("course_id");
+    
+    var courseTitle = courseCard.find(".card-title").text();
+    var courseDescription = courseCard.find("p").text();
 
     $.post("<?= base_url('/course/enroll') ?>", { course_id: courseID }, function(data){
         if (data.success) {
-            courseCard.append("<div class='alert alert-success mt-3'>" + data.message + "</div>");
             bttn.prop("disabled", true).text("Enrolled");
-        } else {
-            courseCard.append("<div class='alert alert-warning mt-3'>" + data.message + "</div>");
-        }
+            courseCard.append("<div class='alert alert-success mt-3'>" + data.message + "</div>");
 
-        $("#enrolledCourses").load("/course/enrolled-list");
+            $("#enrolledCourses").append(`
+                <div class="col-md-4">
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h4 class="card-title">${courseTitle}</h4>
+                            <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
+                            <p>${courseDescription}</p>
+                        </div>
+                    </div>
+                </div>
+            `);
+        } else {
+            courseCard.append("<div class='alert alert-danger mt-3'>" + data.message + "</div>");
+        }
     }, 'json');
 });
 </script>

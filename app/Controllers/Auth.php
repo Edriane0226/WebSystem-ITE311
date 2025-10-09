@@ -108,14 +108,13 @@ class Auth extends Controller
         $course = new CourseModel();
         $enrollment = new EnrollmentModel();
         $session = session();
-
+        
             $data = [
                 'name' => $session->get('name'),
                 'email' => $session->get('email'),
                 'role' => $session->get('role'),
                 'courses' => $course->findAll(),
                 'enrollments' => $enrollment->getUserEnrollments($session->get('userID')),
-
             ];
 
         return view('templates/header', $data) . view('auth/dashboard', $data);
