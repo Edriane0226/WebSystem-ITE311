@@ -152,6 +152,7 @@ $(".enroll").click(function(e){
             `);
         } else {
             courseCard.append("<div class='alert alert-danger mt-3'>" + data.message + "</div>");
+            bttn.prop("disabled", true).text("Enrolled");
         }
     }, 'json');
 });
