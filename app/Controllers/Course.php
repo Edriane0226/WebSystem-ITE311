@@ -13,7 +13,7 @@ Class Course extends BaseController
 
         $enrollmentModel = new EnrollmentModel();
         $user_id = session()->get('userID');
-        $course_id = $this->request->getPost('course_id');
+        $course_id = base64_decode($this->request->getPost('course_id'));
         
         if ($enrollmentModel->isAlreadyEnrolled($user_id, $course_id)) {
             return $this->response->setJSON(['success' => false, 'message' => 'Enrolled Naman ka ani nga course.']);

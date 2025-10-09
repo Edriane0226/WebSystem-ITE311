@@ -20,7 +20,7 @@
                             <div class="row">
                                 <?php foreach ($courses as $course):?>
                                 <div class="col-md-4">
-                                    <div class="card mt-5 courseCard" data-course_id="<?= $course['courseID'] ?>">
+                                    <div class="card mt-5 courseCard" data-course_id="<?= base64_encode($course['courseID']) ?>">
                                         <div class="card-body">
                                             <h4 class="card-title"><?= $course['courseTitle'] ?></h4>
                                             <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
@@ -130,30 +130,36 @@ $(".enroll").click(function(e){
     var bttn = $(this);
     var courseCard = bttn.closest(".courseCard");
     var courseID = courseCard.data("course_id");
-    
-    var courseTitle = courseCard.find(".card-title").text();
-    var courseDescription = courseCard.find("p").text();
 
-    $.post("<?= base_url('/course/enroll') ?>", { course_id: courseID }, function(data){
-        if (data.success) {
-            bttn.prop("disabled", true).text("Enrolled");
-            courseCard.append("<div class='alert alert-success mt-3'>" + data.message + "</div>");
+    $.ajax({
+        url: "<?= base_url('/course/enroll') ?>",
+        type: "POST",
+        data: { course_id: courseID },
+        dataType: "json",
+        success: function(data) {
+            if(data.success) {
+                bttn.prop("disabled", true).text("Enrolled");
+                courseCard.append("<div class='alert alert-success mt-3'>" + data.message + "</div>");
 
-            $("#enrolledCourses").append(`
-                <div class="col-md-4">
-                    <div class="card mt-3">
-                        <div class="card-body">
-                            <h4 class="card-title">${courseTitle}</h4>
-                            <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
-                            <p>${courseDescription}</p>
+                var courseTitle = courseCard.find(".card-title").text();
+                var courseDescription = courseCard.find("p").text();
+
+                $("#enrolledCourses").append(`
+                    <div class="col-md-4">
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <h4 class="card-title">${courseTitle}</h4>
+                                <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
+                                <p>${courseDescription}</p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `);
-        } else {
-            courseCard.append("<div class='alert alert-danger mt-3'>" + data.message + "</div>");
-            bttn.prop("disabled", true).text("Enrolled");
-        }
-    }, 'json');
+                `);
+            } else {
+                courseCard.append("<div class='alert alert-danger mt-3'>" + data.message + "</div>");
+                bttn.prop("disabled", true).text("Enrolled");
+            }
+        },
+    });
 });
 </script>
