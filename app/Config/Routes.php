@@ -34,6 +34,8 @@ $routes->get('logout', 'Auth::logout');
 //Dashboard
 $routes->get('dashboard', 'Auth::dashboard'); 
 
+//Course Enroll Lab 6
+$routes->post('/course/enroll', 'Course::enroll');
 
 // Sa daan na manual
 // $routes->get('/admin', 'AdminController::dashboard'); 

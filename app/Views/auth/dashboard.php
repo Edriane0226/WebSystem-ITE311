@@ -20,21 +20,21 @@
                             
                             <?php foreach ($courses as $course):?>
                             <div class="col-md-4">
-                            <div class="card mt-5">
+                                <div class="card mt-5 courseCard" data-course_id="<?= $course['courseID'] ?>">
                                     <div class="card-body">
                                         <h4 class="card-title"><?= $course['courseTitle'] ?></h4>
                                         <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
                                         <p><?= $course['courseDescription'] ?></p>
-                                        <button class="btn btn-primary">Enroll</button>
+                                        <button class="btn btn-primary enroll">Enroll</button>
                                     </div>
                                 </div>
                             </div>
-                            <?php endforeach;?>
+                        <?php endforeach; ?>
                         </div>
                     </div>
                 </div>
 
-                <div class="col-md-4 , mt-5">
+                <div class="col-md-4 mt-5">
                             <h5 class="mb-2 text-muted">Assignments</h5>
                         </div>
                     </div>
@@ -106,3 +106,24 @@
     </div>
 </body>
 </html>
+
+<script>
+$(".enroll").click(function(e){
+    e.preventDefault();
+
+    var bttn = $(this);
+    var courseCard = bttn.closest(".courseCard");
+    var courseID = courseCard.data("course_id");
+
+    $.post("<?= base_url('/course/enroll') ?>", { course_id: courseID }, function(data){
+        if (data.success) {
+            courseCard.append("<div class='alert alert-success mt-3'>" + data.message + "</div>");
+            bttn.prop("disabled", true).text("Enrolled");
+        } else {
+            courseCard.append("<div class='alert alert-warning mt-3'>" + data.message + "</div>");
+        }
+
+        $("#enrolledCourses").load("/course/enrolled-list");
+    }, 'json');
+});
+</script>
