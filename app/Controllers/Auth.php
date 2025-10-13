@@ -18,8 +18,8 @@ class Auth extends Controller
             // 'first_Name'     => 'required|min_length[3]',
             // 'last_Name'      => 'required|min_length[3]',
             // 'middle_Name'    => 'permit_empty|min_length[3]',
-            'name'      => 'required|min_length[3]',
-            'email'     => 'required|valid_email|is_unique[users.email]',
+            'name'      => 'required|min_length[3]|regex_match[/^[A-Za-zÀ-ÖØ-öø-ÿÑñ ]+$/]', //regex(regular expression) to only allow the user to inpute letters, accented letters and space
+            'email'     => 'required|valid_email|is_unique[users.email]A-Za-z0-9.@', // kani allow a-z A-Z 0-9 . @
             'password'  => 'required|min_length[6]',
             'password_confirm' => 'matches[password]'
         ];
