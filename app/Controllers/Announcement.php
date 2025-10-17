@@ -14,7 +14,7 @@ Class Announcement extends Controller {
 
             $data['announcements'] = $announceModel->orderBy('created_at', 'DESC')->findAll();
 
-            view('Announcement', $data);
+            return view('Announcement', $data);
         } else {
             return redirect()->to('/login');
         }
