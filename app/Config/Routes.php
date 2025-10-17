@@ -37,6 +37,9 @@ $routes->get('dashboard', 'Auth::dashboard');
 //Course Enroll Lab 6
 $routes->post('/course/enroll', 'Course::enroll');
 
+//Midterm Exam Announcements
+$routes->get('/announcements', 'Announcement::index');
+
 // Sa daan na manual
 // $routes->get('/admin', 'AdminController::dashboard'); 
 // $routes->get('/teacher', 'TeacherController::dashboard'); 
