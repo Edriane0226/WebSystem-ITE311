@@ -16,6 +16,8 @@ Class AdminController extends Controller {
             return redirect()->to('/login');
         }
         
-        return view('reusables/sidebar') . view('auth/dashboard');
+        $session->setFlashdata('success', 'Welcome, Admin!. ' . $session->get('name'));
+
+        return view('reusables/sidebar') . view('admin/dashboard');
     }
 }

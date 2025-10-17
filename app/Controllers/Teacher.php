@@ -12,11 +12,12 @@ Class TeacherController extends Controller {
     public function dashboard() {
 
         $session = session();
-
-        if ($session->get('role') !== 'teacher') {
+        if($session->get('role') != 'teacher') {
             return redirect()->to('/login');
         }
 
-        return view('reusables/sidebar') . view('auth/dashboard');
+        $session->setFlashdata('success', 'Welcome, Teacher!. ' . $session->get('name'));
+
+        return view('reusables/sidebar') . view('/teacher/dashboard');
     }
 }
