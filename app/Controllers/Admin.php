@@ -6,7 +6,7 @@ use App\Models\UserModel;
 use App\Models\CourseModel; 
 use CodeIgniter\Controller;
 
-Class AdminController extends Controller {
+Class Admin extends Controller {
 
     public function dashboard() {
 
@@ -15,9 +15,9 @@ Class AdminController extends Controller {
         if ($session->get('role') !== 'admin') {
             return redirect()->to('/login');
         }
-        
+
         $session->setFlashdata('success', 'Welcome, Admin!. ' . $session->get('name'));
 
-        return view('reusables/sidebar') . view('admin/dashboard');
+        return view('auth/admin_dashboard');
     }
 }

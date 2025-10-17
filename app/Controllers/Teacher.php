@@ -7,7 +7,7 @@ use App\Models\CourseModel;
 use App\Models\EnrollmentModel;
 use CodeIgniter\Controller;
 
-Class TeacherController extends Controller {
+Class Teacher extends Controller {
 
     public function dashboard() {
 
@@ -18,6 +18,6 @@ Class TeacherController extends Controller {
 
         $session->setFlashdata('success', 'Welcome, Teacher!. ' . $session->get('name'));
 
-        return view('reusables/sidebar') . view('/teacher/dashboard');
+        return view('auth/teacher_dashboard');
     }
 }
