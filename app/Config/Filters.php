@@ -34,6 +34,8 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
+        // Task 4.3 register ang RoleAuth
+        'roleauth'   => \App\Filters\RoleAuth::class,
     ];
 
     /**
