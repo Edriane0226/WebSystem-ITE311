@@ -16,7 +16,7 @@ Class Announcement extends Controller {
             //order by created_at descending
             $data['announcements'] = $announceModel->orderBy('created_at', 'DESC')->findAll();
             // tapos gipasa ang data sa view
-            return view('Announcement', $data);
+            return view('Announcements', $data);
         } else {
             return redirect()->to('/login');
         }
