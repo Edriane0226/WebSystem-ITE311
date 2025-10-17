@@ -9,6 +9,7 @@
 <body>
 
   <div class="container mt-5">
+    <!-- flashdata na galing sa controller -->
     <?php if(session()->getFlashdata('success')): ?>
       <div class="alert alert-success alert-dismissible fade show" role="alert">
         <?= session()->getFlashdata('success') ?>
@@ -18,6 +19,7 @@
     <div class="card shadow-sm">
       <div class="card-body text-center p-5">
         <h1 class="fw-bold">Welcome</h1>
+        <!-- short echo para sa name galing sa session -->
         <h3 class="mt-3 text-muted">Hello, <?= session()->get('name') ?>!</h3>
         <a  href="<?= base_url('logout')?>" class="btn btn-danger rounded-pill">Logout</a>
       </div>

@@ -6,6 +6,7 @@ use CodeIgniter\Database\Migration;
 
 class CreateAnnouncementsTable extends Migration
 {
+    //Based on the Midterm Exam Task
     public function up()
     {
         $this->forge->addField([

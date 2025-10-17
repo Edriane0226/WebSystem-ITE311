@@ -15,7 +15,9 @@
         <h3 class="mt-3 text-muted">Hello, <?= session()->get('name') ?>!</h3>
         <a  href="<?= base_url('logout')?>" class="btn btn-danger rounded-pill">Logout</a>
         <h1 class="mb-4">Announcements</h1>
+        <!-- check if empty pa or dli if empty diretso siya sa else -->
         <?php if (!empty($announcements)): ?>
+          <!-- foreach loop kay array man ang $announcements -->
             <?php foreach ($announcements as $announcement): ?>
                 <div class="card mb-3">
                     <div class="card-body">

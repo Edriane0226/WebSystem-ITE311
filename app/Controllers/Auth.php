@@ -73,7 +73,7 @@ class Auth extends Controller
                     'role'      => $user['role'],
                     'isLoggedIn'=> true
                 ]);
-                //$session->setFlashdata('success', 'Welcome ' . $user['name']);
+                //$session->setFlashdata('success', 'Welcome ' . $user['name']); commented out kay wala na gamita karon
                 if ($user['role'] == 'student') {
                     return redirect()->to('/announcements');
                 } elseif ($user['role'] == 'teacher') {

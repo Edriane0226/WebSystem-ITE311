@@ -7,7 +7,8 @@ use CodeIgniter\Database\Seeder;
 class AnnouncementSeeder extends Seeder
 {
     public function run()
-    {
+    {   
+        //ang announcements table naay title, content, created_at and in $data naa tay 3 ka sample announcements
         $data = [
             [
                 'title' => 'New Semester Announcement',

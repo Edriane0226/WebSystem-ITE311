@@ -11,7 +11,7 @@ Class Admin extends Controller {
     public function dashboard() {
 
         $session = session();
-
+        // Check session if login by admin
         if ($session->get('role') !== 'admin') {
             return redirect()->to('/login');
         }

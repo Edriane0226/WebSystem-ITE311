@@ -26,7 +26,7 @@ class RoleAuth implements FilterInterface
         elseif ($role == 'teacher' && strpos($uri, 'teacher/') === 0) {
             return;
         }
-        // allowed ang student to access routes na starting with /student
+        // allowed ang student to access routes na starting with /announcements or starting with /student
         elseif ($role === 'student') {
             if (strpos($uri, 'student/') === 0 || strpos($uri, 'announcements') === 0) {
                 return;

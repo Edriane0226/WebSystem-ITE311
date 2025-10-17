@@ -7,7 +7,7 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
-
+  <!-- same lng sa admin_dashboard.php -->
   <div class="container mt-5">
     <?php if(session()->getFlashdata('success')): ?>
       <div class="alert alert-success alert-dismissible fade show" role="alert">
