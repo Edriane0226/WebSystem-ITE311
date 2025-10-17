@@ -19,28 +19,19 @@ class RoleAuth implements FilterInterface
 
         $role = $session->get('role');
         // allowed ang admin to access routes na starting with /admin
-        if ($role === 'admin') {
-            if (strpos($uri, 'admin/') !== 0 && $uri !== 'announcements') {
-                //redirect sila tanan sa /announcements page with an error flash message “Access Denied: Insufficient Permissions".
-                return redirect()
-                    ->to('/announcements')
-                    ->with('error', 'Access Denied: Insufficient Permissions');
-            }
+        if ($role === 'admin' && strpos($uri, 'admin/') == 0) {
+            return;
         }
         // allowed ang teacher to access routes na starting with /teacher
-        elseif ($role === 'teacher') {
-            if (strpos($uri, 'teacher/') !== 0 && $uri !== 'announcements') {
-                return redirect()
-                    ->to('/announcements')
-                    ->with('error', 'Access Denied: Insufficient Permissions');
-            }
+        elseif ($role == 'teacher' && strpos($uri, 'teacher/') === 0) {
+            return;
         }
         // allowed ang student to access routes na starting with /student
         elseif ($role === 'student') {
-            if (strpos($uri, 'student/') !== 0 && $uri !== 'announcements') {
-                return redirect()
-                    ->to('/announcements')
-                    ->with('error', 'Access Denied: Insufficient Permissions');
+            if (strpos($uri, 'student/') === 0 || strpos($uri, 'announcements') === 0) {
+                return;
+            } else {
+                return redirect()->to('/login');
             }
         }
     }

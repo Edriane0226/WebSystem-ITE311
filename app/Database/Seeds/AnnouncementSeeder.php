@@ -10,13 +10,18 @@ class AnnouncementSeeder extends Seeder
     {
         $data = [
             [
-                'title' => 'Welcome Back Students!',
+                'title' => 'New Semester Announcement',
                 'content' => 'We are excited to start the new semester with you. Stay tuned for upcoming events and important dates.',
                 'created_at' => date('Y-m-d H:i:s'),
             ],
             [
-                'title' => 'Hello Students!',
+                'title' => 'Exam Reminder',
                 'content' => 'Please be informed that we have an exam 2morrow.',
+                'created_at' => date('Y-m-d H:i:s'),
+            ],
+            [
+                'title' => 'Holiday Notice',
+                'content' => 'The institution will be closed next Friday in observance of the holiday.',
                 'created_at' => date('Y-m-d H:i:s'),
             ],
         ];
