@@ -8,7 +8,11 @@ Class Course extends BaseController
     public function enroll(){
 
         if (!session()->get('isLoggedIn')) {
-            return redirect()->to('login');
+            return $this->response->setJSON([
+                'failed' => true, 
+                'message' => 'Please login to enroll.', 
+                'csrfHash' => csrf_hash()
+            ]);
         }
 
         $enrollmentModel = new EnrollmentModel();
@@ -16,7 +20,9 @@ Class Course extends BaseController
         $course_id = base64_decode($this->request->getPost('course_id'));
         
         if ($enrollmentModel->isAlreadyEnrolled($user_id, $course_id)) {
-            return $this->response->setJSON(['failed' => false, 'message' => 'Enrolled Naman ka ani nga course.']);
+            return $this->response->setJSON(['success' => false,
+                                             'message' => 'Enrolled Naman ka ani nga course.', 
+                                            'csrfHash' => csrf_hash()]);
         }
         $data = [
             'user_id' => $user_id,

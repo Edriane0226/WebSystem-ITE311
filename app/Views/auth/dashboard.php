@@ -2,6 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <!-- CSRF token -->
+    <meta name="csrf-token-name" content="<?= csrf_token() ?>">
+    <meta name="csrf-token-value" content="<?= csrf_hash() ?>">
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!--Tanggal nako CDN kay naa naman sa header.php-->
     <title> Dashboard</title>
@@ -20,6 +24,7 @@
                             <div class="row">
                                 <?php foreach ($courses as $course):?>
                                 <div class="col-md-4">
+                                    <!-- remove lng ang base64_encode ug decode sa controller kung i try ang CSRF Token -->
                                     <div class="card mt-5 courseCard" data-course_id="<?= base64_encode($course['courseID']) ?>">
                                         <div class="card-body">
                                             <h4 class="card-title"><?= $course['courseTitle'] ?></h4>
@@ -131,10 +136,18 @@ $(".enroll").click(function(e){
     var courseCard = bttn.closest(".courseCard");
     var courseID = courseCard.data("course_id");
 
+    // will get CSRF token name and the hash value from meta tags
+    var csrfName = $('meta[name="csrf-token-name"]').attr('content');
+    var csrfHash = $('meta[name="csrf-token-value"]').attr('content');
+
     $.ajax({
         url: "<?= base_url('/course/enroll') ?>",
         type: "POST",
         data: { course_id: courseID },
+        beforeSend: function(xhr) {
+            // add CSRF Token to the request data
+            xhr.setRequestHeader('X-CSRF-TOKEN', csrfHash);
+        },
         dataType: "json",
         success: function(data) {
             if(data.success) {
@@ -159,6 +172,9 @@ $(".enroll").click(function(e){
                 courseCard.append("<div class='alert alert-danger mt-3'>" + data.message + "</div>");
                 bttn.prop("disabled", true).text("Enrolled");
             }
+
+            // Update CSRF token in meta tags
+            $('meta[name="csrf-token-value"]').attr('content', data.csrfHash);
         },
     });
 });
