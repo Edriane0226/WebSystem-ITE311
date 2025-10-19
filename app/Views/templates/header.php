@@ -25,6 +25,10 @@
           <a href="<?= base_url('teacher/users') ?>" class="nav-link text-white bg-info rounded px-3">
             Teacher Dashboard
           </a>
+
+          <a href="<?= base_url('upload') ?>" class="nav-link text-white bg-info rounded px-3 mt-3">
+            Upload Materials
+          </a>
         </li>
 
       <?php elseif ($role == 'student'): ?>

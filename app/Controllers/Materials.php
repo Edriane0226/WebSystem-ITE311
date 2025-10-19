@@ -7,7 +7,14 @@ use CodeIgniter\Controller;
 class Materials extends Controller
 {
     public function upload($course_id)
-    {
+    {   
+        if (session()->get('isLoggedIn') == false || session()->get('role') != 'admin' && session()->get('role') != 'teacher') {
+            return redirect()->to('login');
+        }
+
+        if ($this->request->getMethod() !== 'POST') {
+            return view('materials/upload', ['course_id' => $course_id]);
+        }
         $materialModel = new MaterialModel();
 
         $file = $this->request->getFile('material_file');
