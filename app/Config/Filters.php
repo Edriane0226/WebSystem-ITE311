@@ -72,7 +72,7 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-           'csrf' => ['except' => ['login', 'dashboard', 'register']], // Gi Uncomment nako para ma enable CSRF gi except nako ang login ug register kay wlay token didto pag submit ug POST
+           'csrf' => ['except' => ['login', 'dashboard', 'register', 'admin/*']], // Gi Uncomment nako para ma enable CSRF gi except nako ang login ug register kay wlay token didto pag submit ug POST
             // 'invalidchars',
         ],
         'after' => [

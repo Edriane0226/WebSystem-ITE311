@@ -58,32 +58,43 @@
                     </div>
                 </div>
 
-            <?php elseif( $role == 'teacher' ): ?>
+           <?php elseif ($role == 'teacher'): ?>
+            <div class="col-md-8">
+                <div class="card mt-5 shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title mb-3">My Courses</h4>
 
-                <div class="col-md-8">
-                    <div class="card mt-5">
-                        <div class="card-body">
-                            <h4 class="card-title">Subjects</h4>
-                            <!-- br sa ahahha -->
-                            <br><br><br><br><br><br> 
-                            <button class="btn btn-primary">Add Subject</button>
+                        <?php if (!empty($courses)): ?>
+                            <div class="list-group">
+                                <?php foreach ($courses as $course): ?>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1 p-2"><?= esc($course['courseTitle']); ?></h5>
+                                        </div>
+                                        <div>
+                                            <a href="<?= base_url('admin/course/' . $course['courseID'] . '/upload'); ?>" 
+                                            class="btn btn-primary btn-sm rounded-pill">
+                                                Add Material
+                                            </a>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted text-center mt-3">No courses assigned yet.</p>
+                        <?php endif; ?>
+
+                        <div class="text-center mt-4">
+                            <a href="<?= base_url('teacher/add-course'); ?>" class="btn btn-primary rounded-pill">
+                                Add New Course
+                            </a>
                         </div>
                     </div>
                 </div>
+            </div>
 
                 <div class="col-md-3 ms-5 mt-4">
                     <h4>Notifications</h4>
-                </div>
-
-                <div class="col-md-8">
-                    <div class="card mt-5">
-                        <div class="card-body">
-                            <h4 class="card-title">Courses</h4>
-                            <!-- br sa ahahha -->
-                            <br><br><br><br><br><br> 
-                            <button class="btn btn-primary">Add Course</button>
-                        </div>
-                    </div>
                 </div>
 
             <?php elseif( $role == 'admin' ): ?>

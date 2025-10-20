@@ -2,70 +2,89 @@
 
 namespace App\Controllers;
 use App\Models\MaterialModel;
+use App\Models\CourseModel;
 use CodeIgniter\Controller;
 
 class Materials extends Controller
 {
     public function upload($course_id)
-    {   
-        if (session()->get('isLoggedIn') == false || session()->get('role') != 'admin' && session()->get('role') != 'teacher') {
-            return redirect()->to('login');
-        }
+{
+    if (!session()->get('isLoggedIn')) {
+        return redirect()->to('login');
+    }
 
-        if ($this->request->getMethod() !== 'POST') {
-            return view('materials/upload', ['course_id' => $course_id]);
-        }
-        $materialModel = new MaterialModel();
+    $materialModel = new MaterialModel();
+    $courseModel   = new CourseModel();
 
+    $courses = $courseModel->findAll();
+    //Guba pa get materials by course kay baskin gina select nako iba course gina show lng gyapon niya ang sa iba
+    $materials = $materialModel->getMaterialsByCourse($course_id);
+
+    $role = session()->get('role');
+
+    // kung POST ang request ug dili student ang role
+    if ($this->request->getMethod() === 'POST' && $role !== 'student') {
         $file = $this->request->getFile('material_file');
+
         if ($file->isValid() && !$file->hasMoved()) {
             $newName = $file->getRandomName();
-            $file->move(WRITEPATH . 'uploads/materials', $newName);
+            $file->move(WRITEPATH . 'materials/uploads', $newName);
 
-            $data = [
-                'course_id' => $course_id,
-                'file_name' => $file->getClientName(),
-                'file_path' => WRITEPATH . 'uploads/materials/' . $newName,
+            $materialModel->insert([
+                'course_id'  => $course_id,
+                'file_name'  => $file->getClientName(),
+                'file_path'  => WRITEPATH . 'materials/uploads/' . $newName,
                 'created_at' => date('Y-m-d H:i:s')
-            ];
+            ]);
 
-            $materialModel->insertMaterial($data);
-
-            return redirect()->back()->with('success', 'Material uploaded successfully.');
-        } else {
-            return redirect()->back()->with('error', 'Failed to upload material.');
+            return redirect()->to(current_url())
+                             ->with('success', 'Material uploaded successfully.');
         }
+
+        return redirect()->back()->with('error', 'Failed to upload file.');
     }
+
+    return view('templates/header', ['role' => $role]) . view('materials/upload', [
+        'courses'   => $courses,
+        'materials' => $materials,
+        'course_id' => $course_id
+    ]);
+}
 
     public function delete($material_id)
     {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('login');
+        }
+
         $materialModel = new MaterialModel();
         $material = $materialModel->find($material_id);
 
         if ($material) {
-            // Delete the file sa folder
             if (file_exists($material['file_path'])) {
                 unlink($material['file_path']);
             }
 
-            // Delete record sa database
             $materialModel->delete($material_id);
-
             return redirect()->back()->with('success', 'Material deleted successfully.');
-        } else {
-            return redirect()->back()->with('error', 'Material not found.');
         }
+
+        return redirect()->back()->with('error', 'Material not found.');
     }
 
     public function download($material_id)
     {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('login');
+        }
+
         $materialModel = new MaterialModel();
         $material = $materialModel->find($material_id);
 
         if ($material && file_exists($material['file_path'])) {
             return $this->response->download($material['file_path'], null);
-        } else {
-            return redirect()->back()->with('error', 'Material not found.');
         }
+
+        return redirect()->back()->with('error', 'Material not found.');
     }
 }

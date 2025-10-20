@@ -17,7 +17,7 @@ class CreateMaterialsTable extends Migration
             ],
             'course_id' => [
                 'type'       => 'INT',
-                'constraint' => 11,
+                'constraint' => 10,
                 'unsigned'   => true,
             ],
             'file_name' => [
@@ -34,7 +34,7 @@ class CreateMaterialsTable extends Migration
             ]
         ]);
         $this->forge->addKey('id');
-        $this->forge->addForeignKey('course_id', 'courses', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('course_id', 'courses', 'courseID', 'CASCADE', 'CASCADE');
         $this->forge->createTable('materials');
     }
 
