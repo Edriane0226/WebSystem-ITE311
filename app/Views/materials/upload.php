@@ -47,7 +47,7 @@
                     <?php endif; ?>
 
                     <?php if($role == 'admin' || $role == 'teacher'): ?>
-                        <form action="<?= base_url(($role == 'admin' ? 'admin' : 'teacher') . '/course/' . $course_id . '/upload') ?>" 
+                        <form action="<?= base_url('admin' . '/course/' . $course_id . '/upload') ?>" 
                               method="post" enctype="multipart/form-data">
                             <div class="mb-3">
                                 <label class="form-label">Choose File</label>

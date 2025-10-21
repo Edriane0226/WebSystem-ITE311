@@ -37,6 +37,21 @@
                     </div>
                 </div>
 
+                <div class="col-md-4">
+                    <h4 class="mt-5">Download Materials</h4>
+                    <?php foreach ($enrollments as $enrolled):?>
+                        <div class="card mt-3">
+                            <div class="card-body">
+                                <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
+                                <a href="<?= base_url('materials/download/' . $enrolled['course_id']) ?>" class="btn btn-secondary btn-sm rounded-pill">
+                                    Download
+                                </a>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+
                 <div class="col-md-8">
                     <div class="card mt-5">
                         <div class="card-body">
@@ -114,20 +129,34 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="card mt-2">
-                        <div class="card-body">
-                            <h4 class="card-title">Total Courses</h4>
-                            <table class="table">
-                                <tr>
-                                    <th>Course ID</th>
-                                    <th>Name</th>
-                                    <th>Date Published</th>
-                                </tr>
-                            </table> 
-                        </div>
+                <div class="col-md-8">
+                <div class="card mt-5 shadow-sm">
+                    <div class="card-body">
+                        <h4 class="card-title mb-3">My Courses</h4>
+
+                        <?php if (!empty($courses)): ?>
+                            <div class="list-group">
+                                <?php foreach ($courses as $course): ?>
+                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h5 class="mb-1 p-2"><?= esc($course['courseTitle']); ?></h5>
+                                        </div>
+                                        <div>
+                                            <a href="<?= base_url('admin/course/' . $course['courseID'] . '/upload'); ?>" 
+                                            class="btn btn-primary btn-sm rounded-pill">
+                                                Add Material
+                                            </a>
+                                        </div>
+                                    </div>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php else: ?>
+                            <p class="text-muted text-center mt-3">No courses assigned yet.</p>
+                        <?php endif; ?>
                     </div>
                 </div>
+            </div>
+
                 
             <?php endif; ?>
         </div>

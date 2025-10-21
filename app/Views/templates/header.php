@@ -15,7 +15,7 @@
     <ul class="nav nav-pills flex-column mb-auto">
       <?php if ($role == 'admin'): ?>
         <li class="nav-item">
-          <a href="<?= base_url('admin/users') ?>" class="nav-link text-white bg-info rounded px-3">
+          <a href="<?= base_url('dashboard') ?>" class="nav-link text-white bg-info rounded px-3">
             Admin Dashboard
           </a>
         </li>
