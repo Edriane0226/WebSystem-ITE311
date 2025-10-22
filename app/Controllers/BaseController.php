@@ -8,6 +8,7 @@ use CodeIgniter\HTTP\IncomingRequest;
 use CodeIgniter\HTTP\RequestInterface;
 use CodeIgniter\HTTP\ResponseInterface;
 use Psr\Log\LoggerInterface;
+use App\Models\NotificationModel;
 
 /**
  * Class BaseController
@@ -36,7 +37,10 @@ abstract class BaseController extends Controller
      * @var list<string>
      */
     protected $helpers = [];
+    
 
+    protected $session;
+    protected $notificationCount = 0; // Counter para sa Unread Notifications
     /**
      * Be sure to declare properties for any property fetch you initialized.
      * The creation of dynamic property is deprecated in PHP 8.2.
@@ -54,5 +58,21 @@ abstract class BaseController extends Controller
         // Preload any models, libraries, etc, here.
 
         // E.g.: $this->session = service('session');
+
+        $this->session = session();
+
+        if($this->session->get('isLoggedIn')) {
+            $notificationModel = new NotificationModel();
+            $this->notificationCount = $notificationModel->getUnreadCount($this->session->get('userID'));
+        }else{
+            return redirect()->to('login');
+        }
+    }
+
+    public function displayNotif(string $view, array $data = []): string
+    {
+        $data['notificationCount'] = $this->notificationCount;
+
+        return view('templates/header', $data) . view($view, $data);
     }
 }

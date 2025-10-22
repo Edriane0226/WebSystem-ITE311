@@ -7,7 +7,7 @@ use App\Models\EnrollmentModel;
 use App\Models\CourseModel;
 use CodeIgniter\Controller;
 
-class Auth extends Controller
+class Auth extends BaseController
 {
     public function register()
     {
@@ -125,7 +125,8 @@ class Auth extends Controller
                 'enrollments' => $enrollment->getUserEnrollments($session->get('userID')),
             ];
 
-        return view('templates/header', $data) . view('auth/dashboard', $data);
+        //return view('templates/header', $data) . view('auth/dashboard', $data);
+        return $this->displayNotif('auth/dashboard', $data);
     }
     /*
         Guides I see
