@@ -10,7 +10,7 @@
 <body class="d-flex">
 
   <!-- Sidebar gyud siya sir sayang man -->
-  <div class="d-flex flex-column flex-shrink-0 p-3 bg-dark vh-100" style="width: 160px;">
+  <div class="d-flex flex-column flex-shrink-0 p-3 bg-dark" style="width: 160px;">
     <h4 class="text-white text-center mb-5">LMS</h4>
 
     <ul class="nav nav-pills flex-column mb-auto">
