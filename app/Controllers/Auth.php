@@ -5,6 +5,7 @@ namespace App\Controllers;
 use App\Models\UserModel; 
 use App\Models\EnrollmentModel;
 use App\Models\CourseModel;
+use App\Models\MaterialModel;
 use CodeIgniter\Controller;
 
 class Auth extends BaseController
@@ -121,14 +122,21 @@ class Auth extends BaseController
         $allUsers = $users->getAllUsers();
         
         $session = session();
+
+        $materialModel = new MaterialModel();
+        $enrollments = $enrollment->getUserEnrollments($session->get('userID'));
+        foreach ($enrollments as &$enrolled) {
+            $enrolled['materials'] = $materialModel->getMaterialsByCourse($enrolled['course_id']);
+        }
         
             $data = [
                 'name' => $session->get('name'),
                 'email' => $session->get('email'),
                 'role' => $session->get('role'),
                 'courses' => $course->findAll(),
-                'enrollments' => $enrollment->getUserEnrollments($session->get('userID')),
-                'allUsers' => $allUsers
+                'enrollments' => $enrollments,
+                'allUsers' => $allUsers,
+            
             ];
 
         //return view('templates/header', $data) . view('auth/dashboard', $data);

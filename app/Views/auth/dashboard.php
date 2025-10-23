@@ -29,19 +29,37 @@
                 </div>
 
                 <div class="col-md-4">
-                    <h4 class="mt-5">Download Materials</h4>
-                    <?php foreach ($enrollments as $enrolled):?>
-                        <div class="card mt-3">
-                            <div class="card-body">
-                                <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
-                                <a href="<?= base_url('materials/download/' . $enrolled['course_id']) ?>" class="btn btn-secondary btn-sm rounded-pill">
-                                    Download
-                                </a>
+                <h4 class="mt-5">Download Materials</h4>
+
+                    <?php foreach ($enrollments as $enrolled): ?>
+                        <?php if (!empty($enrolled['materials'])): ?>
+                            <div class="card mt-3">
+                                <div class="card-body">
+                                    <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
+                                    <ul class="list-group list-group-flush">
+                                        <?php foreach ($enrolled['materials'] as $material): ?>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <?= $material['file_name'] ?>
+                                                <a href="<?= base_url('materials/download/' . $material['id']) ?>" 
+                                                class="btn btn-secondary btn-sm rounded-pill">
+                                                    Download
+                                                </a>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
                             </div>
-                        </div>
+                        <?php else: ?>
+                            <div class="card mt-3">
+                                <div class="card-body">
+                                    <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
+                                    <p class="text-muted">No materials uploaded yet.</p>
+                                </div>
+                            </div>
+                        <?php endif; ?>
                     <?php endforeach; ?>
                 </div>
-            </div>
+
 
                 <div class="col-md-8">
                     <div class="card mt-5">
