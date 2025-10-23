@@ -14,4 +14,9 @@ class UserModel extends Model
     protected $createdField  = 'created_at';
     protected $updatedField  = 'updated_at';
 
+    public function getAllUsers()
+    {
+        return $this->findAll();
+    }
+
 }

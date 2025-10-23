@@ -116,6 +116,14 @@
                                     <th>Name</th>
                                     <th>Role</th>
                                 </tr>
+                                <!-- retrieve all users -->
+                                <?php foreach ($allUsers as $user): ?>
+                                <tr>
+                                    <td><?= esc($user['userID']); ?></td>
+                                    <td><?= esc($user['name']); ?></td>
+                                    <td><?= esc($user['role']); ?></td>
+                                </tr>
+                                <?php endforeach; ?>
                             </table> 
                         </div>
                     </div>

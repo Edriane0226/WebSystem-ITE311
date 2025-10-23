@@ -115,6 +115,11 @@ class Auth extends BaseController
         // }
         $course = new CourseModel();
         $enrollment = new EnrollmentModel();
+
+        //added this to display all users in admin dashboard
+        $users = new UserModel();
+        $allUsers = $users->getAllUsers();
+        
         $session = session();
         
             $data = [
@@ -123,6 +128,7 @@ class Auth extends BaseController
                 'role' => $session->get('role'),
                 'courses' => $course->findAll(),
                 'enrollments' => $enrollment->getUserEnrollments($session->get('userID')),
+                'allUsers' => $allUsers
             ];
 
         //return view('templates/header', $data) . view('auth/dashboard', $data);
