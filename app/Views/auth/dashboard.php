@@ -123,7 +123,7 @@
                 <div class="col-md-8">
                 <div class="card mt-5 shadow-sm">
                     <div class="card-body">
-                        <h4 class="card-title mb-3">My Courses</h4>
+                        <h4 class="card-title mb-3">Courses</h4>
 
                         <?php if (!empty($courses)): ?>
                             <div class="list-group">
