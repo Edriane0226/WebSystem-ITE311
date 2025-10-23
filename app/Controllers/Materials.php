@@ -35,7 +35,7 @@ class Materials extends Controller
             return redirect()->back()->with('error', $validation->getError('material_file'));
         }
 
-        if ($file->isValid() && !$file->hasMoved()) {
+        if ($file->isValid()) {
             $newName = $file->getRandomName();
             $file->move(WRITEPATH . 'materials/uploads', $newName);
 
