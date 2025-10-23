@@ -1,12 +1,3 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <!-- CSRF token -->
-    <meta name="csrf-token-name" content="<?= csrf_token() ?>">
-    <meta name="csrf-token-value" content="<?= csrf_hash() ?>">
-    <!--Tanggal nako CDN kay naa naman sa header.php-->
-    <title> Dashboard</title>
-</head>
 <body class="d-flex">
     <div class="container p-3">
         <h3>Dashboard</h3>
@@ -180,11 +171,8 @@ $(".enroll").click(function(e){
     $.ajax({
         url: "<?= base_url('/course/enroll') ?>",
         type: "POST",
-        data: { course_id: courseID },
-        beforeSend: function(xhr) {
-            // add CSRF Token to the request data
-            xhr.setRequestHeader('X-CSRF-TOKEN', csrfHash);
-        },
+        data: { course_id: courseID, 
+               [csrfName]: csrfHash },
         dataType: "json",
         success: function(data) {
             if(data.success) {
@@ -210,9 +198,15 @@ $(".enroll").click(function(e){
                 bttn.prop("disabled", true).text("Enrolled");
             }
 
-            // Update CSRF token in meta tags
-            $('meta[name="csrf-token-value"]').attr('content', data.csrfHash);
-        },
+            if (data.csrfHash) {
+                $('meta[name="csrf-token-value"]').attr('content', data.csrfHash);
+            }
+            },
+            error: function(xhr) {
+                if (xhr.status === 403) {
+                    alert("Session expired or invalid CSRF. Please refresh the page.");
+                }
+            }
     });
 });
 </script>

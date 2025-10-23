@@ -71,7 +71,7 @@ class Security extends BaseConfig
      *
      * Regenerate CSRF Token on every submission.
      */
-    public bool $regenerate = true;
+    public bool $regenerate = false; //set to false because many multiple submit it will cause an error so the token stay valid until it expires exactly 2hrs
 
     /**
      * --------------------------------------------------------------------------

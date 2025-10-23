@@ -2,6 +2,7 @@
 
 namespace App\Controllers;
 use App\Models\EnrollmentModel;
+use App\Models\NotificationModel;
 
 Class Course extends BaseController
 {
@@ -30,6 +31,10 @@ Class Course extends BaseController
             'enrollment_date' => date('Y-m-d'),
         ];
         $enrollmentModel->enrollUser($data);
+
+        //Insert Notification after ma enroll
+        $notif = new NotificationModel();
+        $notif->createNotification($user_id, 'You have successfully enrolled in a course.');
         return $this->response->setJSON(['success' => true, 'message' => 'Enrolled Naka woaw']);
     }
 }

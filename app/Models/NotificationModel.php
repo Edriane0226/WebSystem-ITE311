@@ -24,4 +24,15 @@ class NotificationModel extends Model {
     public function markAsRead($notificationId) {
         return $this->update($notificationId, ['is_read' => 1]);
     }
+    
+    //nag create ko ug function para mag insert ug notification after ma enroll ang student
+    public function createNotification($user_id, $message) {
+        $data = [
+            'user_id' => $user_id,
+            'message' => $message,
+            'is_read' => 0,
+            'created_at' => date('Y-m-d H:i:s'),
+        ];
+        return $this->insert($data);
+    }
 }

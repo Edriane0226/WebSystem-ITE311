@@ -3,9 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Relocated CSRF Token in header -->
+  <meta name="csrf-token-name" content="<?= csrf_token() ?>">
+  <meta name="csrf-token-value" content="<?= csrf_hash() ?>">
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet"> 
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
 <body class="d-flex">
 
@@ -58,21 +63,76 @@
     <a href="<?= base_url('logout')?>" class="nav-link text-danger">Logout</a>
   </div>
 
-  <div class="bg-light" style="width: 200px;">
+  <div class="bg-light flex-grow-1 p-3">
     <ul class="navbar-nav ms-auto">
-          <li class="nav-item position-relative me-3 mt-3">
-            <!-- # temporary sa -->
-            <a class="nav-link" href="#">
-              <i class="bi bi-bell fs-5 p-3"></i>
-              <?php if (!empty($notificationCount) && $notificationCount > 0): ?>
-                <span class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle">
-                  <?= $notificationCount ?>
-                </span>
-              <?php endif; ?>
-            </a>
-          </li>
+      <li class="nav-item dropdown position-relative">
+        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <i class="bi bi-bell fs-4"></i>
+          <span id="notifBadge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none;">0</span>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationDropdown" id="notifDropdown">
+          <li class="dropdown-header text-center fw-bold">Notifications</li>
+          <li><hr class="dropdown-divider"></li>
+          <div id="notifList" class="px-2" style="max-height: 300px; overflow-y: auto;">
+            <p class="text-center text-muted mb-0">No new notifications</p>
+          </div>
         </ul>
+      </li>
+    </ul>
   </div>
 
+  <script>
+    $(document).ready(function() {
+
+      function loadNotifications() {
+        //get siyag nitfication
+        $.get("<?= base_url('notifications') ?>", function(data) {
+          const notifList = $("#notifList");
+          const badge = $("#notifBadge");
+
+          notifList.empty();
+
+          if (data.count > 0) {
+            badge.text(data.count).show();
+            data.notifications.forEach(function(n) {
+              notifList.append(`
+                <div class="alert alert-info d-flex justify-content-between align-items-center py-2 px-3 mb-2">
+                  <span>${n.message}</span>
+                  <button class="btn btn-sm btn-outline-danger mark-read" data-id="${n.id}">
+                    Mark as Read
+                  </button>
+                </div>
+              `);
+            });
+          } else {
+            badge.hide();
+            notifList.html('<p class="text-center text-muted mb-0">No new notifications</p>');
+          }
+        });
+      }
+      //on click sa mark as read button
+     $(document).on("click", ".mark-read", function() {
+        const notifId = $(this).data("id");
+
+        $.ajax({
+          url: "<?= base_url('notifications/mark_read') ?>/" + notifId,
+          type: "POST",
+          data: {
+            //Added the token and CSRF hash para dli nako mag excecpt sa filters
+            '<?= csrf_token() ?>': '<?= csrf_hash() ?>' 
+          },
+          success: function() {
+            loadNotifications();
+          },
+          error: function(xhr) {
+            console.error("Samthing went whrong:", xhr.responseText);
+          }
+        });
+      });
+
+      loadNotifications();
+    });
+
+  </script>
 </body>
 </html>
