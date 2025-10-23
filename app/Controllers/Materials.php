@@ -25,6 +25,15 @@ class Materials extends Controller
     // kung POST ang request ug dili student ang role
     if ($this->request->getMethod() === 'POST' && $role !== 'student') {
         $file = $this->request->getFile('material_file');
+        
+        $validation =  \Config\Services::validation();
+        $validation->setRules([
+            //Check if the uploaded file is valid, max size 100MB, and allowed file types
+            'material_file' => 'uploaded[material_file]|max_size[material_file,102400]|ext_in[material_file,pdf,doc,docx,ppt,pptx,txt,mp4,png,jpg,jpeg]'
+        ]);
+        if (!$validation->withRequest($this->request)->run()) {
+            return redirect()->back()->with('error', $validation->getError('material_file'));
+        }
 
         if ($file->isValid() && !$file->hasMoved()) {
             $newName = $file->getRandomName();
