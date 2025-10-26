@@ -92,9 +92,20 @@
 
           notifList.empty();
 
-          if (data.count > 0) {
-            badge.text(data.count).show();
-            data.notifications.forEach(function(n) {
+          if (data.notifications.length > 0) {
+            // Unread Counter sa badge
+            if (data.count > 0) {
+              badge.text(data.count).show();
+            } else {
+              badge.hide();
+            }
+
+            // put unread and read notifs in separate arrays
+            const unreadNotifs = data.notifications.filter(n => n.is_read == 0);
+            const readNotifs = data.notifications.filter(n => n.is_read == 1);
+
+            // display unread notifs always at the top of read notifs
+            unreadNotifs.forEach(function(n) {
               notifList.append(`
                 <div class="alert alert-info d-flex justify-content-between align-items-center py-2 px-3 mb-2">
                   <span>${n.message}</span>
@@ -104,9 +115,20 @@
                 </div>
               `);
             });
+
+            // then show already read notifs
+            readNotifs.forEach(function(n) {
+              notifList.append(`
+                <div class="alert alert-secondary d-flex justify-content-between align-items-center py-2 px-3 mb-2">
+                  <span>${n.message}</span>
+                  <small class="text-muted">Read</small>
+                </div>
+              `);
+            });
+
           } else {
             badge.hide();
-            notifList.html('<p class="text-center text-muted mb-0">No new notifications</p>');
+            notifList.html('<p class="text-center text-muted mb-0">No notifications yet</p>');
           }
         });
       }
@@ -130,7 +152,7 @@
         });
       });
 
-      loadNotifications();
+      setInterval(loadNotifications, 5000); // 60s dapat gi 5s lang for nako for testing
     });
 
   </script>
