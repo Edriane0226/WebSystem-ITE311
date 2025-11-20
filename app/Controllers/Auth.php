@@ -44,7 +44,7 @@ class Auth extends BaseController
             return view('auth/register', ['validation' => $this->validator]);
         }
       }
-      return view('auth/register');
+      return  view('templates/header') . view('auth/register');
     }
 
     public function login()
@@ -89,7 +89,7 @@ class Auth extends BaseController
             $session->setFlashdata('error', 'Invalid login credentials');
             return redirect()->back();
         }
-        return view('auth/login');
+        return view('templates/header') . view('auth/login');
     }
 
     public function logout()

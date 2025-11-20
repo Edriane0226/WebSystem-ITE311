@@ -121,6 +121,14 @@
                     <h4>Notifications</h4>
                 </div>
 
+                <div class="col-md-8">
+                    <div class="card mt-5">
+                        <div class="card-body">
+                            <h4 class="card-title">Enrolled Students</h4>
+                        </div>
+                    </div>
+                </div>
+
             <?php elseif( $role == 'admin' ): ?>
                 
                 <h2 class="mt-3">Statistics</h2>

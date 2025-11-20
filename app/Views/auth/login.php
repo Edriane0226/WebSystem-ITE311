@@ -1,5 +1,4 @@
 <?php
-    include 'app/Views/templates/headerOld.php';
 /* 
     Bootstrap
     Flex - .d-flex .align-items-center .justify-content-center

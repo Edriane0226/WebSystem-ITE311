@@ -1,7 +1,3 @@
-<?php
-    include 'app/Views/templates/headerOld.php';
-?>
-
 <body>
 <div class="container-fluid vh-100">
   <div class="row h-100">

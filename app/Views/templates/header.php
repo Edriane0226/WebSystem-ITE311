@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,9 +13,10 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </head>
-<body class="d-flex">
+<body>
 
   <!-- Sidebar gyud siya sir sayang man -->
+  <?php if(session()->get('isLoggedIn') == true):?>
   <div class="d-flex flex-column flex-shrink-0 p-3 bg-dark" style="width: 160px;">
     <h4 class="text-white text-center mb-5">LMS</h4>
 
@@ -156,5 +158,53 @@
     });
 
   </script>
+
+<?php elseif(session()->get('isLoggedIn') == false):?>
+<div>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid d-flex justify-content-between align-items-center">
+         <a class="navbar-brand">Learning Management System</a>
+            <!-- <ul class="navbar-nav flex-row ms-auto">
+                <li class="nav-item mx-2">
+                    <a href="#" class="nav-link"> <i class="fa-brands fa-github"></i> </a>
+                </li>   
+                <li class="nav-item mx-2">
+                    <a href="#" class="nav-link"> <i class="fa-brands fa-reddit"></i> </a>
+                </li>
+                <li class="nav-item mx-2">
+                    <a href="#" class="nav-link"> <i class="fa-brands fa-stack-overflow"></i> </a>
+                </li>
+            </ul> -->
+
+            <ul class="nav nav-underline">
+                <li class="nav-item mx-4">
+                    <a href="<?= base_url('home')?>" class="nav-link text-white"> <i class="fas fa-home"></i> Home</a>
+                </li>
+                <li class="nav-item mx-4">
+                    <a href="<?= base_url('about')?>" class="nav-link text-white"> <i class="fa-solid fa-info"></i> About</a>
+                </li>
+                <li class="nav-item mx-4">
+                    <a href="<?= base_url('contact')?>" class="nav-link text-white"> <i class="fa-solid fa-envelope"></i> Contact</a>
+                </li>
+                <li class="nav-item mx-4">
+                    <a class="btn btn-outline-light" href="<?= base_url('login') ?>" role="button">Login</a>
+                </li>
+            </ul>
+                <!-- <ul class="navbar-nav">
+                <li class="nav-item dropdown">
+                <a href="#" class="nav-link dropdown-toggle" id="Dropdown" role="button" data-bs-toggle="dropdown" 
+                        aria-expanded="false"> <i class="fa-solid fa-user"></i> </a>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdown">
+                    <li><a href="#" class="dropdown-item">Account</a></li>
+                    <li><a href="#" class="dropdown-item">Settings</a></li>
+                    <li><a href="#" class="dropdown-item">Logout</a></li>
+
+                </ul>
+                </li>
+                </ul> -->
+        </div>
+    </nav>
+</div>
+<?php endif; ?>
 </body>
 </html>
