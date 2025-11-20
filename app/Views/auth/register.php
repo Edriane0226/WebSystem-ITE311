@@ -12,6 +12,7 @@
       <h3 class="text-center mb-4">Register</h3>
 
       <form action="<?= base_url('register') ?>" method="post">
+        <?= csrf_field() ?>
           <!-- <div class="mb-3">
               <label class="form-label">First Name</label>
               <input type="text" name="FirstName" class="form-control" value="<?= set_value('FirstName') ?>">
