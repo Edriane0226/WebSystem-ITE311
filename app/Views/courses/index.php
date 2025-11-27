@@ -24,9 +24,6 @@
                         <div class="card shadow-sm h-100">
                             <div class="card-body">
                                 <h5 class="card-title"><?= esc($course['courseTitle']); ?></h5>
-                                <p class="card-text text-muted small">
-                                    Course Code: <strong><?= esc($course['courseCode'] ?? 'N/A'); ?></strong>
-                                </p>
                                 <p class="card-text">
                                     <?= esc($course['courseDescription'] ?? 'No description available.'); ?>
                                 </p>
@@ -69,9 +66,6 @@ $(document).ready(function () {
                             <div class="card shadow-sm h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">${course.courseTitle}</h5>
-                                    <p class="card-text text-muted small">
-                                        Course Code: <strong>${course.courseCode || 'N/A'}</strong>
-                                    </p>
                                     <p class="card-text">${course.courseDescription || 'No description available.'}</p>
                                 </div>
                                 <div class="card-footer bg-white border-top-0">
