@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Models\EnrollmentModel;
 use App\Models\NotificationModel;
 use App\Models\CourseModel;
+use App\Models\UserModel;
 
 Class Course extends BaseController
 {
@@ -41,13 +42,17 @@ Class Course extends BaseController
     
     public function search()
     {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('login');
+        }
+
         $searchTerm = $this->request->getGet('search_term');
 
         $courseModel = new CourseModel();
         
         if (!empty($searchTerm)) {
-           $this->courseModel->like('course_name', $searchTerm);
-           $this->courseModel->orLike('course_description', $searchTerm);
+           $courseModel->like('courseTitle', $searchTerm);
+           $courseModel->orLike('courseDescription', $searchTerm);
         }
 
         $courses = $courseModel->findAll();
@@ -55,7 +60,28 @@ Class Course extends BaseController
         if ($this->request->isAJAX()) {
             return $this->response->setJSON(['courses' => $courses]);
         }
+        $role = session()->get('role');
+        return view('templates/header', ['role' => $role]) . view('courses/index', ['courses' => $courses, 'searchTerm' => $searchTerm]);
+    }
 
-        return view('courses/search_results', ['courses' => $courses, 'searchTerm' => $searchTerm]);
+    public function details($id)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('login');
+        }
+
+        $courseModel = new CourseModel();
+        $userModel = new UserModel();
+        $teacherId = $courseModel->getTeacherIdByCourse($id);
+        $teacher = $userModel->find($teacherId);
+        $course = $courseModel->find($id);
+
+        $data = [
+            'course' => $course,
+            'teacher' => $teacher,
+        ];
+
+        $role = session()->get('role');
+        return view('templates/header', ['role' => $role]) . view('courses/details', $data);
     }
 }

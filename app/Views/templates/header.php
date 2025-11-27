@@ -26,6 +26,9 @@
           <a href="<?= base_url('dashboard') ?>" class="nav-link text-white bg-info rounded px-3">
             Dashboard
           </a>
+          <a href="<?= base_url('/course/search') ?>" class="nav-link text-white bg-info rounded px-3 mt-3">
+            Courses
+          </a>
         </li>
 
       <?php elseif ($role == 'teacher'): ?>
