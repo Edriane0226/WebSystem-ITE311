@@ -21,7 +21,7 @@
       <h2 class="mb-4 text-center">Login</h2>
 
       <form action="<?= base_url('login')?>" method="post">
-
+        <?= csrf_field() ?>
         <div class="mb-3">
           <label class="form-label">Email</label>
           <input type="email" name="email" class="form-control" value="<?= set_value('email') ?>">
