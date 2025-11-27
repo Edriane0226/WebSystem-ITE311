@@ -3,6 +3,7 @@
 namespace App\Controllers;
 use App\Models\EnrollmentModel;
 use App\Models\NotificationModel;
+use App\Models\CourseModel;
 
 Class Course extends BaseController
 {
@@ -36,5 +37,25 @@ Class Course extends BaseController
         $notif = new NotificationModel();
         $notif->createNotification($user_id, 'You have successfully enrolled in a course.');
         return $this->response->setJSON(['success' => true, 'message' => 'Enrolled Naka woaw']);
+    }
+    
+    public function search()
+    {
+        $searchTerm = $this->request->getGet('search_term');
+
+        $courseModel = new CourseModel();
+        
+        if (!empty($searchTerm)) {
+           $this->courseModel->like('course_name', $searchTerm);
+           $this->courseModel->orLike('course_description', $searchTerm);
+        }
+
+        $courses = $courseModel->findAll();
+
+        if ($this->request->isAJAX()) {
+            return $this->response->setJSON(['courses' => $courses]);
+        }
+
+        return view('courses/search_results', ['courses' => $courses, 'searchTerm' => $searchTerm]);
     }
 }

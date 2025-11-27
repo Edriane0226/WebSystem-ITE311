@@ -54,6 +54,9 @@ $routes->get('/materials/download/(:num)', 'Materials::download/$1');
 $routes->get('/notifications', 'Notifications::get');
 $routes->post('/notifications/mark_read/(:num)', 'Notifications::mark_as_read/$1');
 
+//Laboratory Exercise 9
+$routes->get('/course/search', 'Course::search');
+$routes->post('/course/search', 'Course::search');
 
 // Sa daan na manual
 // $routes->get('/admin', 'AdminController::dashboard'); 
