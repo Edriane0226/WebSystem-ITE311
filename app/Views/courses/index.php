@@ -1,7 +1,6 @@
 <body class="d-flex">
     <div class="container p-3">
 
-        <!-- Search Bar -->
         <div class="row mb-4">
             <div class="col-md-6">
                 <form id="searchForm" class="d-flex">
@@ -16,7 +15,6 @@
             </div>
         </div>
 
-        <!-- Courses Container -->
         <div class="row" id="coursesContainer">
             <?php if (!empty($courses)): ?>
                 <?php foreach ($courses as $course): ?>
