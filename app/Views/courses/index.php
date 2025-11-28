@@ -1,7 +1,7 @@
 <body class="d-flex">
     <div class="container p-3">
-
-        <div class="row mb-4">
+        <h1 class="mb-4 p-3">Courses</h1>
+        <div class="row mb-4 p-3">
             <div class="col-md-6">
                 <form id="searchForm" class="d-flex">
                     <div class="input-group">
@@ -15,7 +15,7 @@
             </div>
         </div>
 
-        <div class="row" id="coursesContainer">
+        <div class="row mb-5 p-3" id="coursesContainer">
             <?php if (!empty($courses)): ?>
                 <?php foreach ($courses as $course): ?>
                     <div class="col-md-4 mb-4 course-card">
