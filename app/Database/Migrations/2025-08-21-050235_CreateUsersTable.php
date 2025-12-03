@@ -46,9 +46,9 @@ class CreateUsersTable extends Migration
                 'unique' => true
             ],
             'role' => [
-                'type' => 'ENUM',
-                'constraint' => ['admin', 'teacher', 'student'],
-                'default' => 'student'
+                'type' => 'INT',
+                'constraint' => 5,
+                'unsigned' => true
             ],
             'created_at' => [
                 'type' => 'DATETIME',
@@ -61,6 +61,7 @@ class CreateUsersTable extends Migration
             ]);
 
             $this->forge->addKey('userID');
+            $this->forge->addForeignKey('role', 'roles', 'roleID', 'CASCADE', 'CASCADE');
             $this->forge->createTable('users');
     }
 

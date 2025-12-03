@@ -84,4 +84,6 @@ Class Course extends BaseController
         $role = session()->get('role');
         return view('templates/header', ['role' => $role]) . view('courses/details', $data);
     }
+
+    // CRUD Operations for course
 }

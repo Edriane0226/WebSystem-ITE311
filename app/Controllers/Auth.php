@@ -36,7 +36,7 @@ class Auth extends BaseController
             'name'       => $this->request->getVar('name'),
             'email'      => $this->request->getVar('email'),
             'password'   => password_hash($this->request->getVar('password'), PASSWORD_DEFAULT),
-            'role'       => 'student',
+            'role'       => 3,
         ]);
         
         return redirect()->to('login')->with('success', 'Registration Successful. Please login.');
@@ -65,13 +65,15 @@ class Auth extends BaseController
             }
 
             $user = $userModel->where('email', $this->request->getVar('email'))->first();
+            $role = $userModel->getUserRoleName($user['userID']);
+            
 
             if ($user && password_verify($this->request->getVar('password'), $user['password'])) {
                 $session->set([
                     'userID'    => $user['userID'],
                     'name'      => $user['name'],
                     'email'     => $user['email'],
-                    'role'      => $user['role'],
+                    'role'      => $role,
                     'isLoggedIn'=> true
                 ]);
                 $session->setFlashdata('success', 'Welcome ' . $user['name']);

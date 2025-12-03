@@ -15,6 +15,10 @@ class CreateCoursesTable extends Migration
                 'unsigned' => true,
                 'auto_increment' => true
             ],
+            'courseCode' => [
+                'type' => 'VARCHAR',
+                'constraint' => 20,
+            ],
             'courseTitle' => [
                 'type' => 'VARCHAR',
                 'constraint' => 100,
@@ -23,14 +27,26 @@ class CreateCoursesTable extends Migration
                 'type' => 'VARCHAR',
                 'constraint' => 255,
             ],
+            'schoolYearID' => [
+                'type' => 'INT',
+                'constraint' => 10,
+                'unsigned' => true
+            ],
             'teacherID' => [
                 'type' => 'INT',
                 'constraint' => 10,
                 'unsigned' => true
             ],
+            'statusID' => [
+                'type' => 'INT',
+                'constraint' => 20,
+                'unsigned' => true
+            ],
         ]);
         $this->forge->addKey('courseID');
         $this->forge->addForeignKey('teacherID', 'users', 'userID', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('schoolYearID', 'schoolYear', 'schoolYearID', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('statusID', 'courseStatus', 'statusID', 'CASCADE', 'CASCADE');
         $this->forge->createTable('courses');
     }
 

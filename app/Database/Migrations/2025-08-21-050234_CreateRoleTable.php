@@ -20,7 +20,7 @@ class CreateRoleTable extends Migration
                 'constraint' => '100',
             ]
         ]);
-        $this->forge->addKey('id', true);
+        $this->forge->addKey('roleID');
         $this->forge->createTable('roles');
     }
 

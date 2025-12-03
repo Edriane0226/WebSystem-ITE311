@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use app\Models\RoleModel;
 
 class UserModel extends Model
 {
@@ -17,6 +18,17 @@ class UserModel extends Model
     public function getAllUsers()
     {
         return $this->findAll();
+    }
+
+    public function getUserRoleName($userID)
+    {
+        $this->select('roles.role_name');
+        $this->join('roles', 'users.role = roles.roleID');
+        $this->where('users.userID', $userID);
+        $query = $this->get();
+        $result = $query->getRow();
+
+        return $result ? $result->role_name : null;
     }
 
 }

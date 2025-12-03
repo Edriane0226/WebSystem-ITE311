@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use CodeIgniter\Model;
+use App\Models\ShcoolYearModel;
 
 class CourseModel extends Model
 {
