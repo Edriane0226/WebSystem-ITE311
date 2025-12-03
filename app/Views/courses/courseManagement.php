@@ -93,6 +93,8 @@
                                 <th class="border-0">Description</th>
                                 <th class="border-0">School Year</th>
                                 <th class="border-0">Teacher</th>
+                                <th class="border-0">Status</th>
+                                <th class="border-0">Edit Details</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -112,6 +114,30 @@
                                     </td>
                                     <td><?= esc($course['schoolYear']) ?></td>
                                     <td><?= esc($course['teacherName'] ?? 'Not Assigned') ?></td>
+                                    <td>
+                                        <select name="statusID" class="form-select" required>
+                                            <option value="">Status</option>
+                                            <?php if (isset($courseStatuses)): ?>
+                                                <?php foreach ($courseStatuses as $status): ?>
+                                                    <option value="<?= $status['statusID'] ?>">
+                                                        <?= $status['statusName'] ?>
+                                                    </option>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+                                        </select>
+                                        <button type="button" class="btn btn-sm btn-primary mt-2"
+                                            onclick="location.href='<?= base_url('course/setCourseStatus/' . $course['courseID'] . '/') ?>' + this.previousElementSibling.value;">
+                                            Update
+                                        </button>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-sm btn-secondary mt-2"
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#editCourseModal"
+                                            onclick="loadCourseData(<?= htmlspecialchars(json_encode($course)) ?>)">
+                                             Edit Details
+                                        </button>
+                                    </td>
                                 </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
@@ -125,6 +151,7 @@
                                     </td>
                                 </tr>
                             <?php endif; ?>
+                                
                         </tbody>
                     </table>
                 </div>
@@ -220,6 +247,89 @@
         </div>
     </div>
                                 
+    <!-- Edit Course Modal -->
+    <div class="modal fade" id="editCourseModal" tabindex="-1" aria-labelledby="editCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="editCourseModalLabel">Edit Course Details</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="<?= base_url('courses/updateCourse') ?>" method="post" id="editCourseForm">
+                    <div class="modal-body">
+                        <?= csrf_field() ?>
+                        <input type="hidden" name="courseID" id="edit_courseID">
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Course Code</label>
+                                <input type="text" name="courseCode" id="edit_courseCode" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">School Year</label>
+                                <select name="schoolYear" id="edit_schoolYear" class="form-select" required>
+                                    <option value="">Select School Year</option>
+                                    <?php if (isset($schoolYears)): ?>
+                                        <?php foreach ($schoolYears as $sy): ?>
+                                            <option value="<?= $sy['schoolYearID'] ?>">
+                                                <?= $sy['schoolYear'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Course Title</label>
+                                <input type="text" name="courseTitle" id="edit_courseTitle" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <textarea name="courseDescription" id="edit_courseDescription" class="form-control" rows="3" required></textarea>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Teacher</label>
+                                <select name="teacherID" id="edit_teacherID" class="form-select">
+                                    <option value="">Select Teacher</option>
+                                    <?php if (isset($teachers)): ?>
+                                        <?php foreach ($teachers as $teacher): ?>
+                                            <option value="<?= $teacher['userID'] ?>">
+                                                <?= $teacher['name'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select name="statusID" id="edit_statusID" class="form-select" required>
+                                    <option value="">Select Status</option>
+                                    <?php if (isset($courseStatuses)): ?>
+                                        <?php foreach ($courseStatuses as $status): ?>
+                                            <option value="<?= $status['statusID'] ?>">
+                                                <?= $status['statusName'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Update Course
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+                                
     <script>
         // Search functionality
         document.getElementById('searchInput').addEventListener('keyup', function() {
@@ -235,5 +345,21 @@
         // Reset form when modal is closed
         document.getElementById('createCourseModal').addEventListener('hidden.bs.modal', function () {
             document.getElementById('courseForm').reset();
+        });
+
+        // Load course data into edit modal
+        function loadCourseData(course) {
+            document.getElementById('edit_courseID').value = course.courseID;
+            document.getElementById('edit_courseCode').value = course.courseCode;
+            document.getElementById('edit_courseTitle').value = course.courseTitle;
+            document.getElementById('edit_courseDescription').value = course.courseDescription;
+            document.getElementById('edit_schoolYear').value = course.schoolYearID;
+            document.getElementById('edit_teacherID').value = course.teacherID || '';
+            document.getElementById('edit_statusID').value = course.statusID;
+        }
+
+        // Reset edit form when modal is closed
+        document.getElementById('editCourseModal').addEventListener('hidden.bs.modal', function () {
+            document.getElementById('editCourseForm').reset();
         });
     </script>
