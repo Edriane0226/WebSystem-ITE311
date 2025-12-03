@@ -66,7 +66,7 @@ Class Course extends BaseController
         $role = session()->get('role');
         return view('templates/header', ['role' => $role]) . view('courses/index', ['courses' => $courses, 'searchTerm' => $searchTerm]);
     }
-
+    
     public function details($id)
     {
         if (!session()->get('isLoggedIn')) {
@@ -75,9 +75,20 @@ Class Course extends BaseController
 
         $courseModel = new CourseModel();
         $userModel = new UserModel();
-        $teacherId = $courseModel->getTeacherIdByCourse($id);
-        $teacher = $userModel->find($teacherId);
+        
+        // Use the $id parameter to get the specific course
         $course = $courseModel->find($id);
+        
+        if (!$course) {
+            session()->setFlashdata('error', 'Course not found.');
+            return redirect()->to('courses');
+        }
+        
+        // Get teacher info if assigned
+        $teacher = null;
+        if (!empty($course['teacherID'])) {
+            $teacher = $userModel->find($course['teacherID']);
+        }
 
         $data = [
             'course' => $course,

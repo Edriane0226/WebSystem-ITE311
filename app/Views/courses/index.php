@@ -1,5 +1,3 @@
-
-    <div class="container p-3">
         <h1 class="mb-4 p-3">Courses</h1>
         <div class="row mb-4 p-3">
             <div class="col-md-6">
@@ -22,6 +20,7 @@
                         <div class="card shadow-sm h-100">
                             <div class="card-body">
                                 <h5 class="card-title"><?= esc($course['courseTitle']); ?></h5>
+                                <h6 class="card-subtitle mb-2 text-muted"><?= esc($course['courseCode']); ?></h6>
                                 <p class="card-text">
                                     <?= esc($course['courseDescription'] ?? 'No description available.'); ?>
                                 </p>
@@ -63,10 +62,11 @@ $(document).ready(function () {
                             <div class="card shadow-sm h-100">
                                 <div class="card-body">
                                     <h5 class="card-title">${course.courseTitle}</h5>
+                                    <h6 class="card-subtitle mb-2 text-muted">${course.courseCode}</h6>
                                     <p class="card-text">${course.courseDescription || 'No description available.'}</p>
                                 </div>
                                 <div class="card-footer bg-white border-top-0">
-                                    <a href="<?= base_url('/courses/' . $course['courseID']) ?>" class="btn btn-primary w-100">View Details</a>
+                                    <a href="<?= base_url('courses/') ?>${course.courseID}" class="btn btn-primary w-100">View Details</a>
                                 </div>
                             </div>
                         </div>`;

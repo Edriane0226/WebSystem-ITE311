@@ -1,5 +1,5 @@
 
-    <div class="container p-3">
+    <div class="container">
 
         <div>
             <a href="<?= base_url('/course/search') ?>" class="btn btn-secondary mb-3">
@@ -13,6 +13,7 @@
                     <div class="card shadow-sm h-100">
                         <div class="card-body">
                             <h5 class="card-title"><?= esc($course['courseTitle']); ?></h5>
+                            <h6 class="card-subtitle mb-2 text-muted"><?= esc($course['courseCode']); ?></h6>
                             <p class="card-text">
                                 <?= esc($course['courseDescription'] ?? 'No description available.'); ?>
                             </p>
