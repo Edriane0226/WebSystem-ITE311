@@ -4,6 +4,9 @@ namespace App\Controllers;
 use App\Models\EnrollmentModel;
 use App\Models\NotificationModel;
 use App\Models\CourseModel;
+use App\Models\SchoolYearModel;
+use App\Models\CourseStatusModel;
+
 use App\Models\UserModel;
 
 Class Course extends BaseController
@@ -86,4 +89,60 @@ Class Course extends BaseController
     }
 
     // CRUD Operations for course
+
+    public function createCourse()
+    {
+        if (!session()->get('isLoggedIn') || session()->get('role') != 'admin') {
+            return redirect()->to('login');
+        }
+        
+        $courseModel = new CourseModel();
+        $userModel = new UserModel();
+
+        $userRole = session()->get('role');
+        $userRoleID = $userModel->getRoleIDByUserID($userRole);
+        $teachers = $userModel->getTeacherByRoleID($userRoleID);
+
+        $courseDescriptions = $courseModel->getCoursesWithDetails();
+
+
+        $activeCourses = $courseModel->getActiveCoursesCount();
+        $data = [
+            'course' => $courseDescriptions,
+            'teachers' => $teachers,
+            'activeCourses' => $activeCourses,
+            'role' => session()->get('role')
+        ];
+        if ($this->request->getMethod() === 'POST') {
+            $courseModel = new CourseModel();
+            $data = [
+                'courseCode' => $this->request->getPost('courseCode'),
+                'courseTitle' => $this->request->getPost('courseTitle'),
+                'courseDescription' => $this->request->getPost('courseDescription'),
+                'teacherID' => $this->request->getPost('teacherID'),
+                'schoolYearID' => $this->request->getPost('schoolYearID'),
+                'statusID' => $this->request->getPost('statusID'),
+
+            ];
+            $courseModel->insert($data);
+
+            $message = 'Course created successfully.';
+            return view('templates/header') . view('courses/courseManagement', ['message' => $message]);
+        }else {
+            return view('templates/header', $data) . view('courses/courseManagement');
+        }
+    }
+
+    public function deleteCourse($id)
+    {
+        if (!session()->get('isLoggedIn') || session()->get('role') != 'admin') {
+            return redirect()->to('login');
+        }
+
+        $courseModel = new CourseModel();
+
+        
+
+        return redirect()->to('/courses/manage')->with('message', 'Course deleted successfully.');
+    }
 }

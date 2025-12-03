@@ -1,4 +1,4 @@
-<body class="d-flex">
+
     <div class="container p-3">
         <h3>Dashboard</h3>
         <h4 class="mt-3 text-muted">Welcome, <?= $name ?>!</h4>
@@ -188,7 +188,6 @@
         
 
     </div>
-</body>
 </html>
 <script>
 $(".enroll").click(function(e){

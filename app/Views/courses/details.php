@@ -1,4 +1,4 @@
-<body class="d-flex">
+
     <div class="container p-3">
 
         <div>
@@ -29,4 +29,3 @@
             <?php endif; ?>
         </div>
     </div>
-</body> 

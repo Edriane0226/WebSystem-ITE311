@@ -64,3 +64,7 @@ $routes->get('/courses/(:num)', 'Course::details/$1');
 // $routes->get('/admin', 'AdminController::dashboard'); 
 // $routes->get('/teacher', 'TeacherController::dashboard'); 
 // $routes->get('/student', 'StudentController::dashboard'); 
+
+//Course CRUD
+$routes->get('/course/manage', 'Course::createCourse'); 
+$routes->post('/courses/save', 'Course::createCourse');

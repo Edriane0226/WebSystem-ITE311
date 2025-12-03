@@ -10,29 +10,44 @@ class CoursesSeeder extends Seeder
     {
         $data = [
             [
-                'courseTitle' => 'Mathematics 101',
-                'courseDescription' => 'Basic concepts of algebra, geometry, and calculus.',
-                'teacherID' => 2
+                'courseCode' => 'CS101',
+                'courseTitle' => 'Computer Science Basics',
+                'courseDescription' => 'An introduction to computer science concepts.',
+                'schoolYearID' => 1,
+                'teacherID' => 2,
+                'statusID' => 1
             ],
             [
-                'courseTitle' => 'Introduction to Programming',
-                'courseDescription' => 'Fundamentals of programming using Python.',
-                'teacherID' => 2
-            ],
-            [
+                'courseCode' => 'WD201',
                 'courseTitle' => 'Web Development',
                 'courseDescription' => 'Building websites using HTML, CSS, and JavaScript.',
-                'teacherID' => 2
+                'schoolYearID' => 1,
+                'teacherID' => 2,
+                'statusID' => 1
             ],
             [
+                'courseCode' => 'DB301',
                 'courseTitle' => 'Database Management',
                 'courseDescription' => 'Introduction to SQL and database design principles.',
-                'teacherID' => 2
+                'schoolYearID' => 2,
+                'teacherID' => 2,
+                'statusID' => 1
             ],
             [
+                'courseCode' => 'DSA401',
                 'courseTitle' => 'Data Structures and Algorithms',
                 'courseDescription' => 'Understanding data structures and algorithmic techniques.',
-                'teacherID' => 2
+                'schoolYearID' => 2,
+                'teacherID' => 2,
+                'statusID' => 1
+            ],
+            [
+                'courseCode' => 'AI501',
+                'courseTitle' => 'Introduction to Artificial Intelligence',
+                'courseDescription' => 'Basics of AI, machine learning, and neural networks.',
+                'schoolYearID' => 3,
+                'teacherID' => 2,
+                'statusID' => 1
             ]
         ];
 

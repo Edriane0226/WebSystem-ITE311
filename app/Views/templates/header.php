@@ -17,8 +17,9 @@
 
   <!-- Sidebar gyud siya sir sayang man -->
   <?php if(session()->get('isLoggedIn') == true):?>
-  <div class="d-flex flex-column flex-shrink-0 p-3 bg-dark" style="width: 160px;">
-    <h4 class="text-white text-center mb-5">LMS</h4>
+  <div class="d-flex">
+    <div class="d-flex flex-column flex-shrink-0 p-3 bg-dark" style="width: 160px; min-height: 100vh;">
+      <h4 class="text-white text-center mb-5">LMS</h4>
 
     <ul class="nav nav-pills flex-column mb-auto">
       <?php if ($role == 'admin'): ?>
@@ -28,6 +29,9 @@
           </a>
           <a href="<?= base_url('/course/search') ?>" class="nav-link text-white bg-info rounded px-3 mt-3">
             Courses
+          </a>
+          <a href="<?= base_url('/course/manage') ?>" class="nav-link text-white bg-info rounded px-3 mt-3">
+            Manage Courses
           </a>
         </li>
 
@@ -58,7 +62,7 @@
         <li class="nav-item">
           <!-- # sa -->
           <a href="#" class="nav-link text-white bg-info rounded px-3 mt-3">
-             Manage Students
+              Manage Students
           </a>
         </li>
       <?php endif; ?>
@@ -69,22 +73,23 @@
   </div>
 
   <div class="bg-light flex-grow-1 p-3">
-    <ul class="navbar-nav ms-auto">
-      <li class="nav-item dropdown position-relative">
-        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-          <i class="bi bi-bell fs-4"></i>
-          <span id="notifBadge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none;">0</span>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationDropdown" id="notifDropdown">
-          <li class="dropdown-header text-center fw-bold">Notifications</li>
-          <li><hr class="dropdown-divider"></li>
-          <div id="notifList" class="px-2" style="max-height: 300px; overflow-y: auto;">
-            <p class="text-center text-muted mb-0">No new notifications</p>
-          </div>
-        </ul>
-      </li>
-    </ul>
-  </div>
+    <div class="d-flex justify-content-end mb-3">
+      <ul class="navbar-nav">
+        <li class="nav-item dropdown position-relative">
+          <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-bell fs-4"></i>
+            <span id="notifBadge" class="badge bg-danger rounded-pill position-absolute top-0 start-100 translate-middle" style="display: none;">0</span>
+          </a>
+          <ul class="dropdown-menu dropdown-menu-end shadow" aria-labelledby="notificationDropdown" id="notifDropdown">
+            <li class="dropdown-header text-center fw-bold">Notifications</li>
+            <li><hr class="dropdown-divider"></li>
+            <div id="notifList" class="px-2" style="max-height: 300px; overflow-y: auto;">
+              <p class="text-center text-muted mb-0">No new notifications</p>
+            </div>
+          </ul>
+        </li>
+      </ul>
+    </div>
 
   <script>
     $(document).ready(function() {

@@ -1,4 +1,4 @@
-<body class="d-flex">
+
     <div class="container p-3">
         <h1 class="mb-4 p-3">Courses</h1>
         <div class="row mb-4 p-3">
@@ -36,7 +36,6 @@
             <?php endif; ?>
         </div>
     </div>
-</body>
 
 <script>
 $(document).ready(function () {

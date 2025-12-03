@@ -31,4 +31,14 @@ class UserModel extends Model
         return $result ? $result->role_name : null;
     }
 
+    public function getRoleIDByUserID($userID)
+    {
+        $user = $this->find($userID);
+        return $user ? $user['role'] : null;
+    }
+
+    public function getTeacherByRoleID($roleID)
+    {
+        return $this->where('role', 2)->findAll();
+    }
 }
