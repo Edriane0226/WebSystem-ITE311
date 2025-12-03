@@ -9,9 +9,9 @@ class CourseStatusModel extends Model
     protected $primaryKey = 'statusID';
     protected $allowedFields = ['statusName'];
 
-    public function getStatusNameById($statusID)
+    public function getAllStatuses()
     {
-        $status = $this->find($statusID);
-        return $status ? $status['statusName'] : null;
+        return $this->findAll();
     }
+
 }

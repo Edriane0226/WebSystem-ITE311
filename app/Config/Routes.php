@@ -67,4 +67,4 @@ $routes->get('/courses/(:num)', 'Course::details/$1');
 
 //Course CRUD
 $routes->get('/course/manage', 'Course::createCourse'); 
-$routes->post('/courses/save', 'Course::createCourse');
+$routes->post('/courses/manage', 'Course::createCourse');

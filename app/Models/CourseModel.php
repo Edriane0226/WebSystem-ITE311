@@ -10,7 +10,7 @@ class CourseModel extends Model
 {
     protected $table      = 'courses';
     protected $primaryKey = 'courseID';
-    protected $allowedFields = ['courseTitle', 'courseDescription', 'teacherID'];
+    protected $allowedFields = ['courseCode', 'courseTitle', 'courseDescription', 'schoolYearID', 'teacherID', 'statusID'];
 
     public function getTeacherIdByCourse($courseId)
     {

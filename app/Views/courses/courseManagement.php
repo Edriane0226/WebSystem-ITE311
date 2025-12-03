@@ -1,5 +1,7 @@
-
-    <div class="container-fluid">
+<header>
+    <title>Course Management</title>
+    </header>
+<div class="container-fluid">
         <!-- Flash Messages -->
         <?php if (session()->getFlashdata('message')): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -20,7 +22,6 @@
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
                     <h2 class="h3 mb-0"><i class="fas fa-book-open me-2"></i>Course Management</h2>
-                   
                 </div>
             </div>
         </div>
@@ -110,8 +111,7 @@
                                         </div>
                                     </td>
                                     <td><?= esc($course['schoolYear']) ?></td>
-                                    <td><?= esc($course['teacherName'] ?? 'Not Assigned') ?>
-                                </td>
+                                    <td><?= esc($course['teacherName'] ?? 'Not Assigned') ?></td>
                                 </tr>
                                 <?php endforeach; ?>
                             <?php else: ?>
@@ -130,11 +130,96 @@
                 </div>
             </div>
         </div>
+
+        <div class="p-3">
+            <button type="button" class="btn btn-primary me-3" data-bs-toggle="modal" data-bs-target="#createCourseModal">
+                        <i class="fas fa-plus me-1"></i>Add New Course
+            </button>
+        </div>
     </div>
 
-    <!-- Course Modal -->
-    
-
+    <!-- Create Course Modal -->
+    <div class="modal fade" id="createCourseModal" tabindex="-1" aria-labelledby="createCourseModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createCourseModalLabel">Create New Course</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form action="<?= base_url('courses/manage') ?>" method="post" id="courseForm">
+                    <div class="modal-body">
+                        <?= csrf_field() ?>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Course Code</label>
+                                <input type="text" name="courseCode" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">School Year</label>
+                                <select name="schoolYear" class="form-select" required>
+                                    <option value="">Select School Year</option>
+                                    <?php if (isset($schoolYears)): ?>
+                                        <?php foreach ($schoolYears as $sy): ?>
+                                            <option value="<?= $sy['schoolYearID'] ?>">
+                                                <?= $sy['schoolYear'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Course Title</label>
+                                <input type="text" name="courseTitle" class="form-control" required>
+                            </div>
+                            
+                            <div class="col-12">
+                                <label class="form-label">Description</label>
+                                <textarea name="courseDescription" class="form-control" rows="3" required></textarea>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Teacher</label>
+                                <select name="teacherID" class="form-select">
+                                    <option value="">Select Teacher</option>
+                                    <?php if (isset($teachers)): ?>
+                                        <?php foreach ($teachers as $teacher): ?>
+                                            <option value="<?= $teacher['userID'] ?>">
+                                                <?= $teacher['name'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-6">
+                                <label class="form-label">Status</label>
+                                <select name="statusID" class="form-select" required>
+                                    <option value="">Select Status</option>
+                                    <?php if (isset($courseStatuses)): ?>
+                                        <?php foreach ($courseStatuses as $status): ?>
+                                            <option value="<?= $status['statusID'] ?>">
+                                                <?= $status['statusName'] ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Create Course
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+                                
     <script>
         // Search functionality
         document.getElementById('searchInput').addEventListener('keyup', function() {
@@ -147,11 +232,8 @@
             });
         });
 
-        // Reset form
-        function resetForm() {
+        // Reset form when modal is closed
+        document.getElementById('createCourseModal').addEventListener('hidden.bs.modal', function () {
             document.getElementById('courseForm').reset();
-            document.getElementById('courseID').value = '';
-            document.getElementById('modalTitle').textContent = 'Add New Course';
-            document.getElementById('submitBtnText').textContent = 'Save Course';
-        }
+        });
     </script>

@@ -98,6 +98,8 @@ Class Course extends BaseController
         
         $courseModel = new CourseModel();
         $userModel = new UserModel();
+        $schoolYearModel = new SchoolYearModel();
+        $courseStatusModel = new CourseStatusModel();
 
         $userRole = session()->get('role');
         $userRoleID = $userModel->getRoleIDByUserID($userRole);
@@ -105,29 +107,48 @@ Class Course extends BaseController
 
         $courseDescriptions = $courseModel->getCoursesWithDetails();
 
+        $schoolYears = $schoolYearModel->getAllSchoolYears();
 
         $activeCourses = $courseModel->getActiveCoursesCount();
+
+        $courseStatuses = $courseStatusModel->getAllStatuses();
+        
         $data = [
             'course' => $courseDescriptions,
             'teachers' => $teachers,
+            'schoolYears' => $schoolYears,
             'activeCourses' => $activeCourses,
-            'role' => session()->get('role')
+            'role' => session()->get('role'),
+            'courseStatuses' => $courseStatuses
         ];
         if ($this->request->getMethod() === 'POST') {
+            $rules = [
+                'courseCode' => 'required|is_unique[courses.courseCode]',
+                'courseTitle' => 'required|is_unique[courses.courseTitle]',
+                'courseDescription' => 'required',
+                'teacherID' => 'required',
+                'statusID' => 'required',
+                'schoolYear' => 'required',
+            ];
+            if (!$this->validate($rules)) {
+                return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            }
             $courseModel = new CourseModel();
             $data = [
                 'courseCode' => $this->request->getPost('courseCode'),
                 'courseTitle' => $this->request->getPost('courseTitle'),
                 'courseDescription' => $this->request->getPost('courseDescription'),
                 'teacherID' => $this->request->getPost('teacherID'),
-                'schoolYearID' => $this->request->getPost('schoolYearID'),
                 'statusID' => $this->request->getPost('statusID'),
-
+                'schoolYearID' => $this->request->getPost('schoolYear')
             ];
+            //pang debug
+            //dd($data);
             $courseModel->insert($data);
 
             $message = 'Course created successfully.';
-            return view('templates/header') . view('courses/courseManagement', ['message' => $message]);
+
+            return redirect()->to('/course/manage')->with('message', $message);
         }else {
             return view('templates/header', $data) . view('courses/courseManagement');
         }
