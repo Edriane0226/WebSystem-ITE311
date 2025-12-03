@@ -153,8 +153,20 @@ Class Course extends BaseController
             return view('templates/header', $data) . view('courses/courseManagement');
         }
     }
+    // This act will be like delete but just change the status
+    public function setCourseStatus($courseID, $statusID)
+    {
+        if (!session()->get('isLoggedIn') || session()->get('role') != 'admin') {
+            return redirect()->to('login');
+        }
 
-    public function deleteCourse($id)
+        $courseModel = new CourseModel();
+        $courseModel->setStatus($courseID, $statusID);
+
+        return redirect()->back()->with('message', 'Course status updated successfully.');
+    }
+
+    public function updateCourse($courseID)
     {
         if (!session()->get('isLoggedIn') || session()->get('role') != 'admin') {
             return redirect()->to('login');
@@ -162,8 +174,21 @@ Class Course extends BaseController
 
         $courseModel = new CourseModel();
 
-        
+        if ($this->request->getMethod() === 'POST') {
+            $data = [
+                'courseCode' => $this->request->getPost('courseCode'),
+                'courseTitle' => $this->request->getPost('courseTitle'),
+                'courseDescription' => $this->request->getPost('courseDescription'),
+                'teacherID' => $this->request->getPost('teacherID'),
+                'statusID' => $this->request->getPost('statusID'),
+                'schoolYearID' => $this->request->getPost('schoolYear')
+            ];
+            $courseModel->update($courseID, $data);
 
-        return redirect()->to('/courses/manage')->with('message', 'Course deleted successfully.');
+            return redirect()->to('/course/manage')->with('message', 'Course updated successfully.');
+        }
+
+        $course = $courseModel->find($courseID);
+        return view('templates/header') . view('courses/updateCourse', ['course' => $course]);
     }
 }
