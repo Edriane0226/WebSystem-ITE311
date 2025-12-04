@@ -215,7 +215,7 @@
     </div>
 </div>
 
-<!-- Add Users Modal (Admin Only) -->
+<!-- Add Users Modal For Admin -->
 <?php if ($userRole === 'admin'): ?>
 <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
@@ -346,14 +346,14 @@
                     <div class="col-12">
                         <h6>Available Courses</h6>
                         <div id="availableCourses">
-                            <!-- Will be populated via AJAX -->
+                            
                         </div>
                     </div>
                     
                     <div class="col-12">
                         <h6>Current Enrollments</h6>
                         <div id="currentEnrollments">
-                            <!-- Will be populated via AJAX -->
+                            
                         </div>
                     </div>
                 </div>
@@ -374,7 +374,7 @@
         return div.innerHTML;
     }
 
-    // Search functionality
+    // Client-side search 
     document.getElementById('searchInput').addEventListener('keyup', function() {
         const filter = this.value.toLowerCase();
         const rows = document.querySelectorAll('#studentsTable tbody tr');
@@ -595,7 +595,7 @@
         new bootstrap.Modal(document.getElementById('enrollmentModal')).show();
     }
 
-    // Enroll student function (admin only)
+    // Enroll student function for admin
     function enrollStudent(studentId, courseId) {
         if (!isAdmin) {
             return;
@@ -623,7 +623,7 @@
         .catch(() => alert('Failed to enroll student.'));
     }
 
-    // Update enrollment status (admin & teacher)
+    // Update enrollment status admin and teacher can use
     function updateEnrollmentStatus(enrollmentId, statusId) {
         fetch('<?= base_url('students/updateEnrollmentStatus') ?>', {
             method: 'POST',
@@ -647,7 +647,7 @@
         .catch(() => alert('Failed to update enrollment status.'));
     }
 
-    // Unenroll student function (admin only)
+    // Unenroll student function for admin
     function unenrollStudent(enrollmentId) {
         if (!isAdmin) {
             return;
