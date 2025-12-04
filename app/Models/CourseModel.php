@@ -26,6 +26,15 @@ class CourseModel extends Model
         $query = $this->get();
         return $query->getResultArray();
     }
+    
+    public function getCourseWithDetails($courseID)
+    {
+        $this->select('courses.*, users.name as teacherName, coursestatus.statusName, schoolYear.schoolYear');
+        $this->join('users', 'courses.teacherID = users.userID');
+        $this->join('coursestatus', 'courses.statusID = coursestatus.statusID');
+        $this->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID');
+        return $this->where('courseID', $courseID)->first();
+    }
 
     public function setStatus($courseID, $statusID)
     {
@@ -35,5 +44,12 @@ class CourseModel extends Model
     public function getActiveCoursesCount()
     {
         return $this->where('statusID', 1)->countAllResults();
+    }
+
+    // check if the statusID if the same with the course's current statusID
+    public function checkCourseStatus($courseID)
+    {
+        $course = $this->find($courseID);
+        return $course ? $course['statusID'] : null;
     }
 }

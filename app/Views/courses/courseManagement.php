@@ -1,6 +1,6 @@
 <header>
     <title>Course Management</title>
-    </header>
+</header>
 <div class="container-fluid">
         <!-- Flash Messages -->
         <?php if (session()->getFlashdata('message')): ?>
@@ -17,7 +17,6 @@
             </div>
         <?php endif; ?>
 
-        <!-- Page Header -->
         <div class="row mb-4">
             <div class="col-12">
                 <div class="d-flex justify-content-between align-items-center">
@@ -26,7 +25,6 @@
             </div>
         </div>
 
-        <!-- Stats Cards -->
         <div class="row mb-4">
             <div class="col-xl-3 col-md-6 mb-3">
                 <div class="card border-0 shadow-sm h-100">
@@ -65,7 +63,6 @@
             </div>
         </div>
 
-        <!-- Course Table -->
         <div class="card border-0 shadow-sm">
             <div class="card-header bg-white border-bottom">
                 <div class="row align-items-center">
@@ -115,20 +112,18 @@
                                     <td><?= esc($course['schoolYear']) ?></td>
                                     <td><?= esc($course['teacherName'] ?? 'Not Assigned') ?></td>
                                     <td>
-                                        <select name="statusID" class="form-select" required>
-                                            <option value="">Status</option>
-                                            <?php if (isset($courseStatuses)): ?>
-                                                <?php foreach ($courseStatuses as $status): ?>
-                                                    <option value="<?= $status['statusID'] ?>">
-                                                        <?= $status['statusName'] ?>
-                                                    </option>
-                                                <?php endforeach; ?>
-                                            <?php endif; ?>
-                                        </select>
-                                        <button type="button" class="btn btn-sm btn-primary mt-2"
-                                            onclick="location.href='<?= base_url('course/setCourseStatus/' . $course['courseID'] . '/') ?>' + this.previousElementSibling.value;">
-                                            Update
-                                        </button>
+                                        <form action="<?= base_url('course/setStatus/' . $course['courseID']) ?>" method="post" class="d-inline">
+                                            <?= csrf_field() ?>
+                                            <select name="statusID" class="form-select form-select-sm" onchange="this.form.submit()">
+                                                <?php if (isset($courseStatuses)): ?>
+                                                    <?php foreach ($courseStatuses as $status): ?>
+                                                        <option value="<?= $status['statusID'] ?>" <?= $course['statusID'] == $status['statusID'] ? 'selected' : '' ?>>
+                                                            <?= $status['statusName'] ?>
+                                                        </option>
+                                                    <?php endforeach; ?>
+                                                <?php endif; ?>
+                                            </select>
+                                        </form>
                                     </td>
                                     <td>
                                         <button type="button" class="btn btn-sm btn-secondary mt-2"
@@ -165,7 +160,6 @@
         </div>
     </div>
 
-    <!-- Create Course Modal -->
     <div class="modal fade" id="createCourseModal" tabindex="-1" aria-labelledby="createCourseModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -247,7 +241,6 @@
         </div>
     </div>
                                 
-    <!-- Edit Course Modal -->
     <div class="modal fade" id="editCourseModal" tabindex="-1" aria-labelledby="editCourseModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -255,7 +248,7 @@
                     <h5 class="modal-title" id="editCourseModalLabel">Edit Course Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="<?= base_url('courses/updateCourse') ?>" method="post" id="editCourseForm">
+                <form action="<?= base_url('/course/update/' . $course['courseID']) ?>" method="post" id="editCourseForm">
                     <div class="modal-body">
                         <?= csrf_field() ?>
                         <input type="hidden" name="courseID" id="edit_courseID">
@@ -268,7 +261,7 @@
                             
                             <div class="col-md-6">
                                 <label class="form-label">School Year</label>
-                                <select name="schoolYear" id="edit_schoolYear" class="form-select" required>
+                                <select name="schoolYearID" id="edit_schoolYear" class="form-select" required>
                                     <option value="">Select School Year</option>
                                     <?php if (isset($schoolYears)): ?>
                                         <?php foreach ($schoolYears as $sy): ?>
@@ -297,26 +290,13 @@
                                     <?php if (isset($teachers)): ?>
                                         <?php foreach ($teachers as $teacher): ?>
                                             <option value="<?= $teacher['userID'] ?>">
-                                                <?= $teacher['name'] ?>
+                                                <?= esc($teacher['name']) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>
                             </div>
                             
-                            <div class="col-md-6">
-                                <label class="form-label">Status</label>
-                                <select name="statusID" id="edit_statusID" class="form-select" required>
-                                    <option value="">Select Status</option>
-                                    <?php if (isset($courseStatuses)): ?>
-                                        <?php foreach ($courseStatuses as $status): ?>
-                                            <option value="<?= $status['statusID'] ?>">
-                                                <?= $status['statusName'] ?>
-                                            </option>
-                                        <?php endforeach; ?>
-                                    <?php endif; ?>
-                                </select>
-                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -329,7 +309,7 @@
             </div>
         </div>
     </div>
-                                
+
     <script>
         // Search functionality
         document.getElementById('searchInput').addEventListener('keyup', function() {

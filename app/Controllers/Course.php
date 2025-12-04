@@ -77,7 +77,7 @@ Class Course extends BaseController
         $userModel = new UserModel();
         
         // Use the $id parameter to get the specific course
-        $course = $courseModel->find($id);
+        $course = $courseModel->getCourseWithDetails($id);
         
         if (!$course) {
             session()->setFlashdata('error', 'Course not found.');
@@ -153,8 +153,6 @@ Class Course extends BaseController
                 'statusID' => $this->request->getPost('statusID'),
                 'schoolYearID' => $this->request->getPost('schoolYear')
             ];
-            //pang debug
-            //dd($data);
             $courseModel->insert($data);
 
             $message = 'Course created successfully.';
@@ -165,16 +163,36 @@ Class Course extends BaseController
         }
     }
     // This act will be like delete but just change the status
-    public function setCourseStatus($courseID, $statusID)
+    public function setStatus($courseID)
     {
         if (!session()->get('isLoggedIn') || session()->get('role') != 'admin') {
             return redirect()->to('login');
         }
-
+        
+        if ($this->request->getMethod() !== 'POST') {
+            return redirect()->back();
+        }
+        
+        $statusID = $this->request->getPost('statusID');
+        
         $courseModel = new CourseModel();
-        $courseModel->setStatus($courseID, $statusID);
-
-        return redirect()->back()->with('message', 'Course status updated successfully.');
+        
+        // Get current course status
+        $currentStatusID = $courseModel->checkCourseStatus($courseID);
+        
+        // Check if the new status is the same as current status
+        if ($currentStatusID == $statusID) {
+            return redirect()->back()->with('message', 'Course status is already set to the selected status.');
+        }
+        
+        // Update the course status if different sa current stat
+        try {
+            $updateData = ['statusID' => $statusID];
+            $courseModel->update($courseID, $updateData);
+            return redirect()->back()->with('message', 'Course status updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Failed to update course status: ' . $e->getMessage());
+        }
     }
 
     public function updateCourse($courseID)
@@ -191,15 +209,11 @@ Class Course extends BaseController
                 'courseTitle' => $this->request->getPost('courseTitle'),
                 'courseDescription' => $this->request->getPost('courseDescription'),
                 'teacherID' => $this->request->getPost('teacherID'),
-                'statusID' => $this->request->getPost('statusID'),
-                'schoolYearID' => $this->request->getPost('schoolYear')
+                'schoolYearID' => $this->request->getPost('schoolYearID')
             ];
             $courseModel->update($courseID, $data);
 
             return redirect()->to('/course/manage')->with('message', 'Course updated successfully.');
         }
-
-        $course = $courseModel->find($courseID);
-        return view('templates/header') . view('courses/updateCourse', ['course' => $course]);
     }
 }

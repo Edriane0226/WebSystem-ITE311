@@ -18,6 +18,9 @@
                                 <?= esc($course['courseDescription'] ?? 'No description available.'); ?>
                             </p>
                             <p class="card-text text-muted small">
+                                School Year: <strong><?= esc($course['schoolYear'] ?? 'N/A'); ?></strong>
+                            </p>
+                            <p class="card-text text-muted small">
                                 Teacher: <strong><?= esc($teacher['name'] ?? 'N/A'); ?></strong>
                             </p>
                         </div>

@@ -68,3 +68,9 @@ $routes->get('/courses/(:num)', 'Course::details/$1');
 //Course CRUD
 $routes->get('/course/manage', 'Course::createCourse'); 
 $routes->post('/courses/manage', 'Course::createCourse');
+
+//SetStatus
+$routes->post('/course/setStatus/(:num)/', 'Course::setStatus/$1');
+
+//Edit Course
+$routes->post('/course/update/(:num)', 'Course::updateCourse/$1');

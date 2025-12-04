@@ -135,7 +135,7 @@ class Auth extends BaseController
                 'name' => $session->get('name'),
                 'email' => $session->get('email'),
                 'role' => $session->get('role'),
-                'courses' => $course->findAll(),
+                'courses' => $course->getCoursesWithDetails(),
                 'enrollments' => $enrollments,
                 'allUsers' => $allUsers,
             
