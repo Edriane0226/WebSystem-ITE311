@@ -42,18 +42,11 @@ class CreateCoursesTable extends Migration
                 'constraint' => 20,
                 'unsigned' => true
             ],
-            // 'offers' => [
-            //     'type' => 'INT',
-            //     'constraint' => 10,
-            //     'null' => true
-            // ],
         ]);
         $this->forge->addKey('courseID');
         $this->forge->addForeignKey('teacherID', 'users', 'userID', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('schoolYearID', 'schoolYear', 'schoolYearID', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('statusID', 'courseStatus', 'statusID', 'CASCADE', 'CASCADE');
-        // Imma add this later
-        //$this->forge->addForeignKey('offers', 'offerings', 'offersID', 'CASCADE', 'CASCADE');
         $this->forge->createTable('courses');
     }
 

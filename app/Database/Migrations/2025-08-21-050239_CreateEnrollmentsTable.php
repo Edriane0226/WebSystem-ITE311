@@ -29,11 +29,17 @@ class CreateEnrollmentsTable extends Migration
                 'type' => 'DATE',
                 'null' => true
             ],
+            'enrollmentStatus' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'unsigned' => true
+            ],
         ]);
 
         $this->forge->addKey('enrollmentID');
         $this->forge->addForeignKey('user_id', 'users', 'userID', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('course_id', 'courses', 'courseID', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('enrollmentStatus', 'enrollmentStatus', 'statusID', 'CASCADE', 'CASCADE');
         $this->forge->createTable('enrollments');
     }
 

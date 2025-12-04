@@ -1,0 +1,49 @@
+<?php
+
+namespace App\Database\Migrations;
+
+use CodeIgniter\Database\Migration;
+
+class CreateCourseOfferings extends Migration
+{
+    public function up()
+    {
+        $this->forge->addField([
+            'offeringID' => [
+                'type'           => 'INT',
+                'constraint'     => 11,
+                'unsigned'       => true,
+                'auto_increment' => true,
+            ],
+            'courseID' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+            ],
+            'schoolYearID' => [
+                'type'       => 'INT',
+                'constraint' => 11,
+                'unsigned'   => true,
+            ],
+            'startDate' => [
+                'type' => 'DATE',
+                'null' => true,
+            ],
+            'endDate' => [
+                'type' => 'DATE',
+                'null' => true,
+            ],
+        ]);
+
+        $this->forge->addKey('offeringID');
+        $this->forge->addForeignKey('courseID', 'courses', 'courseID', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('schoolYearID', 'schoolYear', 'schoolYearID', 'CASCADE', 'CASCADE');
+
+        $this->forge->createTable('courseOfferings');
+    }
+
+    public function down()
+    {
+        $this->forge->dropTable('courseOfferings');
+    }
+}
