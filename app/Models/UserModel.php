@@ -52,7 +52,7 @@ class UserModel extends Model
             MAX(users.email) AS email,
             COUNT(enrollments.enrollmentID) AS enrollment_count
         ");
-        $builder->join('enrollments', 'users.userID = enrollments.user_id AND enrollments.enrollmentStatus = ' . EnrollmentModel::STATUS_ENROLLED, 'left');
+        $builder->join('enrollments', 'users.userID = enrollments.user_id AND enrollments.enrollmentStatus = 2', 'left');
         $builder->where('users.role', 3);
         $builder->groupBy('users.userID');
 
@@ -63,7 +63,7 @@ class UserModel extends Model
     {
     return $this->select('users.userID, users.name, users.email, users.role, users.created_at, roles.role_name, COUNT(enrollments.enrollmentID) AS enrolledCourses')
                     ->join('roles', 'users.role = roles.roleID', 'left')
-                    ->join('enrollments', 'enrollments.user_id = users.userID AND enrollments.enrollmentStatus = ' . EnrollmentModel::STATUS_ENROLLED, 'left')
+                    ->join('enrollments', 'enrollments.user_id = users.userID AND enrollments.enrollmentStatus = 2', 'left')
             ->groupBy('users.userID, users.name, users.email, users.role, users.created_at, roles.role_name')
                     ->orderBy('users.name')
                     ->findAll();
@@ -72,11 +72,11 @@ class UserModel extends Model
     public function getStudentsByTeacherCourses($teacherId)
     {
     return $this->select('users.userID, users.name, users.email, COUNT(DISTINCT enrollments.course_id) AS enrolledCourses')
-                    ->join('enrollments', 'enrollments.user_id = users.userID AND enrollments.enrollmentStatus = ' . EnrollmentModel::STATUS_ENROLLED, 'inner')
+                    ->join('enrollments', 'enrollments.user_id = users.userID AND enrollments.enrollmentStatus = 2', 'inner')
                     ->join('courses', 'courses.courseID = enrollments.course_id', 'inner')
                     ->where('courses.teacherID', $teacherId)
                     ->where('users.role', 3)
-            ->groupBy('users.userID, users.name, users.email')
+                    ->groupBy('users.userID, users.name, users.email')
                     ->orderBy('users.name')
                     ->findAll();
     }

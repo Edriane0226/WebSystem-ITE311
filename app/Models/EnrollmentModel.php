@@ -21,7 +21,7 @@ class EnrollmentModel extends Model {
                     ->join('enrollmentstatus', 'enrollmentstatus.statusID = enrollments.enrollmentStatus', 'left')
                     ->join('courseOfferings', 'courseOfferings.courseID = enrollments.course_id', 'left')
                     ->where('enrollments.user_id', $user_id)
-                    ->where('enrollments.enrollmentStatus', self::STATUS_ENROLLED)
+                    ->where('enrollments.enrollmentStatus = 2')
                     ->orderBy('courses.courseTitle')
                     ->findAll();
     }
