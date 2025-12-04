@@ -34,6 +34,7 @@ Class Course extends BaseController
             'user_id' => $user_id,
             'course_id' => $course_id,
             'enrollment_date' => date('Y-m-d'),
+            'enrollmentStatus' => 2,
         ];
         $enrollmentModel->enrollUser($data);
 

@@ -14,5 +14,6 @@ class EnrollmentStatusSeeder extends Seeder
             ['statusName' => 'Completed'],
             ['statusName' => 'Dropped'],
         ];
+        $this->db->table('enrollmentstatus')->insertBatch($data);
     }
 }

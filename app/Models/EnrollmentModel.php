@@ -6,7 +6,7 @@ use CodeIgniter\Model;
 class EnrollmentModel extends Model {
     protected $table = 'enrollments';
     protected $primaryKey = 'id';
-    protected $allowedFields = ['user_id', 'course_id', 'enrollment_date'];
+    protected $allowedFields = ['user_id', 'course_id', 'enrollment_date', 'enrollmentStatus'];
 
     // Insert ug data galing sa controller
     public function enrollUser($data) {

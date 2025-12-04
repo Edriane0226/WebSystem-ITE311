@@ -26,11 +26,11 @@ class CreateCourseOfferings extends Migration
                 'unsigned'   => true,
             ],
             'startDate' => [
-                'type' => 'DATE',
+                'type' => 'DATETIME',
                 'null' => true,
             ],
             'endDate' => [
-                'type' => 'DATE',
+                'type' => 'DATETIME',
                 'null' => true,
             ],
         ]);

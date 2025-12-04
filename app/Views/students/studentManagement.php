@@ -205,7 +205,7 @@
                 <h5 class="modal-title">Add New Student</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-            <form action="<?= base_url('students/save') ?>" method="post" id="studentForm">
+            <form action="<?= base_url('students/addStudent') ?>" method="post" id="studentForm">
                 <div class="modal-body">
                     <?= csrf_field() ?>
                     
