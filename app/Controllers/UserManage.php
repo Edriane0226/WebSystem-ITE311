@@ -5,43 +5,49 @@ namespace App\Controllers;
 use App\Models\UserModel;
 use App\Models\CourseModel;
 use App\Models\EnrollmentModel;
+use App\Models\EnrollmentStatusModel;
 
 class UserManage extends BaseController
 {
-    public function index()
+    public function UserManagement()
     {
         if (!session()->get('isLoggedIn')) {
             return redirect()->to('login');
         }
 
         $userRole = session()->get('role');
-        $userID = session()->get('userID');
+            $userID = session()->get('userID');
         
         $userModel = new UserModel();
         $courseModel = new CourseModel();
         $enrollmentModel = new EnrollmentModel();
 
-        $data = [];
+        $data = [
+            'role' => $userRole,
+            'activeEnrollments' => $enrollmentModel->countActiveEnrollments(),
+        ];
 
         if ($userRole === 'admin') {
-            // Admin can see all students
-            $students = $userModel->getStudentsWithEnrollmentCount();
-            $data['students'] = $students;
-            
+            $users = $userModel->getAllUsersWithRole();
+            $data['users'] = $users;
+
+            $studentCount = 0;
+            foreach ($users as $user) {
+                if (isset($user['role_name']) && strtolower($user['role_name']) === 'student') {
+                    $studentCount++;
+                }
+            }
+
+            $data['studentCount'] = $studentCount;
         } elseif ($userRole === 'teacher') {
-            // Teacher can only see students enrolled in their courses
             $teacherCourses = $courseModel->getCoursesByTeacher($userID);
             $students = $userModel->getStudentsByTeacherCourses($userID);
-            $data['students'] = $students;
             $data['teacherCourses'] = $teacherCourses;
+            $data['users'] = $students;
         } else {
             // Students cannot access this page
             return redirect()->to('dashboard')->with('error', 'Access denied.');
         }
-
-        // Get active enrollments count
-        $data['activeEnrollments'] = $enrollmentModel->getActiveEnrollmentsCount();
-        $data['role'] = $userRole;
 
         return view('templates/header', ['role' => $userRole]) . 
                view('students/studentManagement', $data);
@@ -168,25 +174,27 @@ class UserManage extends BaseController
 
         $userRole = session()->get('role');
         $currentUserID = session()->get('userID');
-        
+
         $courseModel = new CourseModel();
         $enrollmentModel = new EnrollmentModel();
+        $statusModel = new EnrollmentStatusModel();
 
-        // Get current enrollments
-        $enrolledCourses = $enrollmentModel->getStudentEnrollments($studentID);
-
-        // Get available courses based on role
-        if ($userRole === 'admin') {
+        if ($userRole === 'teacher') {
+            // Teachers can see all enrollments but may only edit their own
+            $enrolledCourses = $enrollmentModel->getStudentEnrollments($studentID);
+            $availableCourses = [];
+        } elseif ($userRole === 'admin') {
+            $enrolledCourses = $enrollmentModel->getStudentEnrollments($studentID);
             $availableCourses = $courseModel->getAvailableCoursesForStudent($studentID);
-        } elseif ($userRole === 'teacher') {
-            $availableCourses = $courseModel->getTeacherAvailableCoursesForStudent($currentUserID, $studentID);
         } else {
             return $this->response->setJSON(['error' => 'Access denied']);
         }
 
         return $this->response->setJSON([
             'enrolledCourses' => $enrolledCourses,
-            'availableCourses' => $availableCourses
+            'availableCourses' => $availableCourses,
+            'statuses' => $statusModel->getAllStatuses(),
+            'teacherId' => $userRole === 'teacher' ? (int) $currentUserID : null,
         ]);
     }
 
@@ -198,9 +206,8 @@ class UserManage extends BaseController
         }
 
         $userRole = session()->get('role');
-        $currentUserID = session()->get('userID');
         
-        if (!in_array($userRole, ['admin', 'teacher'])) {
+        if ($userRole !== 'admin') {
             return $this->response->setJSON(['success' => false, 'message' => 'Access denied']);
         }
 
@@ -213,16 +220,6 @@ class UserManage extends BaseController
         }
 
         $enrollmentModel = new EnrollmentModel();
-        $courseModel = new CourseModel();
-
-        // Check if teacher is authorized for this course
-        if ($userRole === 'teacher') {
-            $course = $courseModel->find($courseId);
-            if (!$course || $course['teacherID'] != $currentUserID) {
-                return $this->response->setJSON(['success' => false, 'message' => 'Not authorized for this course']);
-            }
-        }
-
         // Check if already enrolled
         if ($enrollmentModel->isAlreadyEnrolled($studentId, $courseId)) {
             return $this->response->setJSON(['success' => false, 'message' => 'Student already enrolled in this course']);
@@ -232,7 +229,7 @@ class UserManage extends BaseController
             'user_id' => $studentId,
             'course_id' => $courseId,
             'enrollment_date' => date('Y-m-d'),
-            'status' => 'active'
+            'enrollmentStatus' => 2
         ];
 
         try {
@@ -251,9 +248,8 @@ class UserManage extends BaseController
         }
 
         $userRole = session()->get('role');
-        $currentUserID = session()->get('userID');
         
-        if (!in_array($userRole, ['admin', 'teacher'])) {
+        if ($userRole !== 'admin') {
             return $this->response->setJSON(['success' => false, 'message' => 'Access denied']);
         }
 
@@ -266,19 +262,50 @@ class UserManage extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Enrollment not found']);
         }
 
-        // Check if teacher is authorized for this course
-        if ($userRole === 'teacher') {
-            $course = $courseModel->find($enrollment['course_id']);
-            if (!$course || $course['teacherID'] != $currentUserID) {
-                return $this->response->setJSON(['success' => false, 'message' => 'Not authorized for this course']);
-            }
-        }
-
         try {
             $enrollmentModel->delete($enrollmentID);
             return $this->response->setJSON(['success' => true, 'message' => 'Student unenrolled successfully']);
         } catch (\Exception $e) {
             return $this->response->setJSON(['success' => false, 'message' => 'Failed to unenroll student: ' . $e->getMessage()]);
+        }
+    }
+
+    public function updateEnrollmentStatus()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        $userRole = session()->get('role');
+        $currentUserID = session()->get('userID');
+
+        if (!in_array($userRole, ['admin', 'teacher'])) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Access denied']);
+        }
+
+        $enrollmentID = $this->request->getPost('enrollmentId');
+        $statusID = $this->request->getPost('statusId');
+
+        if (!$enrollmentID || !$statusID) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Missing required data']);
+        }
+
+        $enrollmentModel = new EnrollmentModel();
+        $enrollment = $enrollmentModel->getEnrollmentWithCourse($enrollmentID);
+
+        if (!$enrollment) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Enrollment not found']);
+        }
+
+        if ($userRole === 'teacher' && (int) $enrollment['teacherID'] !== (int) $currentUserID) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Not authorized for this enrollment']);
+        }
+
+        try {
+            $enrollmentModel->updateEnrollmentStatus($enrollmentID, $statusID);
+            return $this->response->setJSON(['success' => true, 'message' => 'Enrollment status updated']);
+        } catch (\Exception $e) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Failed to update enrollment: ' . $e->getMessage()]);
         }
     }
 

@@ -52,8 +52,7 @@
 
       <?php if ($role == 'admin'): ?>
         <li class="nav-item">
-          <!-- # sa -->
-          <a href="#" class="nav-link text-white bg-info rounded px-3 mt-3">
+          <a href="<?= base_url('students/studentManagement') ?>" class="nav-link text-white bg-info rounded px-3 mt-3">
             Manage Users
           </a>
         </li>
@@ -61,7 +60,7 @@
       <?php elseif ($role == 'teacher'): ?>
         <li class="nav-item">
           <!-- # sa -->
-          <a href="#" class="nav-link text-white bg-info rounded px-3 mt-3">
+          <a href="<?= base_url('students/studentManagement') ?>" class="nav-link text-white bg-info rounded px-3 mt-3">
               Manage Students
           </a>
         </li>

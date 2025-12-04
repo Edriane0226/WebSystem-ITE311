@@ -65,7 +65,7 @@ $routes->get('/courses/(:num)', 'Course::details/$1');
 // $routes->get('/teacher', 'TeacherController::dashboard'); 
 // $routes->get('/student', 'StudentController::dashboard'); 
 
-//Course CRUD
+//Course Management
 $routes->get('/course/manage', 'Course::createCourse'); 
 $routes->post('/courses/manage', 'Course::createCourse');
 
@@ -74,3 +74,11 @@ $routes->post('/course/setStatus/(:num)/', 'Course::setStatus/$1');
 
 //Edit Course
 $routes->post('/course/update/(:num)', 'Course::updateCourse/$1');
+
+//User Management
+$routes->get('/students/studentManagement', 'UserManage::UserManagement');
+$routes->get('/students/getEnrollmentData/(:num)', 'UserManage::getEnrollmentData/$1');
+$routes->post('/students/enroll', 'UserManage::enroll');
+$routes->delete('/students/unenroll/(:num)', 'UserManage::unenroll/$1');
+$routes->post('/students/updateEnrollmentStatus', 'UserManage::updateEnrollmentStatus');
+$routes->get('/students/by-course/(:num)', 'UserManage::getStudentsByCourse/$1');

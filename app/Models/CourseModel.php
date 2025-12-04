@@ -5,6 +5,7 @@ namespace App\Models;
 use CodeIgniter\Model;
 use App\Models\ShcoolYearModel;
 use App\Models\CourseStatusModel;
+use App\Models\EnrollmentModel;
 
 class CourseModel extends Model
 {
@@ -36,6 +37,13 @@ class CourseModel extends Model
         return $this->where('courseID', $courseID)->first();
     }
 
+    public function getCoursesByTeacher($teacherId)
+    {
+        return $this->where('teacherID', $teacherId)
+                    ->orderBy('courseTitle')
+                    ->findAll();
+    }
+
     public function setStatus($courseID, $statusID)
     {
         $this->update($courseID, ['statusID' => $statusID]);
@@ -51,5 +59,40 @@ class CourseModel extends Model
     {
         $course = $this->find($courseID);
         return $course ? $course['statusID'] : null;
+    }
+
+    public function getAvailableCoursesForStudent($studentId)
+    {
+        $enrolledCourseIds = (new EnrollmentModel())
+            ->where('user_id', $studentId)
+            ->select('course_id')
+            ->findColumn('course_id') ?? [];
+
+        $builder = $this->builder();
+        $builder->select('*');
+
+        if (!empty($enrolledCourseIds)) {
+            $builder->whereNotIn('courseID', $enrolledCourseIds);
+        }
+
+        return $builder->orderBy('courseTitle')->get()->getResultArray();
+    }
+
+    public function getTeacherAvailableCoursesForStudent($teacherId, $studentId)
+    {
+        $enrolledCourseIds = (new EnrollmentModel())
+            ->where('user_id', $studentId)
+            ->select('course_id')
+            ->findColumn('course_id') ?? [];
+
+        $builder = $this->builder();
+        $builder->select('*');
+        $builder->where('teacherID', $teacherId);
+
+        if (!empty($enrolledCourseIds)) {
+            $builder->whereNotIn('courseID', $enrolledCourseIds);
+        }
+
+        return $builder->orderBy('courseTitle')->get()->getResultArray();
     }
 }

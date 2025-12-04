@@ -51,7 +51,7 @@
                             </div>
                             <div>
                                 <h6 class="text-muted mb-1">Total Students</h6>
-                                <h4 class="mb-0"><?= isset($students) ? count($students) : 0 ?></h4>
+                                <h4 class="mb-0"><?= $studentCount ?? 0 ?></h4>
                             </div>
                         </div>
                     </div>
@@ -70,7 +70,7 @@
                         </div>
                         <div>
                             <h6 class="text-muted mb-1">Active Enrollments</h6>
-                            <h4 class="mb-0"><?= isset($activeEnrollments) ? $activeEnrollments : 0 ?></h4>
+                            <h4 class="mb-0"><?= $activeEnrollments ?? 0 ?></h4>
                         </div>
                     </div>
                 </div>
@@ -116,75 +116,82 @@
         
         <div class="card-body p-0">
             <div class="table-responsive">
+                <?php $isAdmin = ($userRole === 'admin'); ?>
+                <?php $records = $users ?? []; ?>
+                <?php $columnCount = $isAdmin ? 7 : 5; ?>
                 <table class="table table-hover mb-0" id="studentsTable">
                     <thead class="table-light">
                         <tr>
-                            <th class="border-0 ps-4">Student ID</th>
+                            <th class="border-0 ps-4"><?= $isAdmin ? 'User ID' : 'Student ID' ?></th>
                             <th class="border-0">Name</th>
                             <th class="border-0">Email</th>
-                            <?php if ($userRole === 'admin'): ?>
-                                <th class="border-0">Status</th>
+                            <?php if ($isAdmin): ?>
+                                <th class="border-0">Role</th>
                                 <th class="border-0">Created</th>
                             <?php endif; ?>
-                            <th class="border-0">Enrolled Courses</th>
+                            <th class="border-0"><?= $isAdmin ? 'Enrolled Courses' : 'Courses in My Classes' ?></th>
                             <th class="border-0 text-end pe-4">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
-                        <?php if (isset($students) && !empty($students)): ?>
-                            <?php foreach ($students as $student): ?>
-                            <tr>
-                                <td class="ps-4">
-                                    <span class="fw-bold"><?= esc($student['studentID'] ?? $student['userID']) ?></span>
-                                </td>
-                                <td>
-                                    <div class="d-flex align-items-center">
-                                        <div class="avatar bg-primary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
-                                            <?= strtoupper(substr($student['firstName'], 0, 1) . substr($student['lastName'], 0, 1)) ?>
-                                        </div>
-                                        <div>
-                                            <div class="fw-medium"><?= esc($student['firstName'] . ' ' . $student['lastName']) ?></div>
-                                        </div>
-                                    </div>
-                                </td>
-                                <td><?= esc($student['email']) ?></td>
-                                <?php if ($userRole === 'admin'): ?>
-                                    <td>
-                                        <span class="badge <?= $student['status'] === 'active' ? 'bg-success' : 'bg-secondary' ?>">
-                                            <?= ucfirst($student['status'] ?? 'active') ?>
-                                        </span>
+                        <?php if (!empty($records)): ?>
+                            <?php foreach ($records as $user): ?>
+                                <?php
+                                    $roleName = isset($user['role_name']) ? strtolower($user['role_name']) : 'student';
+                                    $canManageEnrollment = $roleName === 'student';
+                                ?>
+                                <tr>
+                                    <td class="ps-4">
+                                        <span class="fw-bold"><?= esc($user['userID']) ?></span>
                                     </td>
-                                    <td><?= date('M j, Y', strtotime($student['created_at'] ?? '')) ?></td>
-                                <?php endif; ?>
-                                <td>
-                                    <small class="text-muted"><?= $student['enrolledCourses'] ?? 0 ?> courses</small>
-                                </td>
-                                <td class="text-end pe-4">
-                                    <div class="btn-group" role="group">
-                                        <?php if ($userRole === 'admin'): ?>
-                                            <button class="btn btn-sm btn-outline-primary" onclick="editStudent(<?= htmlspecialchars(json_encode($student)) ?>)" title="Edit Student">
-                                                <i class="bi bi-pencil"></i>
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar bg-primary text-white rounded-circle me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                                <?= strtoupper(substr($user['name'] ?? '', 0, 1)) ?>
+                                            </div>
+                                            <div>
+                                                <div class="fw-medium"><?= esc($user['name'] ?? 'N/A') ?></div>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td><?= esc($user['email'] ?? 'N/A') ?></td>
+                                    <?php if ($isAdmin): ?>
+                                        <td>
+                                            <span class="badge bg-light text-dark border"><?= esc(ucfirst($roleName)) ?></span>
+                                        </td>
+                                        <td>
+                                            <?= isset($user['created_at']) && $user['created_at'] ? date('M j, Y', strtotime($user['created_at'])) : '—' ?>
+                                        </td>
+                                    <?php endif; ?>
+                                    <td>
+                                        <small class="text-muted"><?= (int) ($user['enrolledCourses'] ?? 0) ?> courses</small>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group" role="group">
+                                            <?php if ($isAdmin): ?>
+                                                <button class="btn btn-sm btn-outline-primary" onclick="editStudent(<?= htmlspecialchars(json_encode($user)) ?>)" title="Edit User">
+                                                    <i class="bi bi-pencil"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                            <button class="btn btn-sm btn-outline-info" data-student-id="<?= (int) $user['userID'] ?>" data-student-name="<?= esc($user['name'] ?? '') ?>" onclick="manageEnrollment(this.dataset.studentId, this.dataset.studentName)" title="Manage Enrollment" <?= $canManageEnrollment ? '' : 'disabled' ?>>
+                                                <i class="bi bi-bookmark-plus"></i>
                                             </button>
-                                        <?php endif; ?>
-                                        <button class="btn btn-sm btn-outline-info" onclick="manageEnrollment(<?= $student['userID'] ?>, '<?= esc($student['firstName'] . ' ' . $student['lastName']) ?>')" title="Manage Enrollment">
-                                            <i class="bi bi-bookmark-plus"></i>
-                                        </button>
-                                        <?php if ($userRole === 'admin'): ?>
-                                            <button class="btn btn-sm btn-outline-danger" onclick="deleteStudent(<?= $student['userID'] ?>)" title="Delete">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        <?php endif; ?>
-                                    </div>
-                                </td>
-                            </tr>
+                                            <?php if ($isAdmin): ?>
+                                                <button class="btn btn-sm btn-outline-danger" data-student-id="<?= (int) $user['userID'] ?>" onclick="deleteStudent(this.dataset.studentId)" title="Delete User" <?= $canManageEnrollment ? '' : 'disabled' ?>>
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            <?php endif; ?>
+                                        </div>
+                                    </td>
+                                </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
                             <tr>
-                                <td colspan="<?= $userRole === 'admin' ? '7' : '5' ?>" class="text-center py-5">
+                                <td colspan="<?= $columnCount ?>" class="text-center py-5">
                                     <div class="text-muted">
                                         <i class="bi bi-people fa-3x mb-3"></i>
-                                        <h5>No students found</h5>
-                                        <p><?= $userRole === 'admin' ? 'Add your first student.' : 'No students enrolled in your courses.' ?></p>
+                                        <h5><?= $isAdmin ? 'No users found' : 'No students found' ?></h5>
+                                        <p><?= $isAdmin ? 'Add your first user.' : 'No students enrolled in your courses.' ?></p>
                                     </div>
                                 </td>
                             </tr>
@@ -332,6 +339,17 @@
 </div>
 
 <script>
+    const isAdmin = <?= $userRole === 'admin' ? 'true' : 'false' ?>;
+    const isTeacher = <?= $userRole === 'teacher' ? 'true' : 'false' ?>;
+    const currentTeacherId = <?= $userRole === 'teacher' ? (int) session()->get('userID') : 'null' ?>;
+
+    function escapeHtml(value) {
+        const div = document.createElement('div');
+        const normalized = value === undefined || value === null ? '' : value;
+        div.textContent = normalized;
+        return div.innerHTML;
+    }
+
     // Search functionality
     document.getElementById('searchInput').addEventListener('keyup', function() {
         const filter = this.value.toLowerCase();
@@ -344,76 +362,136 @@
     });
 
     <?php if ($userRole === 'admin'): ?>
-    // Edit student function
-    function editStudent(student) {
-        document.getElementById('edit_userID').value = student.userID;
-        document.getElementById('edit_firstName').value = student.firstName;
-        document.getElementById('edit_lastName').value = student.lastName;
-        document.getElementById('edit_email').value = student.email;
-        document.getElementById('edit_status').value = student.status || 'active';
+    // Edit user function
+    function editStudent(user) {
+        document.getElementById('edit_userID').value = user.userID;
+        document.getElementById('edit_firstName').value = user.firstName || '';
+        document.getElementById('edit_lastName').value = user.lastName || '';
+        document.getElementById('edit_email').value = user.email || '';
+        document.getElementById('edit_status').value = user.status || 'active';
         
         new bootstrap.Modal(document.getElementById('editStudentModal')).show();
     }
 
-    // Delete student function
-    function deleteStudent(studentId) {
-        if (confirm('Are you sure you want to delete this student? This action cannot be undone.')) {
-            window.location.href = `<?= base_url('students/delete/') ?>${studentId}`;
+    // Delete user function
+    function deleteStudent(userId) {
+        if (confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+            window.location.href = `<?= base_url('students/delete/') ?>${userId}`;
         }
     }
     <?php endif; ?>
 
     // Manage enrollment function
     function manageEnrollment(studentId, studentName) {
+        if (!studentName) {
+            studentName = 'Student';
+        }
+
         document.getElementById('enrollment_studentID').value = studentId;
         document.getElementById('enrollmentModalTitle').textContent = `Manage Enrollment - ${studentName}`;
-        
-        // Load enrollment data via AJAX
+
         fetch(`<?= base_url('students/getEnrollmentData/') ?>${studentId}`)
             .then(response => response.json())
             .then(data => {
-                // Populate available courses
-                let availableHTML = '';
-                data.availableCourses.forEach(course => {
-                    availableHTML += `
-                        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                            <div>
-                                <strong>${course.courseTitle}</strong>
-                                <small class="text-muted d-block">${course.courseCode}</small>
-                            </div>
-                            <button class="btn btn-sm btn-outline-primary" onclick="enrollStudent(${studentId}, ${course.courseID})">
-                                Enroll
-                            </button>
-                        </div>
-                    `;
-                });
-                document.getElementById('availableCourses').innerHTML = availableHTML || '<p class="text-muted">No available courses</p>';
-                
-                // Populate current enrollments
+                console.log('Enrollment data response:', data);
+                if (data.error) {
+                    alert('Error: ' + data.error);
+                    return;
+                }
+
+                const availableContainer = document.getElementById('availableCourses');
+                const enrolledContainer = document.getElementById('currentEnrollments');
+
+                if (isAdmin) {
+                    let availableHTML = '';
+
+                    if (Array.isArray(data.availableCourses) && data.availableCourses.length) {
+                        data.availableCourses.forEach(course => {
+                            availableHTML += `
+                                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                    <div>
+                                        <strong>${escapeHtml(course.courseTitle || 'Untitled Course')}</strong>
+                                        <small class="text-muted d-block">${escapeHtml(course.courseCode || '')}</small>
+                                    </div>
+                                    <button class="btn btn-sm btn-outline-primary" onclick="enrollStudent(${studentId}, ${course.courseID})">
+                                        Enroll
+                                    </button>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        availableHTML = '<p class="text-muted">No available courses</p>';
+                    }
+
+                    availableContainer.innerHTML = availableHTML;
+                } else {
+                    availableContainer.innerHTML = '<p class="text-muted mb-0">Teachers can only update enrollment statuses.</p>';
+                }
+
                 let enrolledHTML = '';
-                data.enrolledCourses.forEach(enrollment => {
-                    enrolledHTML += `
-                        <div class="d-flex justify-content-between align-items-center border-bottom py-2">
-                            <div>
-                                <strong>${enrollment.courseTitle}</strong>
-                                <small class="text-muted d-block">Enrolled: ${enrollment.enrollmentDate}</small>
+
+                const enrollments = Array.isArray(data.enrolledCourses) ? data.enrolledCourses : [];
+
+                if (enrollments.length) {
+                    enrollments.forEach(enrollment => {
+                        const managedByCurrentTeacher = isAdmin || (isTeacher && parseInt(enrollment.teacherID, 10) === currentTeacherId);
+                        const statusOptions = (Array.isArray(data.statuses) ? data.statuses : []).map(status => `
+                            <option value="${status.statusID}" ${String(status.statusID) === String(enrollment.enrollmentStatus) ? 'selected' : ''}>
+                                ${escapeHtml(status.statusName)}
+                            </option>
+                        `).join('');
+
+                        let statusControl;
+                        if (managedByCurrentTeacher) {
+                            statusControl = `
+                                <select class="form-select form-select-sm w-auto" onchange="updateEnrollmentStatus(${enrollment.enrollmentID}, this.value)">
+                                    ${statusOptions}
+                                </select>
+                            `;
+                        } else if (isTeacher) {
+                            statusControl = '<span class="badge bg-secondary">Managed by another teacher</span>';
+                        } else {
+                            statusControl = `<span class="badge bg-light text-dark">${escapeHtml(enrollment.statusName || 'N/A')}</span>`;
+                        }
+
+                        const unenrollButton = isAdmin
+                            ? `<button class="btn btn-sm btn-outline-danger ms-2" onclick="unenrollStudent(${enrollment.enrollmentID})">Unenroll</button>`
+                            : '';
+
+                        enrolledHTML += `
+                            <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                <div>
+                                    <strong>${escapeHtml(enrollment.courseTitle || 'Course')}</strong>
+                                    <small class="text-muted d-block">Enrolled: ${escapeHtml(enrollment.enrollmentDate || 'N/A')}</small>
+                                </div>
+                                <div class="d-flex align-items-center gap-2">
+                                    ${statusControl}
+                                    ${unenrollButton}
+                                </div>
                             </div>
-                            <?php if ($userRole === 'admin' || $userRole === 'teacher'): ?>
-                            <button class="btn btn-sm btn-outline-danger" onclick="unenrollStudent(${enrollment.enrollmentID})">
-                                Unenroll
-                            </button>
-                            <?php endif; ?>
-                        </div>
-                    `;
-                });
-                document.getElementById('currentEnrollments').innerHTML = enrolledHTML || '<p class="text-muted">No current enrollments</p>';
+                        `;
+                    });
+                }
+
+                if (!enrollments.length && !enrolledHTML) {
+                    enrolledHTML = '<p class="text-muted">No current enrollments</p>';
+                }
+
+                enrolledContainer.innerHTML = enrolledHTML;
+            })
+            .catch(() => {
+                alert('Failed to load enrollment data.');
             });
-        
+
         new bootstrap.Modal(document.getElementById('enrollmentModal')).show();
     }
 
-    // Enroll student function
+    // Enroll student function (admin only)
     function enrollStudent(studentId, courseId) {
+        if (!isAdmin) {
+            return;
+        }
+
         fetch('<?= base_url('students/enroll') ?>', {
             method: 'POST',
             headers: {
@@ -432,11 +510,40 @@
             } else {
                 alert('Error: ' + data.message);
             }
-        });
+        })
+        .catch(() => alert('Failed to enroll student.'));
     }
 
-    // Unenroll student function
+    // Update enrollment status (admin & teacher)
+    function updateEnrollmentStatus(enrollmentId, statusId) {
+        fetch('<?= base_url('students/updateEnrollmentStatus') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+            },
+            body: new URLSearchParams({
+                enrollmentId: enrollmentId,
+                statusId: statusId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + data.message);
+            }
+        })
+        .catch(() => alert('Failed to update enrollment status.'));
+    }
+
+    // Unenroll student function (admin only)
     function unenrollStudent(enrollmentId) {
+        if (!isAdmin) {
+            return;
+        }
+
         if (confirm('Are you sure you want to unenroll this student?')) {
             fetch(`<?= base_url('students/unenroll/') ?>${enrollmentId}`, {
                 method: 'DELETE',
@@ -451,7 +558,8 @@
                 } else {
                     alert('Error: ' + data.message);
                 }
-            });
+            })
+            .catch(() => alert('Failed to unenroll student.'));
         }
     }
 
