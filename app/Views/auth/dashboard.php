@@ -16,8 +16,9 @@
                                     <div class="card mt-5 courseCard" data-course_id="<?= base64_encode($course['courseID']) ?>">
                                         <div class="card-body">
                                             <h4 class="card-title"><?= $course['courseTitle'] ?></h4>
-                                            <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
+                                            <h6 class="card-subtitle mb-2 text-muted"><?= $course['courseCode'] ?></h6>
                                             <p><?= $course['courseDescription'] ?></p>
+                                            <p class="text-muted small">School Year: <?= $course['schoolYear'] ?></p>
                                             <button class="btn btn-primary enroll">Enroll</button>
                                         </div>
                                     </div>
