@@ -20,20 +20,22 @@ class CourseModel extends Model
     }
     public function getCoursesWithDetails()
     {
-        $this->select('courses.*, users.name as teacherName, coursestatus.statusName, schoolYear.schoolYear');
-        $this->join('users', 'courses.teacherID = users.userID');
-        $this->join('coursestatus', 'courses.statusID = coursestatus.statusID');
-        $this->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID');
+        $this->select('courses.*, users.name as teacherName, coursestatus.statusName, schoolYear.schoolYear, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.offeringID');
+        $this->join('users', 'courses.teacherID = users.userID', 'left');
+        $this->join('coursestatus', 'courses.statusID = coursestatus.statusID', 'left');
+        $this->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left');
+        $this->join('courseOfferings', 'courseOfferings.courseID = courses.courseID', 'left');
         $query = $this->get();
         return $query->getResultArray();
     }
     
     public function getCourseWithDetails($courseID)
     {
-        $this->select('courses.*, users.name as teacherName, coursestatus.statusName, schoolYear.schoolYear');
-        $this->join('users', 'courses.teacherID = users.userID');
-        $this->join('coursestatus', 'courses.statusID = coursestatus.statusID');
-        $this->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID');
+        $this->select('courses.*, users.name as teacherName, coursestatus.statusName, schoolYear.schoolYear, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.offeringID');
+        $this->join('users', 'courses.teacherID = users.userID', 'left');
+        $this->join('coursestatus', 'courses.statusID = coursestatus.statusID', 'left');
+        $this->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left');
+        $this->join('courseOfferings', 'courseOfferings.courseID = courses.courseID', 'left');
         return $this->where('courseID', $courseID)->first();
     }
 

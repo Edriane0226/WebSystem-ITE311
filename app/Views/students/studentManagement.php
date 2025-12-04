@@ -15,7 +15,7 @@
                 </div>
                 <?php if ($userRole === 'admin'): ?>
                     <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addStudentModal">
-                        <i class="bi bi-plus-lg me-1"></i>Add Student
+                        <i class="bi bi-plus-lg me-1"></i>Add Users
                     </button>
                 <?php endif; ?>
             </div>
@@ -33,6 +33,17 @@
     <?php if (session()->getFlashdata('error')): ?>
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <?= session()->getFlashdata('error') ?>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($errors = session()->getFlashdata('errors')): ?>
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <ul class="mb-0">
+                <?php foreach ((array) $errors as $error): ?>
+                    <li><?= esc($error) ?></li>
+                <?php endforeach; ?>
+            </ul>
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
     <?php endif; ?>
@@ -139,6 +150,7 @@
                                 <?php
                                     $roleName = isset($user['role_name']) ? strtolower($user['role_name']) : 'student';
                                     $canManageEnrollment = $roleName === 'student';
+                                    $canEditUser = $isAdmin;
                                 ?>
                                 <tr>
                                     <td class="ps-4">
@@ -168,7 +180,7 @@
                                     </td>
                                     <td class="text-end pe-4">
                                         <div class="btn-group" role="group">
-                                            <?php if ($isAdmin): ?>
+                                            <?php if ($canEditUser): ?>
                                                 <button class="btn btn-sm btn-outline-primary" onclick="editStudent(<?= htmlspecialchars(json_encode($user)) ?>)" title="Edit User">
                                                     <i class="bi bi-pencil"></i>
                                                 </button>
@@ -203,13 +215,13 @@
     </div>
 </div>
 
-<!-- Add Student Modal (Admin Only) -->
+<!-- Add Users Modal (Admin Only) -->
 <?php if ($userRole === 'admin'): ?>
 <div class="modal fade" id="addStudentModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Add New Student</h5>
+                <h5 class="modal-title">Add New User</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <form action="<?= base_url('students/addStudent') ?>" method="post" id="studentForm">
@@ -219,37 +231,46 @@
                     <div class="row g-3">
                         <div class="col-md-6">
                             <label class="form-label">First Name <span class="text-danger">*</span></label>
-                            <input type="text" name="firstName" class="form-control" required>
+                            <input type="text" name="firstName" class="form-control" required minlength="2" maxlength="50" pattern="[A-Za-z][A-Za-z\s'-]*" title="Use letters, spaces, apostrophes, or hyphens only." value="<?= esc(old('firstName')) ?>">
                         </div>
                         
                         <div class="col-md-6">
                             <label class="form-label">Last Name <span class="text-danger">*</span></label>
-                            <input type="text" name="lastName" class="form-control" required>
+                            <input type="text" name="lastName" class="form-control" required minlength="2" maxlength="50" pattern="[A-Za-z][A-Za-z\s'-]*" title="Use letters, spaces, apostrophes, or hyphens only." value="<?= esc(old('lastName')) ?>">
                         </div>
                         
                         <div class="col-12">
                             <label class="form-label">Email <span class="text-danger">*</span></label>
-                            <input type="email" name="email" class="form-control" required>
+                            <input type="email" name="email" class="form-control" required maxlength="100" value="<?= esc(old('email')) ?>">
                         </div>
                         
                         <div class="col-md-6">
                             <label class="form-label">Password <span class="text-danger">*</span></label>
-                            <input type="password" name="password" class="form-control" required>
+                            <input type="password" name="password" class="form-control" required minlength="6" maxlength="64">
                         </div>
-                        
+
                         <div class="col-md-6">
-                            <label class="form-label">Status</label>
-                            <select name="status" class="form-select">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
+                            <label class="form-label">Role <span class="text-danger">*</span></label>
+                            <select name="role" class="form-select" required>
+                                <option value="">Select Role</option>
+                                <?php if (!empty($roleOptions)): ?>
+                                    <?php foreach ($roleOptions as $roleOption): ?>
+                                        <option value="<?= (int) $roleOption['roleID'] ?>" <?= (string) $roleOption['roleID'] === (string) old('role') ? 'selected' : '' ?>>
+                                            <?= esc(ucfirst($roleOption['role_name'])) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
+                        
+                        <div id="addUserValidationAlert" class="alert alert-danger d-none" role="alert"></div>
+
                     </div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save me-1"></i>Save Student
+                        <i class="bi bi-save me-1"></i>Save User
                     </button>
                 </div>
             </form>
@@ -281,18 +302,21 @@
                             <input type="text" name="lastName" id="edit_lastName" class="form-control" required>
                         </div>
                         
-                        <div class="col-12">
+                        <div class="col-md-6">
                             <label class="form-label">Email <span class="text-danger">*</span></label>
                             <input type="email" name="email" id="edit_email" class="form-control" required>
                         </div>
-                        
                         <div class="col-md-6">
-                            <label class="form-label">Status</label>
-                            <select name="status" id="edit_status" class="form-select">
-                                <option value="active">Active</option>
-                                <option value="inactive">Inactive</option>
+                            <label class="form-label">Role <span class="text-danger">*</span></label>
+                            <select name="role" id="edit_role" class="form-select" required>
+                                <?php if (!empty($roleOptions)): ?>
+                                    <?php foreach ($roleOptions as $roleOption): ?>
+                                        <option value="<?= (int) $roleOption['roleID'] ?>"><?= esc(ucfirst($roleOption['role_name'])) ?></option>
+                                    <?php endforeach; ?>
+                                <?php endif; ?>
                             </select>
                         </div>
+                        
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -365,12 +389,97 @@
     // Edit user function
     function editStudent(user) {
         document.getElementById('edit_userID').value = user.userID;
-        document.getElementById('edit_firstName').value = user.firstName || '';
-        document.getElementById('edit_lastName').value = user.lastName || '';
+        const fullName = (user.name || '').trim();
+        const [firstName, ...restOfName] = fullName.split(/\s+/);
+        document.getElementById('edit_firstName').value = firstName || '';
+        document.getElementById('edit_lastName').value = restOfName.join(' ') || '';
         document.getElementById('edit_email').value = user.email || '';
-        document.getElementById('edit_status').value = user.status || 'active';
+        const roleSelect = document.getElementById('edit_role');
+        if (roleSelect) {
+            const dynamicAdminOption = roleSelect.querySelector('option[data-dynamic-admin="true"]');
+            if (dynamicAdminOption) {
+                dynamicAdminOption.remove();
+            }
+
+            const roleValue = user.role !== undefined && user.role !== null ? String(user.role) : '';
+            const normalizedRoleName = (user.role_name || '').toString();
+            let hasOption = Array.from(roleSelect.options).some(option => option.value === roleValue);
+
+            if (!hasOption && roleValue) {
+                const option = document.createElement('option');
+                option.value = roleValue;
+                const labelSource = normalizedRoleName || 'Admin';
+                option.textContent = labelSource.charAt(0).toUpperCase() + labelSource.slice(1);
+                option.dataset.dynamicAdmin = 'true';
+                roleSelect.appendChild(option);
+                hasOption = true;
+            }
+
+            roleSelect.value = hasOption ? roleValue : (roleSelect.options[0] ? roleSelect.options[0].value : '');
+
+            const isAdminRole = normalizedRoleName.toLowerCase() === 'admin';
+            roleSelect.disabled = isAdminRole;
+            if (isAdminRole) {
+                roleSelect.title = 'Admin role cannot be changed.';
+            } else {
+                roleSelect.removeAttribute('title');
+            }
+        }
         
         new bootstrap.Modal(document.getElementById('editStudentModal')).show();
+    }
+
+    const addUserForm = document.getElementById('studentForm');
+    const addUserValidationAlert = document.getElementById('addUserValidationAlert');
+    if (addUserForm && addUserValidationAlert) {
+        addUserForm.addEventListener('submit', function (event) {
+            addUserValidationAlert.classList.add('d-none');
+            addUserValidationAlert.innerHTML = '';
+
+            const firstNameInput = addUserForm.elements['firstName'];
+            const lastNameInput = addUserForm.elements['lastName'];
+            const emailInput = addUserForm.elements['email'];
+            const passwordInput = addUserForm.elements['password'];
+            const roleSelect = addUserForm.elements['role'];
+
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            const roleValue = roleSelect.value.trim();
+            const namePattern = /^[A-Za-z][A-Za-z\s'-]*$/;
+            const errors = [];
+
+            firstNameInput.value = firstName;
+            lastNameInput.value = lastName;
+            emailInput.value = email;
+
+            if (firstName.length < 2 || !namePattern.test(firstName)) {
+                errors.push('Enter a valid first name (letters, spaces, apostrophes, hyphens).');
+            }
+
+            if (lastName.length < 2 || !namePattern.test(lastName)) {
+                errors.push('Enter a valid last name (letters, spaces, apostrophes, hyphens).');
+            }
+
+            if (email.length === 0 || !/^\S+@\S+\.\S+$/.test(email)) {
+                errors.push('Enter a valid email address.');
+            }
+
+            if (password.length < 6) {
+                errors.push('Password must be at least 6 characters long.');
+            }
+
+            if (!roleValue) {
+                errors.push('Select a role for the new user.');
+            }
+
+            if (errors.length) {
+                event.preventDefault();
+                addUserValidationAlert.innerHTML = errors.map(err => `<div>${err}</div>`).join('');
+                addUserValidationAlert.classList.remove('d-none');
+            }
+        });
     }
 
     // Delete user function

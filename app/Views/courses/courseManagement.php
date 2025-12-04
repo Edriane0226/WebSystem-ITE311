@@ -1,8 +1,20 @@
 <header>
     <title>Course Management</title>
 </header>
+<?php $today = date('Y-m-d'); ?>
 <div class="container-fluid">
         <!-- Flash Messages -->
+        <?php if ($errors = session()->getFlashdata('errors')): ?>
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <ul class="mb-0">
+                    <?php foreach ((array) $errors as $error): ?>
+                        <li><?= esc($error) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        <?php endif; ?>
+
         <?php if (session()->getFlashdata('message')): ?>
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 <?= session()->getFlashdata('message') ?>
@@ -228,6 +240,16 @@
                                     <?php endif; ?>
                                 </select>
                             </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" name="startDate" class="form-control" required min="<?= esc($today) ?>" value="<?= esc(old('startDate')) ?>">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">End Date</label>
+                                <input type="date" name="endDate" class="form-control" required min="<?= esc($today) ?>" value="<?= esc(old('endDate')) ?>">
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -248,7 +270,7 @@
                     <h5 class="modal-title" id="editCourseModalLabel">Edit Course Details</h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form action="<?= base_url('/course/update/' . $course['courseID']) ?>" method="post" id="editCourseForm">
+                <form action="<?= base_url('/course/update/') ?>" method="post" id="editCourseForm">
                     <div class="modal-body">
                         <?= csrf_field() ?>
                         <input type="hidden" name="courseID" id="edit_courseID">
@@ -265,12 +287,20 @@
                                     <option value="">Select School Year</option>
                                     <?php if (isset($schoolYears)): ?>
                                         <?php foreach ($schoolYears as $sy): ?>
-                                            <option value="<?= $sy['schoolYearID'] ?>">
-                                                <?= $sy['schoolYear'] ?>
-                                            </option>
+                                            <option value="<?= $sy['schoolYearID'] ?>"><?= $sy['schoolYear'] ?></option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Start Date</label>
+                                <input type="date" name="startDate" id="edit_startDate" class="form-control" required min="<?= esc($today) ?>">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">End Date</label>
+                                <input type="date" name="endDate" id="edit_endDate" class="form-control" required min="<?= esc($today) ?>">
                             </div>
                             
                             <div class="col-12">
@@ -311,6 +341,8 @@
     </div>
 
     <script>
+        const today = '<?= esc($today) ?>';
+
         // Search functionality
         document.getElementById('searchInput').addEventListener('keyup', function() {
             const filter = this.value.toLowerCase();
@@ -322,9 +354,25 @@
             });
         });
 
+        // Keep end date synced with start date in create form
+        const createStart = document.querySelector('#courseForm input[name="startDate"]');
+        const createEnd = document.querySelector('#courseForm input[name="endDate"]');
+        if (createStart && createEnd) {
+            createEnd.min = createStart.value || today;
+            createStart.addEventListener('change', function () {
+                createEnd.min = this.value || today;
+                if (createEnd.value && createEnd.value < createEnd.min) {
+                    createEnd.value = this.value;
+                }
+            });
+        }
+
         // Reset form when modal is closed
         document.getElementById('createCourseModal').addEventListener('hidden.bs.modal', function () {
             document.getElementById('courseForm').reset();
+            if (createEnd) {
+                createEnd.min = createStart ? createStart.min : today;
+            }
         });
 
         // Load course data into edit modal
@@ -335,11 +383,29 @@
             document.getElementById('edit_courseDescription').value = course.courseDescription;
             document.getElementById('edit_schoolYear').value = course.schoolYearID;
             document.getElementById('edit_teacherID').value = course.teacherID || '';
-            document.getElementById('edit_statusID').value = course.statusID;
+            document.getElementById('edit_startDate').value = course.startDate ? course.startDate.substring(0, 10) : '';
+            document.getElementById('edit_endDate').value = course.endDate ? course.endDate.substring(0, 10) : '';
+            document.getElementById('edit_startDate').min = today;
+            document.getElementById('edit_endDate').min = document.getElementById('edit_startDate').value || today;
+            document.getElementById('editCourseForm').action = `<?= base_url('/course/update/') ?>${course.courseID}`;
+        }
+
+        const editStart = document.getElementById('edit_startDate');
+        const editEnd = document.getElementById('edit_endDate');
+        if (editStart && editEnd) {
+            editStart.addEventListener('change', function () {
+                editEnd.min = this.value || today;
+                if (editEnd.value && editEnd.value < editEnd.min) {
+                    editEnd.value = this.value;
+                }
+            });
         }
 
         // Reset edit form when modal is closed
         document.getElementById('editCourseModal').addEventListener('hidden.bs.modal', function () {
             document.getElementById('editCourseForm').reset();
+            if (editEnd) {
+                editEnd.min = today;
+            }
         });
     </script>

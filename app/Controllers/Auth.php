@@ -116,8 +116,8 @@ class Auth extends BaseController
         // } elseif ($userRole == 'student') {
         //     return redirect()->to('/student');
         // }
-        $course = new CourseModel();
-        $enrollment = new EnrollmentModel();
+    $course = new CourseModel();
+    $enrollment = new EnrollmentModel();
 
         //added this to display all users in admin dashboard
         $users = new UserModel();
@@ -126,7 +126,7 @@ class Auth extends BaseController
         $session = session();
 
         $materialModel = new MaterialModel();
-        $enrollments = $enrollment->getUserEnrollments($session->get('userID'));
+    $enrollments = $enrollment->getUserEnrollments($session->get('userID'));
         foreach ($enrollments as &$enrolled) {
             $enrolled['materials'] = $materialModel->getMaterialsByCourse($enrolled['course_id']);
         }

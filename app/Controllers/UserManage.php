@@ -6,9 +6,42 @@ use App\Models\UserModel;
 use App\Models\CourseModel;
 use App\Models\EnrollmentModel;
 use App\Models\EnrollmentStatusModel;
+use App\Models\RoleModel;
 
 class UserManage extends BaseController
 {
+    private const STUDENT_ROLE_ID = 3;
+    private const TEACHER_ROLE_ID = 2;
+
+    private function resolveStudentRoleId(): int
+    {
+        $roleModel = new RoleModel();
+        $role = $roleModel->where('role_name', 'student')->first();
+
+        return (int) ($role['roleID'] ?? self::STUDENT_ROLE_ID);
+    }
+
+    private function resolveTeacherRoleId(): int
+    {
+        $roleModel = new RoleModel();
+        $role = $roleModel->where('role_name', 'teacher')->first();
+
+        return (int) ($role['roleID'] ?? self::TEACHER_ROLE_ID);
+    }
+
+    /**
+     * Returns the list of role IDs an admin may assign.
+     */
+    private function getAssignableRoleIds(): array
+    {
+        $roles = [
+            $this->resolveStudentRoleId(),
+            $this->resolveTeacherRoleId(),
+        ];
+
+        return array_values(array_unique(array_map('intval', $roles)));
+    }
+
     public function UserManagement()
     {
         if (!session()->get('isLoggedIn')) {
@@ -30,6 +63,12 @@ class UserManage extends BaseController
         if ($userRole === 'admin') {
             $users = $userModel->getAllUsersWithRole();
             $data['users'] = $users;
+
+            $roleModel = new RoleModel();
+            $assignableRoleIds = $this->getAssignableRoleIds();
+            $data['roleOptions'] = empty($assignableRoleIds)
+                ? []
+                : $roleModel->whereIn('roleID', $assignableRoleIds)->orderBy('role_name')->findAll();
 
             $studentCount = 0;
             foreach ($users as $user) {
@@ -54,7 +93,7 @@ class UserManage extends BaseController
     }
 
     // Admin Create new student
-    public function save()
+    public function addStudent()
     {
         if (!session()->get('isLoggedIn') || session()->get('role') !== 'admin') {
             return redirect()->to('login');
@@ -65,7 +104,7 @@ class UserManage extends BaseController
             'lastName' => 'required|min_length[2]|max_length[50]',
             'email' => 'required|valid_email|is_unique[users.email]',
             'password' => 'required|min_length[6]',
-            'status' => 'in_list[active,inactive]'
+            'role' => 'required|integer|is_not_unique[roles.roleID]'
         ];
 
         if (!$this->validate($rules)) {
@@ -73,20 +112,30 @@ class UserManage extends BaseController
         }
 
         $userModel = new UserModel();
-        
+
+        $firstName = trim($this->request->getPost('firstName'));
+        $lastName = trim($this->request->getPost('lastName'));
+        $displayName = trim($firstName . ' ' . $lastName);
+
+        $roleId = (int) $this->request->getPost('role');
+        $roleModel = new RoleModel();
+        $assignableRoleIds = $this->getAssignableRoleIds();
+        $selectedRole = $roleModel->find($roleId);
+
+        if (!$selectedRole || !in_array((int) $selectedRole['roleID'], $assignableRoleIds, true)) {
+            return redirect()->back()->withInput()->with('error', 'Invalid role selection.');
+        }
+
         $userData = [
-            'firstName' => $this->request->getPost('firstName'),
-            'lastName' => $this->request->getPost('lastName'),
-            'email' => $this->request->getPost('email'),
+            'name' => $displayName,
+            'email' => trim($this->request->getPost('email')),
             'password' => password_hash($this->request->getPost('password'), PASSWORD_DEFAULT),
-            'role' => 'student',
-            'status' => $this->request->getPost('status') ?? 'active',
-            'created_at' => date('Y-m-d H:i:s')
+            'role' => (int) $selectedRole['roleID'],
         ];
 
         try {
             $userModel->insert($userData);
-            return redirect()->to('students')->with('message', 'Student created successfully.');
+            return redirect()->to('/students/studentManagement')->with('message', 'Student created successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->withInput()->with('error', 'Failed to create student: ' . $e->getMessage());
         }
@@ -105,7 +154,7 @@ class UserManage extends BaseController
             'firstName' => 'required|min_length[2]|max_length[50]',
             'lastName' => 'required|min_length[2]|max_length[50]',
             'email' => "required|valid_email|is_unique[users.email,userID,{$userID}]",
-            'status' => 'in_list[active,inactive]'
+            'role' => 'permit_empty|integer|is_not_unique[roles.roleID]'
         ];
 
         if (!$this->validate($rules)) {
@@ -113,57 +162,62 @@ class UserManage extends BaseController
         }
 
         $userModel = new UserModel();
-        
-        // Check if user exists and is a student
+        $roleModel = new RoleModel();
+        $assignableRoleIds = $this->getAssignableRoleIds();
+
         $user = $userModel->find($userID);
-        if (!$user || $user['role'] !== 'student') {
-            return redirect()->back()->with('error', 'Student not found.');
+        if (!$user) {
+            return redirect()->back()->with('error', 'User not found.');
         }
 
+        $currentRole = $roleModel->find((int) ($user['role'] ?? 0));
+        $currentRoleName = strtolower($currentRole['role_name'] ?? '');
+
+        $currentRoleId = (int) ($user['role'] ?? 0);
+        $isAdminAccount = $currentRoleName === 'admin';
+
+        if (!$isAdminAccount && !in_array($currentRoleId, $assignableRoleIds, true)) {
+            return redirect()->back()->with('error', 'Only student and teacher accounts can be modified.');
+        }
+
+        $requestedRoleRaw = $this->request->getPost('role');
+        $requestedRoleId = $requestedRoleRaw === null || $requestedRoleRaw === '' ? null : (int) $requestedRoleRaw;
+
+        if ($isAdminAccount) {
+            $requestedRoleId = $currentRoleId;
+        }
+
+        if (!$isAdminAccount) {
+            if ($requestedRoleId === null) {
+                return redirect()->back()->with('error', 'Role selection is required.');
+            }
+
+            if (!in_array($requestedRoleId, $assignableRoleIds, true)) {
+                return redirect()->back()->with('error', 'Invalid role selection.');
+            }
+        }
+
+        $requestedRole = $roleModel->find($requestedRoleId);
+
+        if (!$requestedRole) {
+            return redirect()->back()->with('error', 'Invalid role selection.');
+        }
+
+        $firstName = trim($this->request->getPost('firstName'));
+        $lastName = trim($this->request->getPost('lastName'));
         $updateData = [
-            'firstName' => $this->request->getPost('firstName'),
-            'lastName' => $this->request->getPost('lastName'),
-            'email' => $this->request->getPost('email'),
-            'status' => $this->request->getPost('status'),
-            'updated_at' => date('Y-m-d H:i:s')
+            'name' => trim($firstName . ' ' . $lastName),
+            'email' => trim($this->request->getPost('email')),
+            'role' => (int) $requestedRole['roleID'],
         ];
 
         try {
             $userModel->update($userID, $updateData);
-            return redirect()->to('students')->with('message', 'Student updated successfully.');
+            return redirect()->to('/students/studentManagement')->with('message', 'User updated successfully.');
         } catch (\Exception $e) {
             return redirect()->back()->with('error', 'Failed to update student: ' . $e->getMessage());
         }
     }
-
-    // Admin only - Delete student
-    // public function delete($userID)
-    // {
-    //     if (!session()->get('isLoggedIn') || session()->get('role') !== 'admin') {
-    //         return redirect()->to('login');
-    //     }
-
-    //     $userModel = new UserModel();
-    //     $enrollmentModel = new EnrollmentModel();
-        
-    //     // Check if user exists and is a student
-    //     $user = $userModel->find($userID);
-    //     if (!$user || $user['role'] !== 'student') {
-    //         return redirect()->back()->with('error', 'Student not found.');
-    //     }
-
-    //     try {
-    //         // First delete all enrollments
-    //         $enrollmentModel->where('user_id', $userID)->delete();
-            
-    //         // Then delete the user
-    //         $userModel->delete($userID);
-            
-    //         return redirect()->to('students')->with('message', 'Student deleted successfully.');
-    //     } catch (\Exception $e) {
-    //         return redirect()->back()->with('error', 'Failed to delete student: ' . $e->getMessage());
-    //     }
-    // }
 
     // Get enrollment data for a student
     public function getEnrollmentData($studentID)
@@ -338,34 +392,6 @@ class UserManage extends BaseController
             return redirect()->to('login');
         }
 
-        $action = $this->request->getPost('action');
-        $studentIDs = $this->request->getPost('student_ids');
-
-        if (!$action || !$studentIDs) {
-            return redirect()->back()->with('error', 'Invalid action or no students selected');
-        }
-
-        $userModel = new UserModel();
-        $enrollmentModel = new EnrollmentModel();
-
-        try {
-            switch ($action) {
-                case 'activate':
-                    $userModel->whereIn('userID', $studentIDs)->set(['status' => 'active'])->update();
-                    $message = 'Selected students activated successfully';
-                    break;
-                
-                case 'deactivate':
-                    $userModel->whereIn('userID', $studentIDs)->set(['status' => 'inactive'])->update();
-                    $message = 'Selected students deactivated successfully';
-                    break;
-                default:
-                    return redirect()->back()->with('error', 'Invalid action');
-            }
-
-            return redirect()->to('students')->with('message', $message);
-        } catch (\Exception $e) {
-            return redirect()->back()->with('error', 'Failed to perform action: ' . $e->getMessage());
-        }
+        return redirect()->back()->with('error', 'Bulk status updates are not available.');
     }
 }

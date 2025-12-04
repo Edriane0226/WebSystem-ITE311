@@ -37,6 +37,16 @@
                             <div class="card mt-3">
                                 <div class="card-body">
                                     <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
+                                    <?php if (!empty($enrolled['startDate']) || !empty($enrolled['endDate'])): ?>
+                                        <p class="text-muted small mb-2">
+                                            <?php if (!empty($enrolled['startDate'])): ?>
+                                                Starts: <?= date('M j, Y', strtotime($enrolled['startDate'])) ?>
+                                            <?php endif; ?>
+                                            <?php if (!empty($enrolled['endDate'])): ?>
+                                                <br>Ends: <?= date('M j, Y', strtotime($enrolled['endDate'])) ?>
+                                            <?php endif; ?>
+                                        </p>
+                                    <?php endif; ?>
                                     <ul class="list-group list-group-flush">
                                         <?php foreach ($enrolled['materials'] as $material): ?>
                                             <li class="list-group-item d-flex justify-content-between align-items-center">
@@ -54,7 +64,17 @@
                             <div class="card mt-3">
                                 <div class="card-body">
                                     <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
-                                    <p class="text-muted">No materials uploaded yet.</p>
+                                    <?php if (!empty($enrolled['startDate']) || !empty($enrolled['endDate'])): ?>
+                                        <p class="text-muted small mb-2">
+                                            <?php if (!empty($enrolled['startDate'])): ?>
+                                                Starts: <?= date('M j, Y', strtotime($enrolled['startDate'])) ?>
+                                            <?php endif; ?>
+                                            <?php if (!empty($enrolled['endDate'])): ?>
+                                                <br>Ends: <?= date('M j, Y', strtotime($enrolled['endDate'])) ?>
+                                            <?php endif; ?>
+                                        </p>
+                                    <?php endif; ?>
+                                    <p class="text-muted mb-0">No materials uploaded yet.</p>
                                 </div>
                             </div>
                         <?php endif; ?>
@@ -74,6 +94,16 @@
                                             <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
                                             <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
                                             <p><?= $enrolled['courseDescription'] ?></p>
+                                            <?php if (!empty($enrolled['startDate']) || !empty($enrolled['endDate'])): ?>
+                                                <p class="text-muted small mb-0">
+                                                    <?php if (!empty($enrolled['startDate'])): ?>
+                                                        Starts: <?= date('M j, Y', strtotime($enrolled['startDate'])) ?>
+                                                    <?php endif; ?>
+                                                    <?php if (!empty($enrolled['endDate'])): ?>
+                                                        <br>Ends: <?= date('M j, Y', strtotime($enrolled['endDate'])) ?>
+                                                    <?php endif; ?>
+                                                </p>
+                                            <?php endif; ?>
                                         </div>
                                     </div>
                                 </div>

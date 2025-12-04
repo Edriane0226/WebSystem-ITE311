@@ -77,6 +77,8 @@ $routes->post('/course/update/(:num)', 'Course::updateCourse/$1');
 
 //User Management
 $routes->get('/students/studentManagement', 'UserManage::UserManagement');
+$routes->post('/students/addStudent', 'UserManage::addStudent');
+$routes->post('/students/update', 'UserManage::update');
 $routes->get('/students/getEnrollmentData/(:num)', 'UserManage::getEnrollmentData/$1');
 $routes->post('/students/enroll', 'UserManage::enroll');
 $routes->delete('/students/unenroll/(:num)', 'UserManage::unenroll/$1');

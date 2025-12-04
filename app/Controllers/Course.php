@@ -6,6 +6,7 @@ use App\Models\NotificationModel;
 use App\Models\CourseModel;
 use App\Models\SchoolYearModel;
 use App\Models\CourseStatusModel;
+use App\Models\CourseOfferingModel;
 
 use App\Models\UserModel;
 
@@ -108,10 +109,11 @@ Class Course extends BaseController
             return redirect()->to('login');
         }
         
-        $courseModel = new CourseModel();
-        $userModel = new UserModel();
-        $schoolYearModel = new SchoolYearModel();
-        $courseStatusModel = new CourseStatusModel();
+    $courseModel = new CourseModel();
+    $userModel = new UserModel();
+    $schoolYearModel = new SchoolYearModel();
+    $courseStatusModel = new CourseStatusModel();
+    $courseOfferingModel = new CourseOfferingModel();
 
         $userRole = session()->get('role');
         $userRoleID = $userModel->getRoleIDByUserID($userRole);
@@ -141,20 +143,59 @@ Class Course extends BaseController
                 'teacherID' => 'required',
                 'statusID' => 'required',
                 'schoolYear' => 'required',
+                'startDate' => 'required|valid_date[Y-m-d]',
+                'endDate' => 'required|valid_date[Y-m-d]'
             ];
             if (!$this->validate($rules)) {
                 return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
             }
+
+            $startDate = $this->request->getPost('startDate');
+            $endDate = $this->request->getPost('endDate');
+            $customErrors = [];
+
+            if ($startDate && $endDate) {
+                try {
+                    $today = new \DateTimeImmutable('today');
+                    $start = new \DateTimeImmutable($startDate);
+                    $end = new \DateTimeImmutable($endDate);
+
+                    if ($start < $today) {
+                        $customErrors['startDate'] = 'Start date cannot be in the past.';
+                    }
+
+                    if ($end < $start) {
+                        $customErrors['endDate'] = 'End date cannot be earlier than the start date.';
+                    }
+                } catch (\Exception $e) {
+                    $customErrors['startDate'] = 'Invalid date selection.';
+                }
+            }
+
+            if (!empty($customErrors)) {
+                return redirect()->back()->withInput()->with('errors', $customErrors);
+            }
             $courseModel = new CourseModel();
+            $teacherId = $this->request->getPost('teacherID') ?: null;
             $data = [
                 'courseCode' => $this->request->getPost('courseCode'),
                 'courseTitle' => $this->request->getPost('courseTitle'),
                 'courseDescription' => $this->request->getPost('courseDescription'),
-                'teacherID' => $this->request->getPost('teacherID'),
+                'teacherID' => $teacherId,
                 'statusID' => $this->request->getPost('statusID'),
                 'schoolYearID' => $this->request->getPost('schoolYear')
             ];
             $courseModel->insert($data);
+
+            $courseID = $courseModel->getInsertID();
+            if ($courseID) {
+                $courseOfferingModel->insert([
+                    'courseID' => $courseID,
+                    'schoolYearID' => $this->request->getPost('schoolYear'),
+                    'startDate' => $this->request->getPost('startDate') ?: null,
+                    'endDate' => $this->request->getPost('endDate') ?: null,
+                ]);
+            }
 
             $message = 'Course created successfully.';
 
@@ -203,16 +244,72 @@ Class Course extends BaseController
         }
 
         $courseModel = new CourseModel();
+        $courseOfferingModel = new CourseOfferingModel();
 
         if ($this->request->getMethod() === 'POST') {
+            $rules = [
+                'courseCode' => 'required',
+                'courseTitle' => 'required',
+                'courseDescription' => 'required',
+                'teacherID' => 'required',
+                'schoolYearID' => 'required',
+                'startDate' => 'required|valid_date[Y-m-d]',
+                'endDate' => 'required|valid_date[Y-m-d]'
+            ];
+
+            if (!$this->validate($rules)) {
+                return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            }
+
+            $startDate = $this->request->getPost('startDate');
+            $endDate = $this->request->getPost('endDate');
+            $customErrors = [];
+
+            if ($startDate && $endDate) {
+                try {
+                    $today = new \DateTimeImmutable('today');
+                    $start = new \DateTimeImmutable($startDate);
+                    $end = new \DateTimeImmutable($endDate);
+
+                    if ($start < $today) {
+                        $customErrors['startDate'] = 'Start date cannot be in the past.';
+                    }
+
+                    if ($end < $start) {
+                        $customErrors['endDate'] = 'End date cannot be earlier than the start date.';
+                    }
+                } catch (\Exception $e) {
+                    $customErrors['startDate'] = 'Invalid date selection.';
+                }
+            }
+
+            if (!empty($customErrors)) {
+                return redirect()->back()->withInput()->with('errors', $customErrors);
+            }
+
+            $teacherId = $this->request->getPost('teacherID') ?: null;
             $data = [
                 'courseCode' => $this->request->getPost('courseCode'),
                 'courseTitle' => $this->request->getPost('courseTitle'),
                 'courseDescription' => $this->request->getPost('courseDescription'),
-                'teacherID' => $this->request->getPost('teacherID'),
+                'teacherID' => $teacherId,
                 'schoolYearID' => $this->request->getPost('schoolYearID')
             ];
             $courseModel->update($courseID, $data);
+
+                $offeringData = [
+                    'courseID' => $courseID,
+                    'schoolYearID' => $this->request->getPost('schoolYearID'),
+                    'startDate' => $this->request->getPost('startDate'),
+                    'endDate' => $this->request->getPost('endDate'),
+                ];
+
+                $existingOffering = $courseOfferingModel->findByCourseId((int) $courseID);
+                if ($existingOffering) {
+                    $offeringData['offeringID'] = $existingOffering['offeringID'];
+                }
+
+                $courseOfferingModel->save($offeringData);
 
             return redirect()->to('/course/manage')->with('message', 'Course updated successfully.');
         }
