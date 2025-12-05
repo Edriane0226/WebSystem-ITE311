@@ -126,11 +126,10 @@ class Auth extends BaseController
         $session = session();
 
         $materialModel = new MaterialModel();
-    $enrollments = $enrollment->getUserEnrollments($session->get('userID'));
+        $enrollments = $enrollment->getUserEnrollments($session->get('userID'));
         foreach ($enrollments as &$enrolled) {
             $enrolled['materials'] = $materialModel->getMaterialsByCourse($enrolled['course_id']);
         }
-        
             $data = [
                 'name' => $session->get('name'),
                 'email' => $session->get('email'),
@@ -140,7 +139,6 @@ class Auth extends BaseController
                 'allUsers' => $allUsers,
             
             ];
-
         //return view('templates/header', $data) . view('auth/dashboard', $data);
         return $this->displayNotif('auth/dashboard', $data);
     }

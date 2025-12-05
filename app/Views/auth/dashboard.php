@@ -1,4 +1,3 @@
-
     <div class="container p-3">
         <h3>Dashboard</h3>
         <h4 class="mt-3 text-muted">Welcome, <?= $name ?>!</h4>
@@ -10,19 +9,35 @@
                         <div class="card-body">
                             <h4 class="card-title">Available Courses</h4>
                             <div class="row">
+                                <?php
+                                $enrollmentByCourse = [];
+                                foreach ($enrollments as $enroll) {
+                                    $enrollmentByCourse[$enroll['course_id']] = $enroll['statusName'];
+                                }
+                                ?>
                                 <?php foreach ($courses as $course):?>
-                                <div class="col-md-4">
-                                    <!-- remove lng ang base64_encode ug decode sa controller kung i try ang CSRF Token -->
-                                    <div class="card mt-5 courseCard" data-course_id="<?= base64_encode($course['courseID']) ?>">
-                                        <div class="card-body">
-                                            <h4 class="card-title"><?= $course['courseTitle'] ?></h4>
-                                            <h6 class="card-subtitle mb-2 text-muted"><?= $course['courseCode'] ?></h6>
-                                            <p><?= $course['courseDescription'] ?></p>
-                                            <p class="text-muted small">School Year: <?= $course['schoolYear'] ?></p>
-                                            <button class="btn btn-primary enroll">Enroll</button>
+                                    <div class="col-md-4">
+                                        <!-- remove lng ang base64_encode ug decode sa controller kung i try ang CSRF Token -->
+                                        <div class="card mt-5 courseCard" data-course_id="<?= base64_encode($course['courseID']) ?>">
+                                            <div class="card-body">
+                                                <h4 class="card-title"><?= $course['courseTitle'] ?></h4>
+                                                <h6 class="card-subtitle mb-2 text-muted"><?= $course['courseCode'] ?></h6>
+                                                <p><?= $course['courseDescription'] ?></p>
+                                                <p class="text-muted small">School Year: <?= $course['schoolYear'] ?></p>
+                                                   
+                                                    <?php $status = $enrollmentByCourse[$course['courseID']] ?? null?>
+                                                    <?php if ($status == 'Enrolled'): ?>
+                                                    <button class="btn btn-primary" disabled>Enrolled</button>
+                                                    <?php elseif ($status == 'Completed'): ?>
+                                                        <button class="btn btn-secondary" disabled>Completed</button>
+                                                    <?php elseif ($status == 'Dropped'): ?>
+                                                        <button class="btn btn-danger" disabled>Dropped</button>
+                                                    <?php else: ?>
+                                                        <button class="btn btn-primary enroll">Enroll</button>
+                                                    <?php endif; ?>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
                                 <?php endforeach; ?>
                             </div>
                         </div>

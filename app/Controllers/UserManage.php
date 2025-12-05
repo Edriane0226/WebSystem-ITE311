@@ -233,10 +233,28 @@ class UserManage extends BaseController
         $enrollmentModel = new EnrollmentModel();
         $statusModel = new EnrollmentStatusModel();
 
+        $statuses = $statusModel->getAllStatuses();
+        $enrolledStatusId = EnrollmentModel::STATUS_ENROLLED;
+        $enrolledStatusName = 'Enrolled';
+        foreach ($statuses as $status) {
+            if ((int) ($status['statusID'] ?? 0) === $enrolledStatusId) {
+                $enrolledStatusName = (string) ($status['statusName'] ?? $enrolledStatusName);
+                break;
+            }
+        }
+
         if ($userRole === 'teacher') {
-            // Teachers can see all enrollments but may only edit their own
-            $enrolledCourses = $enrollmentModel->getStudentEnrollments($studentID);
-            $availableCourses = [];
+            $enrolledCourses = $enrollmentModel->getStudentEnrollmentsForTeacher($studentID, $currentUserID);
+            $availableCourses = $courseModel->getTeacherAvailableCoursesForStudent($currentUserID, $studentID);
+
+            if (!empty($availableCourses)) {
+                foreach ($availableCourses as &$course) {
+                    $course['defaultStatusID'] = $enrolledStatusId;
+                    $course['defaultStatusName'] = $enrolledStatusName;
+                    $course['defaultActionLabel'] = 'Enroll';
+                }
+                unset($course);
+            }
         } elseif ($userRole === 'admin') {
             $enrolledCourses = $enrollmentModel->getStudentEnrollments($studentID);
             $availableCourses = $courseModel->getAvailableCoursesForStudent($studentID);
@@ -247,7 +265,7 @@ class UserManage extends BaseController
         return $this->response->setJSON([
             'enrolledCourses' => $enrolledCourses,
             'availableCourses' => $availableCourses,
-            'statuses' => $statusModel->getAllStatuses(),
+            'statuses' => $statuses,
             'teacherId' => $userRole === 'teacher' ? (int) $currentUserID : null,
         ]);
     }

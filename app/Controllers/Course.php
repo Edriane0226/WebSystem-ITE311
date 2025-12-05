@@ -35,16 +35,22 @@ Class Course extends BaseController
             'user_id' => $user_id,
             'course_id' => $course_id,
             'enrollment_date' => date('Y-m-d'),
-            'enrollmentStatus' => 2,
+            'enrollmentStatus' => 1,
         ];
         $enrollmentModel->enrollUser($data);
 
-        //Insert Notification after ma enroll
+        //Insert Notification after ma enroll para sa student
         $notif = new NotificationModel();
         $notif->createNotification($user_id, 'You have successfully enrolled in a course.');
-        return $this->response->setJSON(['success' => true, 'message' => 'Enrolled Naka woaw']);
-    }
+
+        
+        return $this->response->setJSON(['success' => true, 
+                                        'message' => 'Successfully Enrolled!', 
+                                        'csrfHash' => csrf_hash()]);
+}
     
+
+    // lab 9 Search Server Side
     public function search()
     {
         if (!session()->get('isLoggedIn')) {
@@ -68,7 +74,7 @@ Class Course extends BaseController
         $role = session()->get('role');
         return view('templates/header', ['role' => $role]) . view('courses/index', ['courses' => $courses, 'searchTerm' => $searchTerm]);
     }
-    
+    // add ons for lab 9 
     public function details($id)
     {
         if (!session()->get('isLoggedIn')) {
@@ -78,7 +84,7 @@ Class Course extends BaseController
         $courseModel = new CourseModel();
         $userModel = new UserModel();
         
-        // Use the $id parameter to get the specific course
+        // get course with all the details 
         $course = $courseModel->getCourseWithDetails($id);
         
         if (!$course) {
@@ -86,11 +92,7 @@ Class Course extends BaseController
             return redirect()->to('courses');
         }
         
-        // Get teacher info if assigned
-        $teacher = null;
-        if (!empty($course['teacherID'])) {
-            $teacher = $userModel->find($course['teacherID']);
-        }
+        $teacher = $userModel->find($course['teacherID']);
 
         $data = [
             'course' => $course,
@@ -109,11 +111,11 @@ Class Course extends BaseController
             return redirect()->to('login');
         }
         
-    $courseModel = new CourseModel();
-    $userModel = new UserModel();
-    $schoolYearModel = new SchoolYearModel();
-    $courseStatusModel = new CourseStatusModel();
-    $courseOfferingModel = new CourseOfferingModel();
+        $courseModel = new CourseModel();
+        $userModel = new UserModel();
+        $schoolYearModel = new SchoolYearModel();
+        $courseStatusModel = new CourseStatusModel();
+        $courseOfferingModel = new CourseOfferingModel();
 
         $userRole = session()->get('role');
         $userRoleID = $userModel->getRoleIDByUserID($userRole);
@@ -137,8 +139,8 @@ Class Course extends BaseController
         ];
         if ($this->request->getMethod() === 'POST') {
             $rules = [
-                'courseCode' => 'required|is_unique[courses.courseCode]',
-                'courseTitle' => 'required|is_unique[courses.courseTitle]',
+                'courseCode' => 'required|is_unique[courses.courseCode]|regex_match[/^[a-zA-Z0-9\s]+$/]',
+                'courseTitle' => 'required|is_unique[courses.courseTitle|regex_match[/^[a-zA-Z0-9\sñÑ]+$/]',
                 'courseDescription' => 'required',
                 'teacherID' => 'required',
                 'statusID' => 'required',

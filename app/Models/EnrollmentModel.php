@@ -8,7 +8,7 @@ class EnrollmentModel extends Model {
     protected $primaryKey = 'enrollmentID';
     protected $returnType = 'array';
     protected $allowedFields = ['user_id', 'course_id', 'enrollment_date', 'enrollmentStatus'];
-    public const STATUS_ENROLLED = 2;
+    public const STATUS_ENROLLED = 1;
 
     // Insert ug data galing sa controller
     public function enrollUser($data) {
@@ -49,6 +49,12 @@ class EnrollmentModel extends Model {
     // check niya if enrolled na ba ang user sa specific course ug i return niya true or false
     public function isAlreadyEnrolled($user_id, $course_id) {
         return (bool) $this->where(['user_id' => $user_id, 'course_id' => $course_id])->first();
+    }
+    public function getEnrollmentById($enrollmentId) {
+        return $this->where('enrollmentID', $enrollmentId)->first();
+    }
+    public function updateEnrollment($enrollmentId, $data) {
+        return $this->update($enrollmentId, $data);
     }
 
     public function getEnrollmentWithCourse($enrollmentId)

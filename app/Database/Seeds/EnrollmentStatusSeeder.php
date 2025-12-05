@@ -9,7 +9,6 @@ class EnrollmentStatusSeeder extends Seeder
     public function run()
     {
         $data = [
-            ['statusName' => 'Pending'],
             ['statusName' => 'Enrolled'],
             ['statusName' => 'Completed'],
             ['statusName' => 'Dropped'],

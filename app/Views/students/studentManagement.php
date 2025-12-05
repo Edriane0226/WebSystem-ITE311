@@ -510,19 +510,21 @@
 
                 const availableContainer = document.getElementById('availableCourses');
                 const enrolledContainer = document.getElementById('currentEnrollments');
+                const studentIdInt = parseInt(studentId, 10);
 
                 if (isAdmin) {
                     let availableHTML = '';
 
                     if (Array.isArray(data.availableCourses) && data.availableCourses.length) {
                         data.availableCourses.forEach(course => {
+                            const courseId = parseInt(course.courseID, 10);
                             availableHTML += `
                                 <div class="d-flex justify-content-between align-items-center border-bottom py-2">
                                     <div>
                                         <strong>${escapeHtml(course.courseTitle || 'Untitled Course')}</strong>
                                         <small class="text-muted d-block">${escapeHtml(course.courseCode || '')}</small>
                                     </div>
-                                    <button class="btn btn-sm btn-outline-primary" onclick="enrollStudent(${studentId}, ${course.courseID})">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="enrollStudent(${studentIdInt}, ${Number.isNaN(courseId) ? 'null' : courseId})">
                                         Enroll
                                     </button>
                                 </div>
@@ -533,45 +535,110 @@
                     }
 
                     availableContainer.innerHTML = availableHTML;
+                } else if (isTeacher) {
+                    let availableHTML = '';
+
+                    if (Array.isArray(data.availableCourses) && data.availableCourses.length) {
+                        data.availableCourses.forEach(course => {
+                            const courseId = parseInt(course.courseID, 10);
+                            const defaultStatusIdRaw = course.defaultStatusID !== undefined ? parseInt(course.defaultStatusID, 10) : NaN;
+                            const defaultStatusName = escapeHtml(course.defaultStatusName || 'Enrolled');
+                            const actionLabel = escapeHtml(course.defaultActionLabel || 'Enroll');
+
+                            const actionControl = Number.isNaN(courseId) || Number.isNaN(defaultStatusIdRaw)
+                                ? '<span class="badge bg-light text-dark">No enrollment record</span>'
+                                : `<button class="btn btn-sm btn-outline-primary" onclick="createPendingEnrollment(${studentIdInt}, ${courseId}, ${defaultStatusIdRaw}, this)">
+                                        ${actionLabel}
+                                   </button>`;
+
+                            availableHTML += `
+                                <div class="d-flex justify-content-between align-items-center border-bottom py-2">
+                                    <div>
+                                        <strong>${escapeHtml(course.courseTitle || 'Untitled Course')}</strong>
+                                        <small class="text-muted d-block">${escapeHtml(course.courseCode || '')}</small>
+                                        <small class="text-muted d-block">No enrollment record</small>
+                                    </div>
+                                    <div class="d-flex align-items-center gap-2">
+                                        ${actionControl}
+                                    </div>
+                                </div>
+                            `;
+                        });
+                    } else {
+                        availableHTML = '<p class="text-muted">No available courses</p>';
+                    }
+
+                    availableContainer.innerHTML = availableHTML;
                 } else {
-                    availableContainer.innerHTML = '<p class="text-muted mb-0">Teachers can only update enrollment statuses.</p>';
+                    availableContainer.innerHTML = '<p class="text-muted mb-0">No available courses.</p>';
                 }
 
                 let enrolledHTML = '';
 
                 const enrollments = Array.isArray(data.enrolledCourses) ? data.enrolledCourses : [];
+                const statuses = Array.isArray(data.statuses) ? data.statuses : [];
 
                 if (enrollments.length) {
                     enrollments.forEach(enrollment => {
-                        const managedByCurrentTeacher = isAdmin || (isTeacher && parseInt(enrollment.teacherID, 10) === currentTeacherId);
-                        const statusOptions = (Array.isArray(data.statuses) ? data.statuses : []).map(status => `
+                        const teacherOwnerId = enrollment.teacherID !== undefined && enrollment.teacherID !== null
+                            ? parseInt(enrollment.teacherID, 10)
+                            : NaN;
+                        const managedByCurrentTeacher = isAdmin || (isTeacher && teacherOwnerId === currentTeacherId);
+                        const hasEnrollmentRecord = Boolean(enrollment.enrollmentID);
+                        const isVirtualPending = enrollment.isVirtualPending === true || enrollment.isVirtualPending === 1 || enrollment.isVirtualPending === '1';
+                        const courseId = enrollment.course_id !== undefined ? parseInt(enrollment.course_id, 10) : NaN;
+                        const statusOptionsHtml = statuses.map(status => `
                             <option value="${status.statusID}" ${String(status.statusID) === String(enrollment.enrollmentStatus) ? 'selected' : ''}>
                                 ${escapeHtml(status.statusName)}
                             </option>
                         `).join('');
 
-                        let statusControl;
+                        const statusLabel = escapeHtml(enrollment.statusName || (isVirtualPending ? 'Pending' : 'N/A'));
+                        const currentStatusValue = enrollment.enrollmentStatus !== undefined && enrollment.enrollmentStatus !== null
+                            ? String(enrollment.enrollmentStatus)
+                            : '';
+
+                        let statusControl = `<span class="badge bg-light text-dark">${statusLabel}</span>`;
                         if (managedByCurrentTeacher) {
-                            statusControl = `
-                                <select class="form-select form-select-sm w-auto" onchange="updateEnrollmentStatus(${enrollment.enrollmentID}, this.value)">
-                                    ${statusOptions}
-                                </select>
-                            `;
+                            if ((isVirtualPending || !hasEnrollmentRecord) && isTeacher && statusOptionsHtml && Number.isInteger(courseId) && Number.isInteger(studentIdInt)) {
+                                statusControl = `
+                                    <select class="form-select form-select-sm w-auto" data-current-value="${currentStatusValue}" onchange="createPendingEnrollment(${studentIdInt}, ${courseId}, this.value, this)">
+                                        ${statusOptionsHtml}
+                                    </select>
+                                `;
+                            } else if (!isVirtualPending && hasEnrollmentRecord && statusOptionsHtml) {
+                                statusControl = `
+                                    <select class="form-select form-select-sm w-auto" onchange="updateEnrollmentStatus(${enrollment.enrollmentID}, this.value)">
+                                        ${statusOptionsHtml}
+                                    </select>
+                                `;
+                            }
                         } else if (isTeacher) {
-                            statusControl = '<span class="badge bg-secondary">Managed by another teacher</span>';
-                        } else {
-                            statusControl = `<span class="badge bg-light text-dark">${escapeHtml(enrollment.statusName || 'N/A')}</span>`;
+                            if (isVirtualPending || !hasEnrollmentRecord) {
+                                statusControl = `<span class="badge bg-warning text-dark">${statusLabel}</span>`;
+                            } else {
+                                statusControl = '<span class="badge bg-secondary">Managed by another teacher</span>';
+                            }
                         }
 
-                        const unenrollButton = isAdmin
+                        const unenrollButton = (isAdmin && hasEnrollmentRecord)
                             ? `<button class="btn btn-sm btn-outline-danger ms-2" onclick="unenrollStudent(${enrollment.enrollmentID})">Unenroll</button>`
                             : '';
+
+                        const courseTitle = escapeHtml(enrollment.courseTitle || 'Course');
+                        const courseCodeLine = enrollment.courseCode
+                            ? `<small class="text-muted d-block">${escapeHtml(enrollment.courseCode)}</small>`
+                            : '';
+                        const enrollmentDetail = hasEnrollmentRecord && enrollment.enrollmentDate
+                            ? `Enrolled: ${escapeHtml(enrollment.enrollmentDate)}`
+                            : 'No enrollment record';
 
                         enrolledHTML += `
                             <div class="d-flex justify-content-between align-items-center border-bottom py-2">
                                 <div>
-                                    <strong>${escapeHtml(enrollment.courseTitle || 'Course')}</strong>
-                                    <small class="text-muted d-block">Enrolled: ${escapeHtml(enrollment.enrollmentDate || 'N/A')}</small>
+                                    <strong>${courseTitle}</strong>
+                                    ${courseCodeLine}
+                                    <small class="text-muted d-block">${enrollmentDetail}</small>
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
                                     ${statusControl}
@@ -645,6 +712,71 @@
             }
         })
         .catch(() => alert('Failed to update enrollment status.'));
+    }
+
+    function createPendingEnrollment(studentId, courseId, statusId, controlEl) {
+        if (!isTeacher) {
+            return;
+        }
+
+        const control = controlEl || null;
+        const isSelectControl = control && control.tagName === 'SELECT';
+        const previousValue = isSelectControl ? (control.dataset.currentValue || '') : '';
+
+        if (!statusId) {
+            if (isSelectControl) {
+                control.value = previousValue;
+            }
+            alert('Select a valid status.');
+            return;
+        }
+
+        if (isSelectControl && String(statusId) === previousValue) {
+            control.value = previousValue;
+            return;
+        }
+
+        if (control) {
+            control.disabled = true;
+        }
+
+        fetch('<?= base_url('students/createTeacherEnrollment') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+            },
+            body: new URLSearchParams({
+                studentId: studentId,
+                courseId: courseId,
+                statusId: statusId
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Unable to create enrollment.'));
+                if (isSelectControl) {
+                    control.value = previousValue;
+                }
+            }
+        })
+        .catch(() => {
+            alert('Failed to update enrollment status.');
+            if (isSelectControl) {
+                control.value = previousValue;
+            }
+        })
+        .finally(() => {
+            if (control) {
+                control.disabled = false;
+                if (isSelectControl) {
+                    control.dataset.currentValue = control.value;
+                }
+            }
+        });
     }
 
     // Unenroll student function for admin
