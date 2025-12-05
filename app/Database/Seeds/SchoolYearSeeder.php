@@ -10,12 +10,6 @@ class SchoolYearSeeder extends Seeder
     {
         $data = [
             [
-            'schoolYear' => '2023-2024',
-            ],
-            [
-            'schoolYear' => '2024-2025',
-            ],
-            [
             'schoolYear' => '2025-2026',
             ],
             [
