@@ -113,7 +113,7 @@ Class Course extends BaseController
         
         $courseModel = new CourseModel();
         $userModel = new UserModel();
-        $schoolYearModel = new SchoolYearModel();
+    $schoolYearModel = new SchoolYearModel();
         $courseStatusModel = new CourseStatusModel();
         $courseOfferingModel = new CourseOfferingModel();
 
@@ -154,7 +154,7 @@ Class Course extends BaseController
 
             $startDate = $this->request->getPost('startDate');
             $endDate = $this->request->getPost('endDate');
-            $schoolYear = (int) $this->request->getPost('schoolYear');
+            $schoolYearId = (int) $this->request->getPost('schoolYear');
             $customErrors = [];
 
             try {
@@ -165,21 +165,22 @@ Class Course extends BaseController
                     $customErrors['endDate'] = 'End date cannot be earlier than the start date.';
                 }
 
-                // Fetch school year range
-                $syModel = new \App\Models\SchoolYearModel();
-                $schoolYear = $syModel->find($schoolYearId);
-                if (!$schoolYear) {
+                $schoolYearRow = $schoolYearModel->find($schoolYearId);
+                if (!$schoolYearRow) {
                     $customErrors['schoolYear'] = 'Selected school year was not found.';
                 } else {
-                    // Expect columns like startDate/endDate or start_year/end_year. Adjust names if different.
-                    $syStart = new \DateTimeImmutable($schoolYear['startDate']);
-                    $syEnd   = new \DateTimeImmutable($schoolYear['endDate']);
+                    $bounds = $this->resolveSchoolYearBounds($schoolYearRow);
+                    if ($bounds === null) {
+                        $customErrors['schoolYear'] = 'School year dates are not configured.';
+                    } else {
+                        [$syStart, $syEnd] = $bounds;
 
-                    if ($start < $syStart || $start > $syEnd) {
-                        $customErrors['startDate'] = 'Start date must be within the selected school year.';
-                    }
-                    if ($end < $syStart || $end > $syEnd) {
-                        $customErrors['endDate'] = 'End date must be within the selected school year.';
+                        if ($start < $syStart || $start > $syEnd) {
+                            $customErrors['startDate'] = 'Start date must be within the selected school year.';
+                        }
+                        if ($end < $syStart || $end > $syEnd) {
+                            $customErrors['endDate'] = 'End date must be within the selected school year.';
+                        }
                     }
                 }
             } catch (\Exception $e) {
@@ -189,7 +190,6 @@ Class Course extends BaseController
             if (!empty($customErrors)) {
                 return redirect()->back()->withInput()->with('errors', $customErrors);
             }
-            $courseModel = new CourseModel();
             $teacherId = $this->request->getPost('teacherID') ?: null;
             $data = [
                 'courseCode' => $this->request->getPost('courseCode'),
@@ -197,7 +197,7 @@ Class Course extends BaseController
                 'courseDescription' => $this->request->getPost('courseDescription'),
                 'teacherID' => $teacherId,
                 'statusID' => $this->request->getPost('statusID'),
-                'schoolYearID' => $this->request->getPost('schoolYearID')
+                'schoolYearID' => $schoolYearId
             ];
             $courseModel->insert($data);
 
@@ -205,9 +205,9 @@ Class Course extends BaseController
             if ($courseID) {
                 $courseOfferingModel->insert([
                     'courseID' => $courseID,
-                    'schoolYearID' => $schoolYearID,
-                    'startDate' => $this->request->getPost('startDate') ?: null,
-                    'endDate' => $this->request->getPost('endDate') ?: null,
+                    'schoolYearID' => $schoolYearId,
+                    'startDate' => $startDate ?: null,
+                    'endDate' => $endDate ?: null,
                 ]);
             }
 
@@ -257,13 +257,14 @@ Class Course extends BaseController
             return redirect()->to('login');
         }
 
-        $courseModel = new CourseModel();
+    $courseModel = new CourseModel();
         $courseOfferingModel = new CourseOfferingModel();
+    $schoolYearModel = new SchoolYearModel();
 
         if ($this->request->getMethod() === 'POST') {
             $rules = [
-                'courseCode' => 'required |regex_match[/^[a-zA-Z0-9\s]+$/]',
-                'courseTitle' => 'required |regex_match[/^[a-zA-Z0-9\sñÑ]+$/]',
+                'courseCode' => 'required|regex_match[/^[a-zA-Z0-9\s]+$/]',
+                'courseTitle' => 'required|regex_match[/^[a-zA-Z0-9\sñÑ]+$/]',
                 'courseDescription' => 'required',
                 'teacherID' => 'required',
                 'schoolYearID' => 'required',
@@ -277,7 +278,7 @@ Class Course extends BaseController
 
             $startDate = $this->request->getPost('startDate');
             $endDate = $this->request->getPost('endDate');
-            $schoolYearID = (int) $this->request->getPost('schoolYearID');
+            $schoolYearId = (int) $this->request->getPost('schoolYearID');
             $customErrors = [];
 
             try {
@@ -287,20 +288,23 @@ Class Course extends BaseController
                 if ($end < $start) {
                     $customErrors['endDate'] = 'End date cannot be earlier than the start date.';
                 }
-                
-                $syModel = new \App\Models\SchoolYearModel();
-                $schoolYear = $syModel->find($schoolYearId);
-                if (!$schoolYear) {
+
+                $schoolYearRow = $schoolYearModel->find($schoolYearId);
+                if (!$schoolYearRow) {
                     $customErrors['schoolYearID'] = 'Selected school year was not found.';
                 } else {
-                    $syStart = new \DateTimeImmutable($schoolYear['startDate']);
-                    $syEnd   = new \DateTimeImmutable($schoolYear['endDate']);
+                    $bounds = $this->resolveSchoolYearBounds($schoolYearRow);
+                    if ($bounds === null) {
+                        $customErrors['schoolYearID'] = 'School year dates are not configured.';
+                    } else {
+                        [$syStart, $syEnd] = $bounds;
 
-                    if ($start < $syStart || $start > $syEnd) {
-                        $customErrors['startDate'] = 'Start date must be within the selected school year.';
-                    }
-                    if ($end < $syStart || $end > $syEnd) {
-                        $customErrors['endDate'] = 'End date must be within the selected school year.';
+                        if ($start < $syStart || $start > $syEnd) {
+                            $customErrors['startDate'] = 'Start date must be within the selected school year.';
+                        }
+                        if ($end < $syStart || $end > $syEnd) {
+                            $customErrors['endDate'] = 'End date must be within the selected school year.';
+                        }
                     }
                 }
             } catch (\Exception $e) {
@@ -317,25 +321,66 @@ Class Course extends BaseController
                 'courseTitle' => $this->request->getPost('courseTitle'),
                 'courseDescription' => $this->request->getPost('courseDescription'),
                 'teacherID' => $teacherId,
-                'schoolYearID' => $this->request->getPost('schoolYearID')
+                'schoolYearID' => $schoolYearId
             ];
             $courseModel->update($courseID, $data);
 
-                $offeringData = [
-                    'courseID' => $courseID,
-                    'schoolYearID' => $this->request->getPost('schoolYearID'),
-                    'startDate' => $this->request->getPost('startDate'),
-                    'endDate' => $this->request->getPost('endDate'),
-                ];
+            $offeringData = [
+                'courseID' => $courseID,
+                'schoolYearID' => $schoolYearId,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+            ];
 
-                $existingOffering = $courseOfferingModel->findByCourseId((int) $courseID);
-                if ($existingOffering) {
-                    $offeringData['offeringID'] = $existingOffering['offeringID'];
-                }
+            $existingOffering = $courseOfferingModel->findByCourseId((int) $courseID);
+            if ($existingOffering) {
+                $offeringData['offeringID'] = $existingOffering['offeringID'];
+            }
 
-                $courseOfferingModel->save($offeringData);
+            $courseOfferingModel->save($offeringData);
 
             return redirect()->to('/course/manage')->with('message', 'Course updated successfully.');
         }
+    }
+
+    private function resolveSchoolYearBounds(?array $schoolYear): ?array
+    {
+        if (!$schoolYear) {
+            return null;
+        }
+
+        $startKeys = ['startDate', 'start_date'];
+        $endKeys = ['endDate', 'end_date'];
+
+        foreach ($startKeys as $startKey) {
+            foreach ($endKeys as $endKey) {
+                if (!empty($schoolYear[$startKey]) && !empty($schoolYear[$endKey])) {
+                    try {
+                        return [
+                            new \DateTimeImmutable($schoolYear[$startKey]),
+                            new \DateTimeImmutable($schoolYear[$endKey]),
+                        ];
+                    } catch (\Exception $e) {
+                        return null;
+                    }
+                }
+            }
+        }
+
+        if (!empty($schoolYear['schoolYear']) && preg_match('/^(\d{4})\s*-\s*(\d{4})$/', $schoolYear['schoolYear'], $matches)) {
+            try {
+                $startYear = (int) $matches[1];
+                $endYear = (int) $matches[2];
+
+                return [
+                    new \DateTimeImmutable(sprintf('%04d-01-01', $startYear)),
+                    new \DateTimeImmutable(sprintf('%04d-12-31', $endYear)),
+                ];
+            } catch (\Exception $e) {
+                return null;
+            }
+        }
+
+        return null;
     }
 }
