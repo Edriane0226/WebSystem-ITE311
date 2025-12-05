@@ -154,24 +154,36 @@ Class Course extends BaseController
 
             $startDate = $this->request->getPost('startDate');
             $endDate = $this->request->getPost('endDate');
+            $schoolYear = (int) $this->request->getPost('schoolYear');
             $customErrors = [];
 
-            if ($startDate && $endDate) {
-                try {
-                    $today = new \DateTimeImmutable('today');
-                    $start = new \DateTimeImmutable($startDate);
-                    $end = new \DateTimeImmutable($endDate);
+            try {
+                $start = new \DateTimeImmutable($startDate);
+                $end   = new \DateTimeImmutable($endDate);
 
-                    if ($start < $today) {
-                        $customErrors['startDate'] = 'Start date cannot be in the past.';
-                    }
-
-                    if ($end < $start) {
-                        $customErrors['endDate'] = 'End date cannot be earlier than the start date.';
-                    }
-                } catch (\Exception $e) {
-                    $customErrors['startDate'] = 'Invalid date selection.';
+                if ($end < $start) {
+                    $customErrors['endDate'] = 'End date cannot be earlier than the start date.';
                 }
+
+                // Fetch school year range
+                $syModel = new \App\Models\SchoolYearModel();
+                $schoolYear = $syModel->find($schoolYearId);
+                if (!$schoolYear) {
+                    $customErrors['schoolYear'] = 'Selected school year was not found.';
+                } else {
+                    // Expect columns like startDate/endDate or start_year/end_year. Adjust names if different.
+                    $syStart = new \DateTimeImmutable($schoolYear['startDate']);
+                    $syEnd   = new \DateTimeImmutable($schoolYear['endDate']);
+
+                    if ($start < $syStart || $start > $syEnd) {
+                        $customErrors['startDate'] = 'Start date must be within the selected school year.';
+                    }
+                    if ($end < $syStart || $end > $syEnd) {
+                        $customErrors['endDate'] = 'End date must be within the selected school year.';
+                    }
+                }
+            } catch (\Exception $e) {
+                $customErrors['startDate'] = 'Invalid date selection.';
             }
 
             if (!empty($customErrors)) {
@@ -185,7 +197,7 @@ Class Course extends BaseController
                 'courseDescription' => $this->request->getPost('courseDescription'),
                 'teacherID' => $teacherId,
                 'statusID' => $this->request->getPost('statusID'),
-                'schoolYearID' => $this->request->getPost('schoolYear')
+                'schoolYearID' => $this->request->getPost('schoolYearID')
             ];
             $courseModel->insert($data);
 
@@ -193,7 +205,7 @@ Class Course extends BaseController
             if ($courseID) {
                 $courseOfferingModel->insert([
                     'courseID' => $courseID,
-                    'schoolYearID' => $this->request->getPost('schoolYear'),
+                    'schoolYearID' => $schoolYearID,
                     'startDate' => $this->request->getPost('startDate') ?: null,
                     'endDate' => $this->request->getPost('endDate') ?: null,
                 ]);
@@ -250,8 +262,8 @@ Class Course extends BaseController
 
         if ($this->request->getMethod() === 'POST') {
             $rules = [
-                'courseCode' => 'required',
-                'courseTitle' => 'required',
+                'courseCode' => 'required |regex_match[/^[a-zA-Z0-9\s]+$/]',
+                'courseTitle' => 'required |regex_match[/^[a-zA-Z0-9\sñÑ]+$/]',
                 'courseDescription' => 'required',
                 'teacherID' => 'required',
                 'schoolYearID' => 'required',
@@ -265,24 +277,34 @@ Class Course extends BaseController
 
             $startDate = $this->request->getPost('startDate');
             $endDate = $this->request->getPost('endDate');
+            $schoolYearID = (int) $this->request->getPost('schoolYearID');
             $customErrors = [];
 
-            if ($startDate && $endDate) {
-                try {
-                    $today = new \DateTimeImmutable('today');
-                    $start = new \DateTimeImmutable($startDate);
-                    $end = new \DateTimeImmutable($endDate);
+            try {
+                $start = new \DateTimeImmutable($startDate);
+                $end   = new \DateTimeImmutable($endDate);
 
-                    if ($start < $today) {
-                        $customErrors['startDate'] = 'Start date cannot be in the past.';
-                    }
-
-                    if ($end < $start) {
-                        $customErrors['endDate'] = 'End date cannot be earlier than the start date.';
-                    }
-                } catch (\Exception $e) {
-                    $customErrors['startDate'] = 'Invalid date selection.';
+                if ($end < $start) {
+                    $customErrors['endDate'] = 'End date cannot be earlier than the start date.';
                 }
+                
+                $syModel = new \App\Models\SchoolYearModel();
+                $schoolYear = $syModel->find($schoolYearId);
+                if (!$schoolYear) {
+                    $customErrors['schoolYearID'] = 'Selected school year was not found.';
+                } else {
+                    $syStart = new \DateTimeImmutable($schoolYear['startDate']);
+                    $syEnd   = new \DateTimeImmutable($schoolYear['endDate']);
+
+                    if ($start < $syStart || $start > $syEnd) {
+                        $customErrors['startDate'] = 'Start date must be within the selected school year.';
+                    }
+                    if ($end < $syStart || $end > $syEnd) {
+                        $customErrors['endDate'] = 'End date must be within the selected school year.';
+                    }
+                }
+            } catch (\Exception $e) {
+                $customErrors['startDate'] = 'Invalid date selection.';
             }
 
             if (!empty($customErrors)) {
