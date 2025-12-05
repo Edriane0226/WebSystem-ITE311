@@ -36,7 +36,7 @@ class CourseModel extends Model
         $this->join('coursestatus', 'courses.statusID = coursestatus.statusID', 'left');
         $this->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left');
         $this->join('courseOfferings', 'courseOfferings.courseID = courses.courseID', 'left');
-        return $this->where('courseID', $courseID)->first();
+        return $this->where('courses.courseID', $courseID)->first();
     }
 
     public function getCoursesByTeacher($teacherId)
