@@ -140,7 +140,7 @@ Class Course extends BaseController
         if ($this->request->getMethod() === 'POST') {
             $rules = [
                 'courseCode' => 'required|is_unique[courses.courseCode]|regex_match[/^[a-zA-Z0-9\s]+$/]',
-                'courseTitle' => 'required|is_unique[courses.courseTitle|regex_match[/^[a-zA-Z0-9\sñÑ]+$/]',
+                'courseTitle' => 'required|is_unique[courses.courseTitle]|regex_match[/^[a-zA-Z0-9\sñÑ]+$/]',
                 'courseDescription' => 'required',
                 'teacherID' => 'required',
                 'statusID' => 'required',
