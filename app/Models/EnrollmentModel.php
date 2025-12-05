@@ -21,7 +21,7 @@ class EnrollmentModel extends Model {
                     ->join('enrollmentstatus', 'enrollmentstatus.statusID = enrollments.enrollmentStatus', 'left')
                     ->join('courseOfferings', 'courseOfferings.courseID = enrollments.course_id', 'left')
                     ->where('enrollments.user_id', $user_id)
-                    ->where('enrollments.enrollmentStatus = 2')
+                    ->where('enrollments.enrollmentStatus = 1 OR enrollments.enrollmentStatus = 2 OR enrollments.enrollmentStatus = 3')
                     ->orderBy('courses.courseTitle')
                     ->findAll();
     }
@@ -67,7 +67,7 @@ class EnrollmentModel extends Model {
 
     public function countActiveEnrollments()
     {
-        return $this->where('enrollmentStatus', 2)->countAllResults();
+        return $this->where('enrollmentStatus', 1)->countAllResults();
     }
 
     public function updateEnrollmentStatus($enrollmentId, $statusId)

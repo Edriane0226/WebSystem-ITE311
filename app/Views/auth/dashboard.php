@@ -25,7 +25,7 @@
                                                 <p><?= $course['courseDescription'] ?></p>
                                                 <p class="text-muted small">School Year: <?= $course['schoolYear'] ?></p>
                                                    
-                                                    <?php $status = $enrollmentByCourse[$course['courseID']] ?? null?>
+                                                    <?php $status = $enrollmentByCourse[$course['courseID']] ?? null;?>
                                                     <?php if ($status == 'Enrolled'): ?>
                                                     <button class="btn btn-primary" disabled>Enrolled</button>
                                                     <?php elseif ($status == 'Completed'): ?>
@@ -48,6 +48,7 @@
                 <h4 class="mt-5">Download Materials</h4>
 
                     <?php foreach ($enrollments as $enrolled): ?>
+                        <?php if ($enrolled['enrollmentStatus'] == 2 || $enrolled['enrollmentStatus'] == 3) continue;?>
                         <?php if (!empty($enrolled['materials'])): ?>
                             <div class="card mt-3">
                                 <div class="card-body">
@@ -103,6 +104,7 @@
                             <h4 class="card-title">Enrolled Courses</h4>
                             <div class="row" id="enrolledCourses">
                                 <?php foreach ($enrollments as $enrolled):?>
+                                <?php if ($enrolled['enrollmentStatus'] == 2 || $enrolled['enrollmentStatus'] == 3) continue;?>
                                 <div class="col-md-4">
                                     <div class="card mt-5">
                                         <div class="card-body">
