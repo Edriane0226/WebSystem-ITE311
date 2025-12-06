@@ -57,6 +57,7 @@ $routes->post('/notifications/mark_read/(:num)', 'Notifications::mark_as_read/$1
 //Laboratory Exercise 9
 $routes->get('/course/search', 'Course::search');
 $routes->post('/course/search', 'Course::search');
+$routes->get('/course/(:num)', 'Course::viewCourses/$1');
 //Para Ma Fullfil view Details sa course
 $routes->get('/courses/(:num)', 'Course::details/$1');
 

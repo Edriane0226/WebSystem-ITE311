@@ -129,7 +129,9 @@
                                                     <?php if (!empty($enrolled['endDate'])): ?>
                                                         <br>Ends: <?= date('M j, Y', strtotime($enrolled['endDate'])) ?>
                                                     <?php endif; ?>
+                                                    
                                                 </p>
+                                                <a href="<?= base_url('courses/' . $enrolled['courseID']) ?>" class="btn btn-primary mt-3">View Course Details</a>
                                             <?php endif; ?>
                                         </div>
                                     </div>

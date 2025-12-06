@@ -394,4 +394,25 @@ Class Course extends BaseController
 
         return null;
     }
+    // View Course
+    public function viewCourses($courseID)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('login');
+        }
+
+        $courseModel = new CourseModel();
+        $course = $courseModel->getCourseWithDetails((int) $courseID);
+
+        if (!$course) {
+            return redirect()->to('/course/search')->with('error', 'Course not found.');
+        }
+
+        $data = [
+            'course' => $course,
+            'role' => session()->get('role'),
+        ];
+
+        return view('templates/header', $data) . view('courses/course/index', $data);
+    }
 }
