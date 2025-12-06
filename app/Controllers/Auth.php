@@ -140,7 +140,6 @@ class Auth extends BaseController
             
             ];
 
-            //dd($data);
         //return view('templates/header', $data) . view('auth/dashboard', $data);
         return $this->displayNotif('auth/dashboard', $data);
     }

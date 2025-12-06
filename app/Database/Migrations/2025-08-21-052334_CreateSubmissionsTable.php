@@ -20,18 +20,15 @@ class CreateSubmissionsTable extends Migration
                 'constraint' => 10,
                 'unsigned' => true
             ],
-            'quizID' => [
+            'AssignmentID' => [
                 'type' => 'INT',
                 'constraint' => 10,
                 'unsigned' => true
             ],
-            'answer' => [
-                'type' => 'TEXT'
-            ],
-            'score' => [
+            'materialID' => [
                 'type' => 'INT',
-                'constraint' => 100,
-                'null' => true
+                'constraint' => 11,
+                'unsigned' => true
             ],
             'submissionDate' => [
                 'type' => 'DATETIME',
@@ -40,7 +37,8 @@ class CreateSubmissionsTable extends Migration
         ]);
         $this->forge->addKey('submissionID');
         $this->forge->addForeignKey('userID', 'users', 'userID', 'CASCADE', 'CASCADE');
-        $this->forge->addForeignKey('quizID', 'quizzes', 'quizID', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('AssignmentID', 'assignments', 'AssignmentID', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('materialID', 'materials', 'id', 'CASCADE', 'CASCADE');
         $this->forge->createTable('submissions');
     }
 

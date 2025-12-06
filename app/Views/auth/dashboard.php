@@ -15,7 +15,15 @@
                                     $enrollmentByCourse[$enroll['course_id']] = $enroll['statusName'];
                                 }
                                 ?>
+                                
                                 <?php foreach ($courses as $course):?>
+                                    <?php
+                                        $statusValue = strtolower(trim($course['statusName'] ?? ''));
+                                        
+                                        if ($statusValue === 'inactive') {
+                                            continue; 
+                                        }
+                                    ?>
                                     <div class="col-md-4">
                                         <!-- remove lng ang base64_encode ug decode sa controller kung i try ang CSRF Token -->
                                         <div class="card mt-5 courseCard" data-course_id="<?= base64_encode($course['courseID']) ?>">

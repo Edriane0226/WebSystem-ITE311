@@ -27,13 +27,13 @@ class CreateQuizzesTable extends Migration
                 'type' => 'TEXT',
             ],
         ]);
-        $this->forge->addKey('quizID');
-        $this->forge->addForeignKey('lessonID', 'lessons', 'lessonID', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('quizzes');
+        //$this->forge->addKey('quizID');
+        //$this->forge->addForeignKey('lessonID', 'lessons', 'lessonID', 'CASCADE', 'CASCADE');
+        //$this->forge->createTable('quizzes');
     }
 
     public function down()
     {
-        $this->forge->dropTable('quizzes');
+        //$this->forge->dropTable('quizzes');
     }
 }

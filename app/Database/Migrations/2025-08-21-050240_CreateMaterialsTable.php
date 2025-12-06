@@ -20,6 +20,11 @@ class CreateMaterialsTable extends Migration
                 'constraint' => 10,
                 'unsigned'   => true,
             ],
+            'materialCategoryID' => [
+                'type'       => 'INT',
+                'constraint' => 10,
+                'unsigned'   => true,
+            ],
             'file_name' => [
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
@@ -28,13 +33,14 @@ class CreateMaterialsTable extends Migration
                 'type'       => 'VARCHAR',
                 'constraint' => 255,
             ],
-            'created_at' => [
+            'uploaded_at' => [
                 'type' => 'DATETIME',
                 'null' => true,
             ]
         ]);
         $this->forge->addKey('id');
         $this->forge->addForeignKey('course_id', 'courses', 'courseID', 'CASCADE', 'CASCADE');
+        $this->forge->addForeignKey('materialCategoryID', 'materialCategories', 'categoryID', 'CASCADE', 'CASCADE');
         $this->forge->createTable('materials');
     }
 

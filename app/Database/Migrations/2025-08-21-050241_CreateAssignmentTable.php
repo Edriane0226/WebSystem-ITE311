@@ -9,7 +9,7 @@ class CreateLessonsTable extends Migration
     public function up()
     {
         $this->forge->addField([
-            'lessonID' => [
+            'AssignmentID' => [
                 'type' => 'INT',
                 'constraint' => 10,
                 'unsigned' => true,
@@ -20,26 +20,33 @@ class CreateLessonsTable extends Migration
                 'constraint' => 10,
                 'unsigned' => true
             ],
-            'title' => [
-                'type' => 'VARCHAR',
-                'constraint' => 100,
+            'materialID' => [
+                'type' => 'INT',
+                'constraint' => 11,
+                'unsigned' => true
             ],
-            'startDate' => [
+            'allowedAttempts' => [
+                'type' => 'INT',
+                'constraint' => 1,
+                'null' => true
+            ],
+            'publishDate' => [
                 'type' => 'DATE',
                 'null' => true
             ],
-            'endDate' => [
+            'dueDate' => [
                 'type' => 'DATE',
                 'null' => true
             ],
         ]);
-        $this->forge->addKey('lessonID');
+        $this->forge->addKey('AssignmentID');
         $this->forge->addForeignKey('courseID', 'courses', 'courseID', 'CASCADE', 'CASCADE');
-        $this->forge->createTable('lessons');
+        $this->forge->addForeignKey('materialID', 'materials', 'id', 'CASCADE', 'CASCADE');
+        $this->forge->createTable('assignments');
     }
 
     public function down()
     {
-        $this->forge->dropTable('lessons');
+        $this->forge->dropTable('assignments');
     }
 }
