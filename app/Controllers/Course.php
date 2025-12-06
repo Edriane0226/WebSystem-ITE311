@@ -402,8 +402,8 @@ Class Course extends BaseController
         }
 
         $courseModel = new CourseModel();
-        $course = $courseModel->getCourseWithDetails((int) $courseID);
-
+        $enrollmentModel = new EnrollmentModel();
+        $course = $courseModel->getCourseWithDetails($courseID);
         if (!$course) {
             return redirect()->to('/course/search')->with('error', 'Course not found.');
         }

@@ -14,6 +14,7 @@
                 <div class="card-body">
                     <h4 class="card-title mb-3">Select Course</h4>
                     <form method="get">
+                        <?= csrf_field() ?>
                         <select name="course_id" class="form-select" required onchange="this.form.submit()">
                             <option value="">-- Choose a Course --</option>
                             <?php foreach($courses as $c): ?>
@@ -45,7 +46,8 @@
 
                     <?php if($role == 'admin' || $role == 'teacher'): ?>
                         <form action="<?= base_url('admin' . '/course/' . $course_id . '/upload') ?>" 
-                              method="post" enctype="multipart/form-data">
+                        method="post" enctype="multipart/form-data">
+                        <?= csrf_field() ?>
                             <div class="mb-3">
                                 <label class="form-label">Choose File</label>
                                 <input type="file" name="material_file" class="form-control" required>
