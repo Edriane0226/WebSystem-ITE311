@@ -366,9 +366,9 @@
     const isAdmin = <?= $userRole === 'admin' ? 'true' : 'false' ?>;
     const isTeacher = <?= $userRole === 'teacher' ? 'true' : 'false' ?>;
     const currentTeacherId = <?= $userRole === 'teacher' ? (int) session()->get('userID') : 'null' ?>;
-    const STATUS_ENROLLED = <?= (int) \App\Models\EnrollmentModel::STATUS_ENROLLED ?>;
-    const STATUS_PENDING = <?= (int) \App\Models\EnrollmentModel::STATUS_PENDING ?>;
-    const STATUS_DROPPED = <?= (int) \App\Models\EnrollmentModel::STATUS_DROPPED ?>;
+    const STATUS_ENROLLED = 1;
+    const STATUS_PENDING = 4;
+    const STATUS_DROPPED = 3;
 
     function escapeHtml(value) {
         const div = document.createElement('div');
@@ -812,7 +812,7 @@
         if (!confirm('Decline this enrollment request?')) {
             return;
         }
-        updatePendingEnrollment(studentId, courseId, STATUS_DROPPED, button);
+        updatePendingEnrollment(studentId, courseId, STATUS_PENDING, button);
     }
 
     function updatePendingEnrollment(studentId, courseId, statusId, button) {
