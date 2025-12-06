@@ -25,6 +25,10 @@ class CreateLessonsTable extends Migration
                 'constraint' => 11,
                 'unsigned' => true
             ],
+            'details' => [
+                'type' => 'TEXT',
+                'null' => true
+            ],
             'allowedAttempts' => [
                 'type' => 'INT',
                 'constraint' => 1,

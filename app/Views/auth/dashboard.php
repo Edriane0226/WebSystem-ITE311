@@ -116,9 +116,9 @@
                                 <?php foreach ($enrollments as $enrolled):?>
                                 <?php if ($enrolled['enrollmentStatus'] == 2 || $enrolled['enrollmentStatus'] == 3) continue;?>
                                 <div class="col-md-4">
-                                    <div class="card mt-5">
+                                    <div class="card mt-5 position-relative">
                                         <div class="card-body">
-                                            <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
+                                            <h4 class="card-title"><?= $enrolled['courseTitle']?></h4>
                                             <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
                                             <p><?= $enrolled['courseDescription'] ?></p>
                                             <?php if (!empty($enrolled['startDate']) || !empty($enrolled['endDate'])): ?>
@@ -129,10 +129,9 @@
                                                     <?php if (!empty($enrolled['endDate'])): ?>
                                                         <br>Ends: <?= date('M j, Y', strtotime($enrolled['endDate'])) ?>
                                                     <?php endif; ?>
-                                                    
                                                 </p>
-                                                <a href="<?= base_url('courses/' . $enrolled['courseID']) ?>" class="btn btn-primary mt-3">View Course Details</a>
                                             <?php endif; ?>
+                                            <a href="<?= base_url('course/' . $enrolled['course_id']) ?>" class="stretched-link" aria-label="Open <?= esc($enrolled['courseTitle']) ?> course page"></a>
                                         </div>
                                     </div>
                                 </div>
@@ -151,9 +150,11 @@
                         <?php if (!empty($courses)): ?>
                             <div class="list-group">
                                 <?php foreach ($courses as $course): ?>
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div class="list-group-item d-flex justify-content-between align-items-center position-relative">
                                         <div>
-                                            <h5 class="mb-1 p-2"><?= esc($course['courseTitle']); ?></h5>
+                                            <a href="<?= base_url('course/' . $course['courseID']); ?>" class="stretched-link text-decoration-none">
+                                                <h5 class="mb-1 p-2 text-primary"><?= esc($course['courseTitle']); ?></h5>
+                                            </a>
                                         </div>
                                         <div>
                                             <a href="<?= base_url('admin/course/' . $course['courseID'] . '/upload'); ?>" 

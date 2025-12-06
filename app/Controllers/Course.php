@@ -415,4 +415,39 @@ Class Course extends BaseController
 
         return view('templates/header', $data) . view('courses/course/index', $data);
     }
+
+    public function people($courseID)
+    {
+        if (!session()->get('isLoggedIn')) {
+            return redirect()->to('login');
+        }
+
+        $courseId = (int) $courseID;
+        $courseModel = new CourseModel();
+        $course = $courseModel->getCourseWithDetails($courseId);
+
+        if (!$course) {
+            return redirect()->to('/course/search')->with('error', 'Course not found.');
+        }
+
+        $userModel = new UserModel();
+        $students = $userModel->getStudentsByCourse($courseId);
+        $teacher = null;
+
+        if (!empty($course['teacherID'])) {
+            $teacher = $userModel->find($course['teacherID']);
+        }
+
+        $data = [
+            'course' => $course,
+            'students' => $students,
+            'teacher' => $teacher,
+            'role' => session()->get('role'),
+        ];
+
+        return view('templates/header', ['role' => session()->get('role')])
+            . view('courses/course/people', $data);
+    }
+
+    
 }

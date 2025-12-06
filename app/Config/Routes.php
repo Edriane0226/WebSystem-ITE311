@@ -58,6 +58,11 @@ $routes->post('/notifications/mark_read/(:num)', 'Notifications::mark_as_read/$1
 $routes->get('/course/search', 'Course::search');
 $routes->post('/course/search', 'Course::search');
 $routes->get('/course/(:num)', 'Course::viewCourses/$1');
+$routes->match(['get', 'post'], '/course/(:num)/modules', 'Materials::upload/$1');
+$routes->get('/course/(:num)/peoples', 'Course::people/$1');
+$routes->get('/course/(:num)/assignments', 'Assignments::index/$1');
+$routes->post('/course/(:num)/assignments', 'Assignments::create/$1');
+$routes->post('/course/(:num)/assignments/submit', 'Assignments::submit/$1');
 //Para Ma Fullfil view Details sa course
 $routes->get('/courses/(:num)', 'Course::details/$1');
 

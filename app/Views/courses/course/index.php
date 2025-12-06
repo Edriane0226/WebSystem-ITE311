@@ -35,6 +35,23 @@ $timeSlotLabel = !empty($course['timeSlot']) ? $course['timeSlot'] : 'To be anno
 $teacherName = $course['teacherName'] ?? 'No teacher assigned';
 $schoolYear = $course['schoolYear'] ?? 'Not available';
 $semesterName = $course['semesterName'] ?? null;
+$roleName = strtolower((string) ($role ?? session()->get('role') ?? ''));
+$isStudent = $roleName === 'student';
+$modulesTitle = $isStudent ? 'Modules' : 'Manage Modules';
+$modulesDescription = $isStudent
+    ? 'Browse and download available course materials.'
+    : 'Upload new materials and manage course resources.';
+$modulesAction = $isStudent ? 'Download Modules' : 'Open Module Manager';
+$assignmentTitle = $isStudent ? 'Assignments' : 'Manage Assignments';
+$assignmentDescription = $isStudent
+    ? 'Submit your work and keep track of every attempt.'
+    : 'Upload assignment briefs and monitor submissions.';
+$assignmentAction = $isStudent ? 'Submit Assignment' : 'Upload Assignment';
+$peopleTitle = $isStudent ? 'Classmates & Teacher' : 'People Roster';
+$peopleDescription = $isStudent
+    ? 'See who is in this class and reach out when you need help.'
+    : 'Review enrolled students and their enrollment status.';
+$peopleAction = $isStudent ? 'View Classmates' : 'Manage People';
 ?>
 
 <div class="container-fluid p-4">
@@ -88,8 +105,11 @@ $semesterName = $course['semesterName'] ?? null;
                         <div class="bg-primary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
                             <i class="bi bi-clipboard-check text-primary fs-3"></i>
                         </div>
-                        <h5 class="fw-semibold mb-2">Assignments</h5>
-                        <p class="text-muted small mb-3">Track and submit your course tasks on time.</p>
+                        <h5 class="fw-semibold mb-2"><?= esc($assignmentTitle) ?></h5>
+                        <p class="text-muted small mb-3"><?= esc($assignmentDescription) ?></p>
+                        <span class="badge bg-primary-subtle text-primary fw-semibold mb-3 px-3 py-2">
+                            <?= esc($assignmentAction) ?>
+                        </span>
                         <div class="bg-light border rounded-pill px-3 py-2 small text-muted">
                             Base URL: <code><?= esc($assignmentUrl) ?></code>
                         </div>
@@ -104,8 +124,11 @@ $semesterName = $course['semesterName'] ?? null;
                         <div class="bg-success bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
                             <i class="bi bi-collection-play text-success fs-3"></i>
                         </div>
-                        <h5 class="fw-semibold mb-2">Modules</h5>
-                        <p class="text-muted small mb-3">Access learning materials and weekly lessons.</p>
+                        <h5 class="fw-semibold mb-2"><?= esc($modulesTitle) ?></h5>
+                        <p class="text-muted small mb-3"><?= esc($modulesDescription) ?></p>
+                        <span class="badge bg-success-subtle text-success fw-semibold mb-3 px-3 py-2">
+                            <?= esc($modulesAction) ?>
+                        </span>
                         <div class="bg-light border rounded-pill px-3 py-2 small text-muted">
                             Base URL: <code><?= esc($modulesUrl) ?></code>
                         </div>
@@ -120,8 +143,11 @@ $semesterName = $course['semesterName'] ?? null;
                         <div class="bg-info bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3" style="width: 64px; height: 64px;">
                             <i class="bi bi-people text-info fs-3"></i>
                         </div>
-                        <h5 class="fw-semibold mb-2">Peoples</h5>
-                        <p class="text-muted small mb-3">Connect with classmates and instructors in this course.</p>
+                        <h5 class="fw-semibold mb-2"><?= esc($peopleTitle) ?></h5>
+                        <p class="text-muted small mb-3"><?= esc($peopleDescription) ?></p>
+                        <span class="badge bg-info-subtle text-info fw-semibold mb-3 px-3 py-2">
+                            <?= esc($peopleAction) ?>
+                        </span>
                         <div class="bg-light border rounded-pill px-3 py-2 small text-muted">
                             Base URL: <code><?= esc($peopleUrl) ?></code>
                         </div>
