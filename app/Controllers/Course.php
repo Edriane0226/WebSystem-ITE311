@@ -37,17 +37,17 @@ Class Course extends BaseController
             'user_id' => $user_id,
             'course_id' => $course_id,
             'enrollment_date' => date('Y-m-d'),
-            'enrollmentStatus' => 1,
+            'enrollmentStatus' => 4, // Status ID sa pending
         ];
         $enrollmentModel->enrollUser($data);
 
         //Insert Notification after ma enroll para sa student
         $notif = new NotificationModel();
-        $notif->createNotification($user_id, 'You have successfully enrolled in a course.');
+    $notif->createNotification($user_id, 'Your enrollment request has been submitted and is pending approval.');
 
         
         return $this->response->setJSON(['success' => true, 
-                                        'message' => 'Successfully Enrolled!', 
+                    'message' => 'Enrollment request submitted. Waiting for approval.', 
                                         'csrfHash' => csrf_hash()]);
 }
     

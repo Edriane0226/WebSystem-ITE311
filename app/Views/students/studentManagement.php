@@ -366,6 +366,9 @@
     const isAdmin = <?= $userRole === 'admin' ? 'true' : 'false' ?>;
     const isTeacher = <?= $userRole === 'teacher' ? 'true' : 'false' ?>;
     const currentTeacherId = <?= $userRole === 'teacher' ? (int) session()->get('userID') : 'null' ?>;
+    const STATUS_ENROLLED = <?= (int) \App\Models\EnrollmentModel::STATUS_ENROLLED ?>;
+    const STATUS_PENDING = <?= (int) \App\Models\EnrollmentModel::STATUS_PENDING ?>;
+    const STATUS_DROPPED = <?= (int) \App\Models\EnrollmentModel::STATUS_DROPPED ?>;
 
     function escapeHtml(value) {
         const div = document.createElement('div');
@@ -589,7 +592,10 @@
                             : NaN;
                         const managedByCurrentTeacher = isAdmin || (isTeacher && teacherOwnerId === currentTeacherId);
                         const hasEnrollmentRecord = Boolean(enrollment.enrollmentID);
+                        const normalizedStatusId = enrollment.enrollmentStatus !== undefined ? parseInt(enrollment.enrollmentStatus, 10) : NaN;
+                        const isPendingStatus = !Number.isNaN(normalizedStatusId) && normalizedStatusId === STATUS_PENDING;
                         const isVirtualPending = enrollment.isVirtualPending === true || enrollment.isVirtualPending === 1 || enrollment.isVirtualPending === '1';
+                        const isPending = isPendingStatus || isVirtualPending;
                         const courseId = enrollment.course_id !== undefined ? parseInt(enrollment.course_id, 10) : NaN;
                         const statusOptionsHtml = statuses.map(status => `
                             <option value="${status.statusID}" ${String(status.statusID) === String(enrollment.enrollmentStatus) ? 'selected' : ''}>
@@ -597,20 +603,26 @@
                             </option>
                         `).join('');
 
-                        const statusLabel = escapeHtml(enrollment.statusName || (isVirtualPending ? 'Pending' : 'N/A'));
+                        const statusLabel = escapeHtml(enrollment.statusName || (isPending ? 'Pending' : 'N/A'));
                         const currentStatusValue = enrollment.enrollmentStatus !== undefined && enrollment.enrollmentStatus !== null
                             ? String(enrollment.enrollmentStatus)
                             : '';
 
                         let statusControl = `<span class="badge bg-light text-dark">${statusLabel}</span>`;
+                        let teacherActions = '';
+
                         if (managedByCurrentTeacher) {
-                            if ((isVirtualPending || !hasEnrollmentRecord) && isTeacher && statusOptionsHtml && Number.isInteger(courseId) && Number.isInteger(studentIdInt)) {
-                                statusControl = `
-                                    <select class="form-select form-select-sm w-auto" data-current-value="${currentStatusValue}" onchange="createPendingEnrollment(${studentIdInt}, ${courseId}, this.value, this)">
-                                        ${statusOptionsHtml}
-                                    </select>
+                            if (isTeacher && isPending && Number.isInteger(courseId) && Number.isInteger(studentIdInt)) {
+                                statusControl = `<span class="badge bg-warning text-dark">${statusLabel}</span>`;
+                                teacherActions = `
+                                    <button class="btn btn-sm btn-success" onclick="acceptEnrollment(${studentIdInt}, ${courseId}, this)">
+                                        <i class="bi bi-check-lg"></i>
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-danger" onclick="declineEnrollment(${studentIdInt}, ${courseId}, this)">
+                                        <i class="bi bi-x-lg"></i>
+                                    </button>
                                 `;
-                            } else if (!isVirtualPending && hasEnrollmentRecord && statusOptionsHtml) {
+                            } else if (hasEnrollmentRecord && statusOptionsHtml) {
                                 statusControl = `
                                     <select class="form-select form-select-sm w-auto" onchange="updateEnrollmentStatus(${enrollment.enrollmentID}, this.value)">
                                         ${statusOptionsHtml}
@@ -618,7 +630,7 @@
                                 `;
                             }
                         } else if (isTeacher) {
-                            if (isVirtualPending || !hasEnrollmentRecord) {
+                            if (isPending || !hasEnrollmentRecord) {
                                 statusControl = `<span class="badge bg-warning text-dark">${statusLabel}</span>`;
                             } else {
                                 statusControl = '<span class="badge bg-secondary">Managed by another teacher</span>';
@@ -654,6 +666,7 @@
                                 </div>
                                 <div class="d-flex align-items-center gap-2">
                                     ${statusControl}
+                                    ${teacherActions}
                                     ${unenrollButton}
                                 </div>
                             </div>
@@ -788,6 +801,63 @@
                     control.dataset.currentValue = control.value;
                 }
             }
+        });
+    }
+
+    function acceptEnrollment(studentId, courseId, button) {
+        updatePendingEnrollment(studentId, courseId, STATUS_ENROLLED, button);
+    }
+
+    function declineEnrollment(studentId, courseId, button) {
+        if (!confirm('Decline this enrollment request?')) {
+            return;
+        }
+        updatePendingEnrollment(studentId, courseId, STATUS_DROPPED, button);
+    }
+
+    function updatePendingEnrollment(studentId, courseId, statusId, button) {
+        if (!isTeacher) {
+            return;
+        }
+
+        const spinner = document.createElement('span');
+        spinner.className = 'spinner-border spinner-border-sm';
+        spinner.setAttribute('role', 'status');
+        spinner.setAttribute('aria-hidden', 'true');
+
+        const originalContent = button.innerHTML;
+        button.disabled = true;
+        button.innerHTML = '';
+        button.appendChild(spinner);
+
+        const bodyParams = new URLSearchParams({
+            studentId: String(studentId),
+            courseId: String(courseId),
+            statusId: String(statusId),
+        });
+
+        fetch('<?= base_url('students/createTeacherEnrollment') ?>', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRF-TOKEN': '<?= csrf_hash() ?>'
+            },
+            body: bodyParams
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                location.reload();
+            } else {
+                alert('Error: ' + (data.message || 'Unable to update enrollment.'));
+            }
+        })
+        .catch(() => {
+            alert('Failed to update enrollment.');
+        })
+        .finally(() => {
+            button.disabled = false;
+            button.innerHTML = originalContent;
         });
     }
 

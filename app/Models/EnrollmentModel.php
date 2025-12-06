@@ -8,7 +8,11 @@ class EnrollmentModel extends Model {
     protected $primaryKey = 'enrollmentID';
     protected $returnType = 'array';
     protected $allowedFields = ['user_id', 'course_id', 'enrollment_date', 'enrollmentStatus'];
+
     public const STATUS_ENROLLED = 1;
+    public const STATUS_COMPLETED = 2;
+    public const STATUS_DROPPED = 3;
+    public const STATUS_PENDING = 4;
 
     // Insert ug data galing sa controller
     public function enrollUser($data) {
@@ -24,7 +28,7 @@ class EnrollmentModel extends Model {
                     ->join('semester', 'semester.semesterID = schoolYear.Semester', 'left')
                     ->join('time', 'time.timeID = courseOfferings.Schedule', 'left')
                     ->where('enrollments.user_id', $user_id)
-                    ->where('enrollments.enrollmentStatus = 1 OR enrollments.enrollmentStatus = 2 OR enrollments.enrollmentStatus = 3')
+                    ->whereIn('enrollments.enrollmentStatus', [1,2,3,4] )
                     ->orderBy('courses.courseTitle')
                     ->findAll();
     }

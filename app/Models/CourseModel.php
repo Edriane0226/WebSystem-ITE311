@@ -82,7 +82,7 @@ class CourseModel extends Model
         $builder->join('time', 'time.timeID = courseOfferings.Schedule', 'left');
 
         if (!empty($enrolledCourseIds)) {
-            $builder->whereNotIn('courseID', $enrolledCourseIds);
+            $builder->whereNotIn('courses.courseID', $enrolledCourseIds);
         }
 
         return $builder->orderBy('courseTitle')->get()->getResultArray();
@@ -104,7 +104,7 @@ class CourseModel extends Model
         $builder->where('teacherID', $teacherId);
 
         if (!empty($enrolledCourseIds)) {
-            $builder->whereNotIn('courseID', $enrolledCourseIds);
+            $builder->whereNotIn('courses.courseID', $enrolledCourseIds);
         }
 
         return $builder->orderBy('courseTitle')->get()->getResultArray();

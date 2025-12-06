@@ -233,8 +233,8 @@ class UserManage extends BaseController
         $enrollmentModel = new EnrollmentModel();
         $statusModel = new EnrollmentStatusModel();
 
-        $statuses = $statusModel->getAllStatuses();
-        $enrolledStatusId = 1;
+    $statuses = $statusModel->getAllStatuses();
+    $enrolledStatusId = 1;
         $enrolledStatusName = 'Enrolled';
         foreach ($statuses as $status) {
             if ((int) ($status['statusID'] ?? 0) === $enrolledStatusId) {
@@ -301,7 +301,7 @@ class UserManage extends BaseController
             'user_id' => $studentId,
             'course_id' => $courseId,
             'enrollment_date' => date('Y-m-d'),
-            'enrollmentStatus' => 2
+            'enrollmentStatus' => 1
         ];
 
         try {
@@ -378,6 +378,86 @@ class UserManage extends BaseController
             return $this->response->setJSON(['success' => true, 'message' => 'Enrollment status updated']);
         } catch (\Exception $e) {
             return $this->response->setJSON(['success' => false, 'message' => 'Failed to update enrollment: ' . $e->getMessage()]);
+        }
+    }
+
+    public function createTeacherEnrollment()
+    {
+        if (!session()->get('isLoggedIn')) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Unauthorized']);
+        }
+
+        if (session()->get('role') !== 'teacher') {
+            return $this->response->setJSON(['success' => false, 'message' => 'Access denied']);
+        }
+
+        $teacherId = (int) session()->get('userID');
+        $studentId = (int) $this->request->getPost('studentId');
+        $courseId = (int) $this->request->getPost('courseId');
+        $statusId = (int) $this->request->getPost('statusId');
+
+        if ($studentId <= 0 || $courseId <= 0 || $statusId <= 0) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Missing or invalid data']);
+        }
+
+        $courseModel = new CourseModel();
+        $course = $courseModel->find($courseId);
+
+        if (!$course || (int) ($course['teacherID'] ?? 0) !== $teacherId) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Course not found or not assigned to current teacher']);
+        }
+
+        $allowedStatuses = [1, 2, 3, 4];
+
+        if (!in_array($statusId, $allowedStatuses, true)) {
+            return $this->response->setJSON(['success' => false, 'message' => 'Invalid status selection']);
+        }
+
+        $enrollmentModel = new EnrollmentModel();
+        $existing = $enrollmentModel
+            ->where('user_id', $studentId)
+            ->where('course_id', $courseId)
+            ->first();
+
+        try {
+            if ($existing) {
+                $updateData = [
+                    'enrollmentStatus' => $statusId,
+                ];
+
+                if (empty($existing['enrollment_date'])) {
+                    $updateData['enrollment_date'] = date('Y-m-d');
+                }
+
+                $enrollmentModel->update((int) $existing['enrollmentID'], $updateData);
+            } else {
+                if ($statusId === 3) {
+                    return $this->response->setJSON(['success' => true, 'message' => 'Enrollment request declined.']);
+                }
+
+                $enrollmentModel->insert([
+                    'user_id' => $studentId,
+                    'course_id' => $courseId,
+                    'enrollment_date' => date('Y-m-d'),
+                    'enrollmentStatus' => $statusId,
+                ]);
+            }
+
+            $message = 'Enrollment updated.';
+            if ($statusId === 1) {
+                $message = 'Enrollment approved.';
+            } elseif ($statusId === 3) {
+                $message = 'Enrollment declined.';
+            } elseif ($statusId === 4) {
+                $message = 'Enrollment set to pending.';
+            }
+
+            return $this->response->setJSON(['success' => true, 'message' => $message]);
+        } catch (\Exception $e) {
+            return $this->response->setJSON([
+                'success' => false,
+                'message' => 'Failed to update enrollment: ' . $e->getMessage(),
+            ]);
         }
     }
 
