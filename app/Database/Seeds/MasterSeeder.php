@@ -11,6 +11,8 @@ class MasterSeeder extends Seeder
         $this->call('RoleSeeder');
         $this->call('UserSeeder');
         $this->call('CourseStatusSeeder');
+        $this->call('TimeSeeder');
+        $this->call('SemesterSeeder');
         $this->call('SchoolYearSeeder');
         $this->call('CoursesSeeder');
         $this->call('CourseOfferingSeeder');

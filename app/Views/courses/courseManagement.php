@@ -101,6 +101,8 @@
                                 <th class="border-0">Title</th>
                                 <th class="border-0">Description</th>
                                 <th class="border-0">School Year</th>
+                                <th class="border-0">Semester</th>
+                                <th class="border-0">Schedule</th>
                                 <th class="border-0">Teacher</th>
                                 <th class="border-0">Status</th>
                                 <th class="border-0">Edit Details</th>
@@ -122,6 +124,8 @@
                                         </div>
                                     </td>
                                     <td><?= esc($course['schoolYear']) ?></td>
+                                    <td><?= esc($course['semesterName'] ?? ($course['Semester'] !== null ? 'Semester ' . $course['Semester'] : 'Not Set')) ?></td>
+                                    <td><?= esc($course['timeSlot'] ?? 'Not Set') ?></td>
                                     <td><?= esc($course['teacherName'] ?? 'Not Assigned') ?></td>
                                     <td>
                                         <form action="<?= base_url('course/setStatus/' . $course['courseID']) ?>" method="post" class="d-inline">
@@ -195,8 +199,8 @@
                                     <option value="">Select School Year</option>
                                     <?php if (isset($schoolYears)): ?>
                                         <?php foreach ($schoolYears as $sy): ?>
-                                            <option value="<?= $sy['schoolYearID'] ?>">
-                                                <?= $sy['schoolYear'] ?>
+                                            <option value="<?= esc($sy['schoolYearID']) ?>">
+                                                <?= esc($sy['schoolYear']) ?><?= !empty($sy['semesterName']) ? ' • ' . esc($sy['semesterName']) : '' ?>
                                             </option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
@@ -241,6 +245,19 @@
                                 </select>
                             </div>
 
+                            <div class="col-md-6">
+                                <label class="form-label">Schedule</label>
+                                <select name="schedule" class="form-select" required>
+                                    <option value="">Select Schedule</option>
+                                    <?php if (isset($timeSlots)): ?>
+                                        <?php foreach ($timeSlots as $slot): ?>
+                                            <option value="<?= esc($slot['timeID']) ?>" <?= (string) $slot['timeID'] === (string) old('schedule') ? 'selected' : '' ?>>
+                                                <?= esc($slot['timeSlot']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
                             <div class="col-md-6">
                                 <label class="form-label">Start Date</label>
                                 <input type="date" name="startDate" class="form-control" required min="<?= esc($today) ?>" value="<?= esc(old('startDate')) ?>">
@@ -287,7 +304,7 @@
                                     <option value="">Select School Year</option>
                                     <?php if (isset($schoolYears)): ?>
                                         <?php foreach ($schoolYears as $sy): ?>
-                                            <option value="<?= $sy['schoolYearID'] ?>"><?= $sy['schoolYear'] ?></option>
+                                            <option value="<?= esc($sy['schoolYearID']) ?>"><?= esc($sy['schoolYear']) ?><?= !empty($sy['semesterName']) ? ' • ' . esc($sy['semesterName']) : '' ?></option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
                                 </select>
@@ -321,6 +338,20 @@
                                         <?php foreach ($teachers as $teacher): ?>
                                             <option value="<?= $teacher['userID'] ?>">
                                                 <?= esc($teacher['name']) ?>
+                                            </option>
+                                        <?php endforeach; ?>
+                                    <?php endif; ?>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Schedule</label>
+                                <select name="schedule" id="edit_schedule" class="form-select" required>
+                                    <option value="">Select Schedule</option>
+                                    <?php if (isset($timeSlots)): ?>
+                                        <?php foreach ($timeSlots as $slot): ?>
+                                            <option value="<?= esc($slot['timeID']) ?>">
+                                                <?= esc($slot['timeSlot']) ?>
                                             </option>
                                         <?php endforeach; ?>
                                     <?php endif; ?>
@@ -383,6 +414,7 @@
             document.getElementById('edit_courseDescription').value = course.courseDescription;
             document.getElementById('edit_schoolYear').value = course.schoolYearID;
             document.getElementById('edit_teacherID').value = course.teacherID || '';
+            document.getElementById('edit_schedule').value = course.Schedule || '';
             document.getElementById('edit_startDate').value = course.startDate ? course.startDate.substring(0, 10) : '';
             document.getElementById('edit_endDate').value = course.endDate ? course.endDate.substring(0, 10) : '';
             document.getElementById('edit_startDate').min = today;

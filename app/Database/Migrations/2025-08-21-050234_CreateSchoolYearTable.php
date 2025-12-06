@@ -18,9 +18,15 @@ class CreateSchoolYearTable extends Migration
             'schoolYear' => [
                 'type' => 'VARCHAR',
                 'constraint' => 9,
-            ],
+            ],        
+            'Semester' => [
+                'type' => 'INT',
+                'constraint' => 10,
+                'unsigned' => true,
+            ]
         ]);
         $this->forge->addKey('schoolYearID');
+        $this->forge->addForeignKey('Semester', 'semester', 'semesterID', 'CASCADE', 'CASCADE');
         $this->forge->createTable('schoolYear');
     }
 

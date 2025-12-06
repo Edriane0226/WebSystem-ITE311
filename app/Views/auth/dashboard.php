@@ -1,4 +1,4 @@
-    <div class="container p-3">
+<div class="container p-3">
         <h3>Dashboard</h3>
         <h4 class="mt-3 text-muted">Welcome, <?= $name ?>!</h4>
     
@@ -24,6 +24,8 @@
                                                 <h6 class="card-subtitle mb-2 text-muted"><?= $course['courseCode'] ?></h6>
                                                 <p><?= $course['courseDescription'] ?></p>
                                                 <p class="text-muted small">School Year: <?= $course['schoolYear'] ?></p>
+                                                <p class="text-muted small">Semester: <?= $course['semesterName'] ?? $course['Semester'] ?></p>
+                                                <p class="text-muted small">Schedule: <?= $course['timeSlot'] ?? 'Not Set' ?></p>
                                                    
                                                     <?php $status = $enrollmentByCourse[$course['courseID']] ?? null;?>
                                                     <?php if ($status == 'Enrolled'): ?>

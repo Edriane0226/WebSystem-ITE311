@@ -14,18 +14,21 @@ class CourseOfferingSeeder extends Seeder
                 'schoolYearID' => 1,
                 'startDate' => '2023-09-01',
                 'endDate' => '2024-06-15',
+                'Schedule' => 1,
             ],
             [
                 'courseID' => 2,
                 'schoolYearID' => 1,
                 'startDate' => '2023-09-01',
                 'endDate' => '2024-06-15',
+                'Schedule' => 2,
             ],
             [
                 'courseID' => 3,
                 'schoolYearID' => 1,
                 'startDate' => '2023-09-01',
                 'endDate' => '2024-06-15',
+                'Schedule' => 3,
             ],
         ];
 

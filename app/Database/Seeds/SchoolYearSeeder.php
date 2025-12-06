@@ -11,20 +11,28 @@ class SchoolYearSeeder extends Seeder
         $data = [
             [
             'schoolYear' => '2025-2026',
+            'Semester' => 1,
+            ],
+            [
+            'schoolYear' => '2025-2026',
+            'Semester' => 2,
+            ],
+            [
+            'schoolYear' => '2025-2026',
+            'Semester' => 3,
             ],
             [
             'schoolYear' => '2026-2027',
+            'Semester' => 1,
             ],
             [
-            'schoolYear' => '2027-2028',
+            'schoolYear' => '2026-2027',
+            'Semester' => 2,
             ],
             [
-            'schoolYear' => '2028-2029',
-            ],
-            [
-            'schoolYear' => '2029-2030',
-            ]
-            
+            'schoolYear' => '2026-2027',
+            'Semester' => 3,
+            ],            
         ];
 
         $this->db->table('schoolYear')->insertBatch($data);

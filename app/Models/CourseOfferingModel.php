@@ -8,7 +8,7 @@ class CourseOfferingModel extends Model
 {
     protected $table = 'courseOfferings';
     protected $primaryKey = 'offeringID';
-    protected $allowedFields = ['courseID', 'schoolYearID', 'startDate', 'endDate'];
+    protected $allowedFields = ['courseID', 'schoolYearID', 'startDate', 'endDate', 'Schedule'];
     protected $returnType = 'array';
 
     public function findByCourseId(int $courseId): ?array

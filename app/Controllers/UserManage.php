@@ -234,7 +234,7 @@ class UserManage extends BaseController
         $statusModel = new EnrollmentStatusModel();
 
         $statuses = $statusModel->getAllStatuses();
-        $enrolledStatusId = EnrollmentModel::STATUS_ENROLLED;
+        $enrolledStatusId = 1;
         $enrolledStatusName = 'Enrolled';
         foreach ($statuses as $status) {
             if ((int) ($status['statusID'] ?? 0) === $enrolledStatusId) {

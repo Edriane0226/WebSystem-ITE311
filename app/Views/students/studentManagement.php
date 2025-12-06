@@ -523,6 +523,8 @@
                                     <div>
                                         <strong>${escapeHtml(course.courseTitle || 'Untitled Course')}</strong>
                                         <small class="text-muted d-block">${escapeHtml(course.courseCode || '')}</small>
+                                        <small class="text-muted d-block">${escapeHtml(course.schoolYear || '')}${course.semesterName ? ' • ' + escapeHtml(course.semesterName) : ''}</small>
+                                        <small class="text-muted d-block">${escapeHtml(course.timeSlot || 'No schedule')}</small>
                                     </div>
                                     <button class="btn btn-sm btn-outline-primary" onclick="enrollStudent(${studentIdInt}, ${Number.isNaN(courseId) ? 'null' : courseId})">
                                         Enroll
@@ -556,6 +558,8 @@
                                     <div>
                                         <strong>${escapeHtml(course.courseTitle || 'Untitled Course')}</strong>
                                         <small class="text-muted d-block">${escapeHtml(course.courseCode || '')}</small>
+                                        <small class="text-muted d-block">${escapeHtml(course.schoolYear || '')}${course.semesterName ? ' • ' + escapeHtml(course.semesterName) : ''}</small>
+                                        <small class="text-muted d-block">${escapeHtml(course.timeSlot || 'No schedule')}</small>
                                         <small class="text-muted d-block">No enrollment record</small>
                                     </div>
                                     <div class="d-flex align-items-center gap-2">
@@ -629,6 +633,12 @@
                         const courseCodeLine = enrollment.courseCode
                             ? `<small class="text-muted d-block">${escapeHtml(enrollment.courseCode)}</small>`
                             : '';
+                        const scheduleLine = enrollment.schoolYear
+                            ? `<small class="text-muted d-block">${escapeHtml(enrollment.schoolYear)}${enrollment.semesterName ? ' • ' + escapeHtml(enrollment.semesterName) : ''}</small>`
+                            : '';
+                        const timeLine = enrollment.timeSlot
+                            ? `<small class="text-muted d-block">${escapeHtml(enrollment.timeSlot)}</small>`
+                            : '';
                         const enrollmentDetail = hasEnrollmentRecord && enrollment.enrollmentDate
                             ? `Enrolled: ${escapeHtml(enrollment.enrollmentDate)}`
                             : 'No enrollment record';
@@ -638,6 +648,8 @@
                                 <div>
                                     <strong>${courseTitle}</strong>
                                     ${courseCodeLine}
+                                    ${scheduleLine}
+                                    ${timeLine}
                                     <small class="text-muted d-block">${enrollmentDetail}</small>
                                 </div>
                                 <div class="d-flex align-items-center gap-2">

@@ -1,12 +1,14 @@
 <?php
 
 namespace App\Controllers;
+
 use App\Models\EnrollmentModel;
 use App\Models\NotificationModel;
 use App\Models\CourseModel;
 use App\Models\SchoolYearModel;
 use App\Models\CourseStatusModel;
 use App\Models\CourseOfferingModel;
+use App\Models\TimeModel;
 
 use App\Models\UserModel;
 
@@ -113,9 +115,10 @@ Class Course extends BaseController
         
         $courseModel = new CourseModel();
         $userModel = new UserModel();
-    $schoolYearModel = new SchoolYearModel();
+        $schoolYearModel = new SchoolYearModel();
         $courseStatusModel = new CourseStatusModel();
         $courseOfferingModel = new CourseOfferingModel();
+        $timeModel = new TimeModel();
 
         $userRole = session()->get('role');
         $userRoleID = $userModel->getRoleIDByUserID($userRole);
@@ -126,6 +129,7 @@ Class Course extends BaseController
         $schoolYears = $schoolYearModel->getAllSchoolYears();
 
         $activeCourses = $courseModel->getActiveCoursesCount();
+        $timeSlots = $timeModel->getAllSlots();
 
         $courseStatuses = $courseStatusModel->getAllStatuses();
         
@@ -135,7 +139,8 @@ Class Course extends BaseController
             'schoolYears' => $schoolYears,
             'activeCourses' => $activeCourses,
             'role' => session()->get('role'),
-            'courseStatuses' => $courseStatuses
+            'courseStatuses' => $courseStatuses,
+            'timeSlots' => $timeSlots,
         ];
         if ($this->request->getMethod() === 'POST') {
             $rules = [
@@ -146,7 +151,8 @@ Class Course extends BaseController
                 'statusID' => 'required',
                 'schoolYear' => 'required',
                 'startDate' => 'required|valid_date[Y-m-d]',
-                'endDate' => 'required|valid_date[Y-m-d]'
+                'endDate' => 'required|valid_date[Y-m-d]',
+                'schedule' => 'required|integer|is_not_unique[time.timeID]'
             ];
             if (!$this->validate($rules)) {
                 return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
@@ -155,6 +161,7 @@ Class Course extends BaseController
             $startDate = $this->request->getPost('startDate');
             $endDate = $this->request->getPost('endDate');
             $schoolYearId = (int) $this->request->getPost('schoolYear');
+            $scheduleId = (int) $this->request->getPost('schedule');
             $customErrors = [];
 
             try {
@@ -208,6 +215,7 @@ Class Course extends BaseController
                     'schoolYearID' => $schoolYearId,
                     'startDate' => $startDate ?: null,
                     'endDate' => $endDate ?: null,
+                    'Schedule' => $scheduleId,
                 ]);
             }
 
@@ -215,7 +223,7 @@ Class Course extends BaseController
 
             return redirect()->to('/course/manage')->with('message', $message);
         }else {
-            return view('templates/header', $data) . view('courses/courseManagement');
+            return view('templates/header', $data) . view('courses/courseManagement', $data);
         }
     }
     // This act will be like delete but just change the status
@@ -258,7 +266,7 @@ Class Course extends BaseController
         }
 
     $courseModel = new CourseModel();
-        $courseOfferingModel = new CourseOfferingModel();
+    $courseOfferingModel = new CourseOfferingModel();
     $schoolYearModel = new SchoolYearModel();
 
         if ($this->request->getMethod() === 'POST') {
@@ -269,7 +277,8 @@ Class Course extends BaseController
                 'teacherID' => 'required',
                 'schoolYearID' => 'required',
                 'startDate' => 'required|valid_date[Y-m-d]',
-                'endDate' => 'required|valid_date[Y-m-d]'
+                'endDate' => 'required|valid_date[Y-m-d]',
+                'schedule' => 'required|integer|is_not_unique[time.timeID]'
             ];
 
             if (!$this->validate($rules)) {
@@ -279,6 +288,7 @@ Class Course extends BaseController
             $startDate = $this->request->getPost('startDate');
             $endDate = $this->request->getPost('endDate');
             $schoolYearId = (int) $this->request->getPost('schoolYearID');
+            $scheduleId = (int) $this->request->getPost('schedule');
             $customErrors = [];
 
             try {
@@ -330,6 +340,7 @@ Class Course extends BaseController
                 'schoolYearID' => $schoolYearId,
                 'startDate' => $startDate,
                 'endDate' => $endDate,
+                'Schedule' => $scheduleId,
             ];
 
             $existingOffering = $courseOfferingModel->findByCourseId((int) $courseID);

@@ -16,20 +16,26 @@ class EnrollmentModel extends Model {
     }
     //kwaon niya tanan enrollments ug unsa ang info sa course sa user na naa sa $user_id
     public function getUserEnrollments($user_id) {
-        return $this->select('enrollments.*, enrollments.enrollment_date AS enrollmentDate, courses.courseTitle, courses.courseDescription, courses.courseCode, enrollmentstatus.statusName, courseOfferings.startDate, courseOfferings.endDate')
+        return $this->select('enrollments.*, enrollments.enrollment_date AS enrollmentDate, courses.courseTitle, courses.courseDescription, courses.courseCode, courses.schoolYearID, enrollmentstatus.statusName, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.Schedule, time.timeSlot, schoolYear.schoolYear, schoolYear.Semester, semester.semesterName')
                     ->join('courses', 'courses.courseID = enrollments.course_id')
                     ->join('enrollmentstatus', 'enrollmentstatus.statusID = enrollments.enrollmentStatus', 'left')
                     ->join('courseOfferings', 'courseOfferings.courseID = enrollments.course_id', 'left')
+                    ->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left')
+                    ->join('semester', 'semester.semesterID = schoolYear.Semester', 'left')
+                    ->join('time', 'time.timeID = courseOfferings.Schedule', 'left')
                     ->where('enrollments.user_id', $user_id)
                     ->where('enrollments.enrollmentStatus = 1 OR enrollments.enrollmentStatus = 2 OR enrollments.enrollmentStatus = 3')
                     ->orderBy('courses.courseTitle')
                     ->findAll();
     }
     public function getStudentEnrollments($studentId) {
-        return $this->select('enrollments.*, enrollments.enrollment_date AS enrollmentDate, courses.courseTitle, courses.courseCode, courses.teacherID, enrollmentstatus.statusName, courseOfferings.startDate, courseOfferings.endDate')
+        return $this->select('enrollments.*, enrollments.enrollment_date AS enrollmentDate, courses.courseTitle, courses.courseCode, courses.teacherID, courses.schoolYearID, enrollmentstatus.statusName, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.Schedule, time.timeSlot, schoolYear.schoolYear, schoolYear.Semester, semester.semesterName')
                     ->join('courses', 'courses.courseID = enrollments.course_id')
                     ->join('enrollmentstatus', 'enrollmentstatus.statusID = enrollments.enrollmentStatus', 'left')
                     ->join('courseOfferings', 'courseOfferings.courseID = enrollments.course_id', 'left')
+                    ->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left')
+                    ->join('semester', 'semester.semesterID = schoolYear.Semester', 'left')
+                    ->join('time', 'time.timeID = courseOfferings.Schedule', 'left')
                     ->where('enrollments.user_id', $studentId)
                     ->orderBy('courses.courseTitle')
                     ->findAll();
@@ -37,10 +43,13 @@ class EnrollmentModel extends Model {
 
     public function getStudentEnrollmentsForTeacher($studentId, $teacherId)
     {
-        return $this->select('enrollments.*, enrollments.enrollment_date AS enrollmentDate, courses.courseTitle, courses.courseCode, courses.teacherID, enrollmentstatus.statusName, courseOfferings.startDate, courseOfferings.endDate')
+        return $this->select('enrollments.*, enrollments.enrollment_date AS enrollmentDate, courses.courseTitle, courses.courseCode, courses.teacherID, courses.schoolYearID, enrollmentstatus.statusName, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.Schedule, time.timeSlot, schoolYear.schoolYear, schoolYear.Semester, semester.semesterName')
                     ->join('courses', 'courses.courseID = enrollments.course_id')
                     ->join('enrollmentstatus', 'enrollmentstatus.statusID = enrollments.enrollmentStatus', 'left')
                     ->join('courseOfferings', 'courseOfferings.courseID = enrollments.course_id', 'left')
+                    ->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left')
+                    ->join('semester', 'semester.semesterID = schoolYear.Semester', 'left')
+                    ->join('time', 'time.timeID = courseOfferings.Schedule', 'left')
                     ->where('enrollments.user_id', $studentId)
                     ->where('courses.teacherID', $teacherId)
                     ->orderBy('courses.courseTitle')

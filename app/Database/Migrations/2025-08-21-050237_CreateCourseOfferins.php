@@ -33,12 +33,17 @@ class CreateCourseOfferings extends Migration
                 'type' => 'DATETIME',
                 'null' => true,
             ],
+            'Schedule' => [
+                'type' => 'INT',
+                'constraint' => 10,
+                'unsigned' => true,
+            ],
         ]);
 
         $this->forge->addKey('offeringID');
         $this->forge->addForeignKey('courseID', 'courses', 'courseID', 'CASCADE', 'CASCADE');
         $this->forge->addForeignKey('schoolYearID', 'schoolYear', 'schoolYearID', 'CASCADE', 'CASCADE');
-
+        $this->forge->addForeignKey('Schedule', 'time', 'timeID', 'CASCADE', 'CASCADE');
         $this->forge->createTable('courseOfferings');
     }
 

@@ -20,22 +20,26 @@ class CourseModel extends Model
     }
     public function getCoursesWithDetails()
     {
-        $this->select('courses.*, users.name as teacherName, coursestatus.statusName, schoolYear.schoolYear, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.offeringID');
+        $this->select('courses.*, users.name as teacherName, coursestatus.statusName, schoolYear.schoolYear, schoolYear.Semester, semester.semesterName, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.Schedule, time.timeSlot, courseOfferings.offeringID');
         $this->join('users', 'courses.teacherID = users.userID', 'left');
         $this->join('coursestatus', 'courses.statusID = coursestatus.statusID', 'left');
         $this->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left');
+        $this->join('semester', 'semester.semesterID = schoolYear.Semester', 'left');
         $this->join('courseOfferings', 'courseOfferings.courseID = courses.courseID', 'left');
+        $this->join('time', 'time.timeID = courseOfferings.Schedule', 'left');
         $query = $this->get();
         return $query->getResultArray();
     }
     
     public function getCourseWithDetails($courseID)
     {
-        $this->select('courses.*, users.name as teacherName, coursestatus.statusName, schoolYear.schoolYear, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.offeringID');
+        $this->select('courses.*, users.name as teacherName, coursestatus.statusName, schoolYear.schoolYear, schoolYear.Semester, semester.semesterName, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.Schedule, time.timeSlot, courseOfferings.offeringID');
         $this->join('users', 'courses.teacherID = users.userID', 'left');
         $this->join('coursestatus', 'courses.statusID = coursestatus.statusID', 'left');
         $this->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left');
+        $this->join('semester', 'semester.semesterID = schoolYear.Semester', 'left');
         $this->join('courseOfferings', 'courseOfferings.courseID = courses.courseID', 'left');
+        $this->join('time', 'time.timeID = courseOfferings.Schedule', 'left');
         return $this->where('courses.courseID', $courseID)->first();
     }
 
@@ -71,7 +75,11 @@ class CourseModel extends Model
             ->findColumn('course_id') ?? [];
 
         $builder = $this->builder();
-        $builder->select('*');
+        $builder->select('courses.*, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.Schedule, schoolYear.schoolYear, schoolYear.Semester, semester.semesterName, time.timeSlot');
+        $builder->join('courseOfferings', 'courseOfferings.courseID = courses.courseID', 'left');
+        $builder->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left');
+        $builder->join('semester', 'semester.semesterID = schoolYear.Semester', 'left');
+        $builder->join('time', 'time.timeID = courseOfferings.Schedule', 'left');
 
         if (!empty($enrolledCourseIds)) {
             $builder->whereNotIn('courseID', $enrolledCourseIds);
@@ -88,7 +96,11 @@ class CourseModel extends Model
             ->findColumn('course_id') ?? [];
 
         $builder = $this->builder();
-        $builder->select('*');
+        $builder->select('courses.*, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.Schedule, schoolYear.schoolYear, schoolYear.Semester, semester.semesterName, time.timeSlot');
+        $builder->join('courseOfferings', 'courseOfferings.courseID = courses.courseID', 'left');
+        $builder->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left');
+        $builder->join('semester', 'semester.semesterID = schoolYear.Semester', 'left');
+        $builder->join('time', 'time.timeID = courseOfferings.Schedule', 'left');
         $builder->where('teacherID', $teacherId);
 
         if (!empty($enrolledCourseIds)) {
