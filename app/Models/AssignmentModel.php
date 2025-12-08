@@ -8,7 +8,7 @@ class AssignmentModel extends Model
 {
     protected $table = 'assignments';
     protected $primaryKey = 'AssignmentID';
-    protected $allowedFields = ['courseID', 'materialID', 'Instructions', 'allowedAttempts', 'publishDate', 'dueDate'];
+    protected $allowedFields = ['courseID', 'materialID', 'title', 'Instructions', 'allowedAttempts', 'publishDate', 'dueDate', 'isClosed', 'autoClose'];
     protected $returnType = 'array';
 
     public function getAssignmentsByCourse(int $courseId): array
@@ -23,7 +23,7 @@ class AssignmentModel extends Model
 
     public function findWithMaterial(int $assignmentId): ?array
     {
-        return $this->select('assignments.*, materials.file_name AS materialName, materials.file_path AS materialPath')
+        return $this->select('assignments.*, materials.file_name AS materialName, materials.file_path AS materialPath, materials.id AS materialIdRef')
             ->join('materials', 'materials.id = assignments.materialID', 'left')
             ->where('assignments.AssignmentID', $assignmentId)
             ->first();

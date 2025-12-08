@@ -58,4 +58,26 @@ class SubmissionModel extends Model
 
         return $mapped;
     }
+
+    public function getDetailsByAssignment(int $assignmentId): array
+    {
+        return $this->select('
+                submissions.submissionID,
+                submissions.userID,
+                submissions.AssignmentID,
+                submissions.materialID,
+                submissions.submissionDate,
+                users.name AS studentName,
+                users.email AS studentEmail,
+                materials.file_name AS submissionFile,
+                materials.id AS submissionMaterialId,
+                assignmentAttempts.attemptNumber
+            ')
+            ->join('users', 'users.userID = submissions.userID', 'left')
+            ->join('materials', 'materials.id = submissions.materialID', 'left')
+            ->join('assignmentAttempts', 'assignmentAttempts.submissionID = submissions.submissionID', 'left')
+            ->where('submissions.AssignmentID', $assignmentId)
+            ->orderBy('submissions.submissionDate', 'DESC')
+            ->findAll();
+    }
 }

@@ -15,6 +15,9 @@ class MaterialCategorySeeder extends Seeder
             [
                 'categoryName' => 'Assignments',
             ],
+            [
+                'categoryName' => 'Submissions',
+            ],
         ];
 
         $this->db->table('materialCategories')->insertBatch($data);

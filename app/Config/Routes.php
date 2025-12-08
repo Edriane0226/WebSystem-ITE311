@@ -62,6 +62,9 @@ $routes->match(['get', 'post'], '/course/(:num)/modules', 'Materials::upload/$1'
 $routes->get('/course/(:num)/peoples', 'Course::people/$1');
 $routes->get('/course/(:num)/assignments', 'Assignments::index/$1');
 $routes->post('/course/(:num)/assignments', 'Assignments::create/$1');
+$routes->post('/course/(:num)/assignments/(:num)/update', 'Assignments::updateAssignment/$1/$2');
+$routes->post('/course/(:num)/assignments/(:num)/status', 'Assignments::setSubmissionStatus/$1/$2');
+$routes->get('/course/(:num)/assignments/(:num)/submissions', 'Assignments::submissionsDetail/$1/$2');
 $routes->post('/course/(:num)/assignments/submit', 'Assignments::submit/$1');
 //Para Ma Fullfil view Details sa course
 $routes->get('/courses/(:num)', 'Course::details/$1');

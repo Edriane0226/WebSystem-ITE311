@@ -25,6 +25,11 @@ class CreateLessonsTable extends Migration
                 'constraint' => 11,
                 'unsigned' => true
             ],
+            'title' => [
+                'type' => 'VARCHAR',
+                'constraint' => 255,
+                'null' => false
+            ],
             'Instructions' => [
                 'type' => 'TEXT',
                 'null' => true
@@ -41,6 +46,12 @@ class CreateLessonsTable extends Migration
             'dueDate' => [
                 'type' => 'DATETIME',
                 'null' => true
+            ],
+            'isClosed' => [
+                'type' => 'TINYINT',
+                'constraint' => 1,
+                'default' => 0,
+                'null' => false,
             ],
         ]);
         $this->forge->addKey('AssignmentID');
