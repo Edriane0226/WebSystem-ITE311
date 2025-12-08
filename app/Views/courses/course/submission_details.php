@@ -1,4 +1,4 @@
-<title><?= esc($course['courseTitle'] ?? 'Course') ?> • Submission Details</title>
+<title><?= esc($assignment['title'] ?? 'Assignment') ?> | Submission Details</title>
 
 <div class="container-fluid bg-light py-4 px-4 px-md-5 min-vh-100">
     <div class="d-flex flex-column flex-md-row align-items-md-center gap-3 mb-4">
