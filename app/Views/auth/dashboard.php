@@ -1,6 +1,6 @@
 <div class="container p-3">
         <h3>Dashboard</h3>
-        <h4 class="mt-3 text-muted">Welcome, <?= $name ?>!</h4>
+        <h4 class="mt-3 text-muted">Hello, <?= $name ?>!</h4>
     
         <div class="row">
             <?php if( $role == 'student' ): ?>
@@ -142,7 +142,7 @@
                 </div>
 
            <?php elseif ($role == 'teacher'): ?>
-            <div class="col-md-8">
+            <div class="col-md-7">
                 <div class="card mt-5 shadow-sm">
                     <div class="card-body">
                         <h4 class="card-title mb-3">My Courses</h4>
@@ -157,10 +157,6 @@
                                             </a>
                                         </div>
                                         <div>
-                                            <a href="<?= base_url('admin/course/' . $course['courseID'] . '/upload'); ?>" 
-                                            class="btn btn-primary btn-sm rounded-pill">
-                                                Add Material
-                                            </a>
                                         </div>
                                     </div>
                                 <?php endforeach; ?>
@@ -169,18 +165,11 @@
                             <p class="text-muted text-center mt-3">No courses assigned yet.</p>
                         <?php endif; ?>
 
-                        <div class="text-center mt-4">
-                            <a href="<?= base_url('teacher/add-course'); ?>" class="btn btn-primary rounded-pill">
-                                Add New Course
-                            </a>
                         </div>
                     </div>
                 </div>
             </div>
 
-                <div class="col-md-3 ms-5 mt-4">
-                    <h4>Notifications</h4>
-                </div>
 
                 <div class="col-md-8">
                     <div class="card mt-5">

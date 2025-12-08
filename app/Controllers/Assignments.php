@@ -89,6 +89,7 @@ class Assignments extends Controller
 
         $rules = [
             'assignment_file' => 'uploaded[assignment_file]|max_size[assignment_file,102400]|ext_in[assignment_file,pdf,doc,docx,ppt,pptx,txt,zip,rar]',
+            'instructions' => 'permit_empty|string',
             'allowedAttempts' => 'permit_empty|integer|greater_than_equal_to[1]|less_than_equal_to[9]',
             'publishDate' => 'permit_empty|valid_date[Y-m-d]',
             'dueDate' => 'permit_empty|valid_date[Y-m-d]',
@@ -103,8 +104,9 @@ class Assignments extends Controller
             return redirect()->back()->withInput()->with('error', 'Invalid file upload.');
         }
 
-        $publishDate = $this->request->getPost('publishDate');
-        $dueDate = $this->request->getPost('dueDate');
+    $publishDate = $this->request->getPost('publishDate');
+    $dueDate = $this->request->getPost('dueDate');
+    $instructions = trim((string) $this->request->getPost('instructions'));
 
         if (!empty($publishDate) && !empty($dueDate)) {
             try {
@@ -131,9 +133,10 @@ class Assignments extends Controller
         $materialModel = new MaterialModel();
         $materialId = $materialModel->insert([
             'course_id' => $courseId,
+            'materialCategoryID' => 2, // Assignment category
             'file_name' => $file->getClientName(),
             'file_path' => rtrim($assignmentsDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $newName,
-            'created_at' => date('Y-m-d H:i:s'),
+            'uploaded_at' => date('Y-m-d H:i:s'),
         ], true);
 
         if (!$materialId) {
@@ -149,6 +152,7 @@ class Assignments extends Controller
         $assignmentModel->insert([
             'courseID' => $courseId,
             'materialID' => $materialId,
+            'Instructions' => $instructions !== '' ? $instructions : null,
             'allowedAttempts' => $allowedAttempts,
             'publishDate' => $publishDate ?: null,
             'dueDate' => $dueDate ?: null,

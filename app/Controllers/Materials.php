@@ -34,7 +34,6 @@ class Materials extends Controller
         if (!$validation->withRequest($this->request)->run()) {
             return redirect()->back()->with('error', $validation->getError('material_file'));
         }
-
         if ($file->isValid()) {
             $newName = $file->getRandomName();
             $file->move(WRITEPATH . 'materials/uploads', $newName);
@@ -43,7 +42,7 @@ class Materials extends Controller
                 'course_id'  => $course_id,
                 'file_name'  => $file->getClientName(),
                 'file_path'  => WRITEPATH . 'materials/uploads/' . $newName,
-                'created_at' => date('Y-m-d H:i:s')
+                'uploaded_at' => date('Y-m-d H:i:s')
             ]);
 
             return redirect()->to(current_url())

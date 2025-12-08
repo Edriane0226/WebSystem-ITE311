@@ -1,5 +1,5 @@
 
-<title><?= esc($course['courseTitle'] ?? 'Course Details') ?></title>
+<title><?= $course['courseCode']?> | <?= esc($course['courseTitle'] ?? 'Course Details') ?></title>
 
 <div class="container-fluid py-4 px-4 px-md-5">
     <div class="d-flex align-items-center mb-4">

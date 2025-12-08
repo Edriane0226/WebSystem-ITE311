@@ -25,7 +25,7 @@ class CreateLessonsTable extends Migration
                 'constraint' => 11,
                 'unsigned' => true
             ],
-            'details' => [
+            'Instructions' => [
                 'type' => 'TEXT',
                 'null' => true
             ],
@@ -35,11 +35,11 @@ class CreateLessonsTable extends Migration
                 'null' => true
             ],
             'publishDate' => [
-                'type' => 'DATE',
+                'type' => 'DATETIME',
                 'null' => true
             ],
             'dueDate' => [
-                'type' => 'DATE',
+                'type' => 'DATETIME',
                 'null' => true
             ],
         ]);

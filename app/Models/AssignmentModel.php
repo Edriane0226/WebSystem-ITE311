@@ -8,7 +8,7 @@ class AssignmentModel extends Model
 {
     protected $table = 'assignments';
     protected $primaryKey = 'AssignmentID';
-    protected $allowedFields = ['courseID', 'materialID', 'allowedAttempts', 'publishDate', 'dueDate'];
+    protected $allowedFields = ['courseID', 'materialID', 'Instructions', 'allowedAttempts', 'publishDate', 'dueDate'];
     protected $returnType = 'array';
 
     public function getAssignmentsByCourse(int $courseId): array
