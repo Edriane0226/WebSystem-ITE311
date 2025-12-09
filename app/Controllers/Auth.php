@@ -61,7 +61,7 @@ class Auth extends BaseController
             ];
 
             if (!$this->validate($rules)) {
-                return view('auth/login', ['validation' => $this->validator]);
+                return  view('templates/header') . view('auth/login', ['validation' => $this->validator]);
             }
 
             $user = $userModel->where('email', $this->request->getVar('email'))->first();

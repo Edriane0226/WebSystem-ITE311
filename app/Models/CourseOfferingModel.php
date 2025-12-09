@@ -15,4 +15,17 @@ class CourseOfferingModel extends Model
     {
         return $this->where('courseID', $courseId)->first();
     }
+
+    public function hasScheduleConflict(int $schoolYearId, int $timeSlotId, ?int $excludeCourseId = null): bool
+    {
+        $builder = $this->builder()
+            ->where('schoolYearID', $schoolYearId)
+            ->where('Schedule', $timeSlotId);
+
+        if ($excludeCourseId !== null) {
+            $builder->where('courseID !=', $excludeCourseId);
+        }
+
+        return $builder->countAllResults() > 0;
+    }
 }

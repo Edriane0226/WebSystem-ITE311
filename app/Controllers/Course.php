@@ -194,6 +194,10 @@ Class Course extends BaseController
                 $customErrors['startDate'] = 'Invalid date selection.';
             }
 
+            if ($courseOfferingModel->hasScheduleConflict($schoolYearId, $scheduleId)) {
+                $customErrors['schedule'] = 'Another course already uses this schedule in the selected school year.';
+            }
+
             if (!empty($customErrors)) {
                 return redirect()->back()->withInput()->with('errors', $customErrors);
             }
@@ -319,6 +323,10 @@ Class Course extends BaseController
                 }
             } catch (\Exception $e) {
                 $customErrors['startDate'] = 'Invalid date selection.';
+            }
+
+            if ($courseOfferingModel->hasScheduleConflict($schoolYearId, $scheduleId, (int) $courseID)) {
+                $customErrors['schedule'] = 'Another course already uses this schedule in the selected school year.';
             }
 
             if (!empty($customErrors)) {
