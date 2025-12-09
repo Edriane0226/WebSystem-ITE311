@@ -11,12 +11,12 @@ class CourseOfferingModel extends Model
     protected $allowedFields = ['courseID', 'schoolYearID', 'startDate', 'endDate', 'Schedule'];
     protected $returnType = 'array';
 
-    public function findByCourseId(int $courseId): ?array
+    public function findByCourseId($courseId)
     {
         return $this->where('courseID', $courseId)->first();
     }
 
-    public function hasScheduleConflict(int $schoolYearId, int $timeSlotId, ?int $excludeCourseId = null): bool
+    public function hasScheduleConflict($schoolYearId,$timeSlotId, ? int $excludeCourseId = null)
     {
         $builder = $this->builder()
             ->where('schoolYearID', $schoolYearId)

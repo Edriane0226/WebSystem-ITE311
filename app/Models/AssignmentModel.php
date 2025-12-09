@@ -11,7 +11,7 @@ class AssignmentModel extends Model
     protected $allowedFields = ['courseID', 'materialID', 'title', 'Instructions', 'allowedAttempts', 'publishDate', 'dueDate', 'isClosed', 'autoClose'];
     protected $returnType = 'array';
 
-    public function getAssignmentsByCourse(int $courseId): array
+    public function getAssignmentsByCourse($courseId)
     {
         return $this->select('assignments.*, materials.file_name AS materialName, materials.id AS materialIdRef')
             ->join('materials', 'materials.id = assignments.materialID', 'left')
@@ -21,7 +21,7 @@ class AssignmentModel extends Model
             ->findAll();
     }
 
-    public function findWithMaterial(int $assignmentId): ?array
+    public function findWithMaterial($assignmentId)
     {
         return $this->select('assignments.*, materials.file_name AS materialName, materials.file_path AS materialPath, materials.id AS materialIdRef')
             ->join('materials', 'materials.id = assignments.materialID', 'left')

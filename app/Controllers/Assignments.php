@@ -275,6 +275,13 @@ class Assignments extends Controller
                 'autoClose' => $autoCloseRequested ? 1 : 0,
             ];
 
+        if (!empty($assignment['isClosed'])) {
+            $dueTimestamp = $dueDate ? strtotime($dueDate) : null;
+            if ($dueTimestamp === null || $dueTimestamp > time()) {
+                $assignmentUpdate['isClosed'] = 0;
+            }
+        }
+
         if ($updatedMaterialId !== null) {
             $assignmentUpdate['materialID'] = $updatedMaterialId;
         }
@@ -429,7 +436,11 @@ class Assignments extends Controller
         }
 
         $role = $session->get('role');
-        if (!in_array($role, ['admin', 'teacher'], true)) {
+        $userId = (int) $session->get('userID');
+        $isStaff = in_array($role, ['admin', 'teacher'], true);
+        $isStudent = ($role === 'student');
+
+        if (!$isStaff && !$isStudent) {
             return redirect()->back()->with('error', 'You are not authorized to view submission details.');
         }
 
@@ -448,13 +459,26 @@ class Assignments extends Controller
             return redirect()->to('/course/' . $courseId . '/assignments')->with('error', 'Assignment not found.');
         }
 
-        $submissionModel = new SubmissionModel();
-        $submissions = $submissionModel->getDetailsByAssignment($assignmentId);
+        if ($isStudent) {
+            $enrollmentModel = new EnrollmentModel();
+            if (!$enrollmentModel->isAlreadyEnrolled($userId, $courseId)) {
+                return redirect()->to('/course/search')->with('error', 'You are not enrolled in this course.');
+            }
+        }
 
-        $uniqueStudentIds = array_map(static function (array $row): int {
-            return (int) ($row['userID'] ?? 0);
-        }, $submissions);
-        $uniqueStudentCount = count(array_unique($uniqueStudentIds));
+        $submissionModel = new SubmissionModel();
+        if ($isStaff) {
+            $submissions = $submissionModel->getDetailsByAssignment($assignmentId);
+
+            $uniqueStudentIds = array_map(static function (array $row): int {
+                return (int) ($row['userID'] ?? 0);
+            }, $submissions);
+            $uniqueStudentCount = count(array_unique($uniqueStudentIds));
+        } else {
+            $submissions = $submissionModel->getDetailsByAssignmentForStudent($assignmentId, $userId);
+            $uniqueStudentCount = empty($submissions) ? 0 : 1;
+        }
+
         $latestSubmission = $submissions[0]['submissionDate'] ?? null;
 
         $teacher = null;
@@ -467,12 +491,14 @@ class Assignments extends Controller
             'assignment' => $assignment,
             'submissions' => $submissions,
             'role' => $role,
+            'isStaff' => $isStaff,
             'stats' => [
                 'totalSubmissions' => count($submissions),
                 'uniqueStudents' => $uniqueStudentCount,
                 'latestSubmission' => $latestSubmission,
             ],
             'teacher' => $teacher,
+            'currentUserId' => $userId,
         ];
 
         return view('templates/header', ['role' => $role])

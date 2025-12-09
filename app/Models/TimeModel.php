@@ -11,7 +11,7 @@ class TimeModel extends Model
     protected $allowedFields = ['timeSlot'];
     protected $returnType = 'array';
 
-    public function getAllSlots(): array
+    public function getAllSlots()
     {
         return $this->orderBy('timeID')->findAll();
     }

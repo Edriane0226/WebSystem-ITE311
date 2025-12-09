@@ -1,3 +1,9 @@
+<?php
+$isStudent = ($role === 'student');
+$totalSubmissions = $stats['totalSubmissions'] ?? 0;
+$latestSubmission = $stats['latestSubmission'] ?? null;
+?>
+
 <title><?= esc($assignment['title'] ?? 'Assignment') ?> | Submission Details</title>
 
 <div class="container-fluid bg-light py-4 px-4 px-md-5 min-vh-100">
@@ -53,14 +59,16 @@
                 <div class="card border-0 shadow-sm">
                     <div class="card-body">
                         <div class="d-flex justify-content-between align-items-center mb-3">
-                            <h5 class="fw-semibold mb-0">Submissions</h5>
-                            <span class="badge bg-primary"><?= esc($stats['totalSubmissions']) ?> total</span>
+                            <h5 class="fw-semibold mb-0"><?= $isStudent ? 'Your Submission Attempts' : 'Submissions' ?></h5>
+                            <span class="badge bg-primary"><?= esc($totalSubmissions) ?> total</span>
                         </div>
                         <div class="table-responsive">
                             <table class="table align-middle">
                                 <thead>
                                     <tr>
-                                        <th>Student</th>
+                                        <?php if (!$isStudent): ?>
+                                            <th>Student</th>
+                                        <?php endif; ?>
                                         <th>Submitted At</th>
                                         <th>Attempt #</th>
                                         <th>Status</th>
@@ -74,14 +82,16 @@
                                                 && strtotime($submission['submissionDate']) > strtotime($assignment['dueDate']);
                                         ?>
                                         <tr>
-                                            <td>
-                                                <div class="fw-semibold">
-                                                    <?= esc($submission['studentName'] ?? 'Unknown Student') ?>
-                                                </div>
-                                                <div class="text-muted small">
-                                                    <?= esc($submission['studentEmail'] ?? 'N/A') ?>
-                                                </div>
-                                            </td>
+                                            <?php if (!$isStudent): ?>
+                                                <td>
+                                                    <div class="fw-semibold">
+                                                        <?= esc($submission['studentName'] ?? 'Unknown Student') ?>
+                                                    </div>
+                                                    <div class="text-muted small">
+                                                        <?= esc($submission['studentEmail'] ?? 'N/A') ?>
+                                                    </div>
+                                                </td>
+                                            <?php endif; ?>
                                             <td>
                                                 <?= esc(date('M d, Y g:i A', strtotime($submission['submissionDate']))) ?>
                                             </td>
@@ -120,19 +130,35 @@
         <div class="col-lg-4">
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-body">
-                    <h6 class="fw-semibold mb-3">Submission Overview</h6>
-                    <ul class="list-unstyled small text-muted mb-0">
-                        <li class="mb-2"><span class="fw-semibold text-dark">Total Files:</span> <?= esc($stats['totalSubmissions']) ?></li>
-                        <li class="mb-2"><span class="fw-semibold text-dark">Unique Students:</span> <?= esc($stats['uniqueStudents']) ?></li>
-                        <li class="mb-2"><span class="fw-semibold text-dark">Submission Window:</span>
-                            <span class="badge <?= !empty($assignment['isClosed']) ? 'bg-dark' : 'bg-success' ?>">
-                                <?= !empty($assignment['isClosed']) ? 'Closed' : 'Open' ?>
-                            </span>
-                        </li>
-                        <li><span class="fw-semibold text-dark">Latest Submission:</span>
-                            <?= $stats['latestSubmission'] ? esc(date('M d, Y g:i A', strtotime($stats['latestSubmission']))) : 'N/A' ?>
-                        </li>
-                    </ul>
+                    <?php if ($isStudent): ?>
+                        <h6 class="fw-semibold mb-3">Your Submission Summary</h6>
+                        <ul class="list-unstyled small text-muted mb-0">
+                            <li class="mb-2"><span class="fw-semibold text-dark">Total Attempts:</span> <?= esc($totalSubmissions) ?></li>
+                            <li class="mb-2"><span class="fw-semibold text-dark">Allowed Attempts:</span> <?= !empty($assignment['allowedAttempts']) ? esc($assignment['allowedAttempts']) : 'Unlimited' ?></li>
+                            <li class="mb-2"><span class="fw-semibold text-dark">Submission Window:</span>
+                                <span class="badge <?= !empty($assignment['isClosed']) ? 'bg-dark' : 'bg-success' ?>">
+                                    <?= !empty($assignment['isClosed']) ? 'Closed' : 'Open' ?>
+                                </span>
+                            </li>
+                            <li><span class="fw-semibold text-dark">Latest Attempt:</span>
+                                <?= $latestSubmission ? esc(date('M d, Y g:i A', strtotime($latestSubmission))) : 'N/A' ?>
+                            </li>
+                        </ul>
+                    <?php else: ?>
+                        <h6 class="fw-semibold mb-3">Submission Overview</h6>
+                        <ul class="list-unstyled small text-muted mb-0">
+                            <li class="mb-2"><span class="fw-semibold text-dark">Total Files:</span> <?= esc($totalSubmissions) ?></li>
+                            <li class="mb-2"><span class="fw-semibold text-dark">Unique Students:</span> <?= esc($stats['uniqueStudents']) ?></li>
+                            <li class="mb-2"><span class="fw-semibold text-dark">Submission Window:</span>
+                                <span class="badge <?= !empty($assignment['isClosed']) ? 'bg-dark' : 'bg-success' ?>">
+                                    <?= !empty($assignment['isClosed']) ? 'Closed' : 'Open' ?>
+                                </span>
+                            </li>
+                            <li><span class="fw-semibold text-dark">Latest Submission:</span>
+                                <?= $latestSubmission ? esc(date('M d, Y g:i A', strtotime($latestSubmission))) : 'N/A' ?>
+                            </li>
+                        </ul>
+                    <?php endif; ?>
                 </div>
             </div>
 

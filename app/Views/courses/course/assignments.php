@@ -147,6 +147,10 @@
 										<?php if ($isOverdue): ?>
 											<span class="badge bg-warning text-dark align-self-center">Late submissions</span>
                                     <?php endif; ?>
+										<a href="<?= base_url('/course/' . $course['courseID'] . '/assignments/' . $assignmentId . '/submissions') ?>"
+											class="btn btn-outline-secondary btn-sm">
+											View Submission Details
+										</a>
 								<?php endif; ?>
 								<?php if (in_array($role, ['admin', 'teacher'], true)): ?>
 									<a href="<?= base_url('/course/' . $course['courseID'] . '/assignments/' . $assignmentId . '/submissions') ?>"

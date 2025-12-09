@@ -12,7 +12,47 @@ class MaterialModel extends Model {
     }
 
     public function getMaterialsByCourse($course_id) {
-        return $this->where('course_id', $course_id)->findAll();
+        $materials = $this->select('materials.*, materialCategories.categoryName')
+            ->join('materialCategories', 'materialCategories.categoryID = materials.materialCategoryID', 'left')
+            ->where('course_id', $course_id)
+            ->orderBy('uploaded_at', 'DESC')
+            ->findAll();
+
+        foreach ($materials as &$material) {
+            $material['display_name'] = $material['file_name'] !== null && $material['file_name'] !== ''
+                ? $material['file_name']
+                : basename((string) $material['file_path']);
+        }
+        unset($material);
+
+        return $materials;
+    }
+
+    public function getMaterialsByCourseGrouped($courseId)
+    {
+        $grouped = [
+            'modules' => [],
+            'assignments' => [],
+            'others' => [],
+        ];
+
+        foreach ($this->getMaterialsByCourse($courseId) as $material) {
+            $categoryId = isset($material['materialCategoryID']) ? (int) $material['materialCategoryID'] : 0;
+
+            switch ($categoryId) {
+                case 1:
+                    $grouped['modules'][] = $material;
+                    break;
+                case 2:
+                    $grouped['assignments'][] = $material;
+                    break;
+                default:
+                    $grouped['others'][] = $material;
+                    break;
+            }
+        }
+
+        return $grouped;
     }
 
 }

@@ -33,14 +33,14 @@ class SubmissionModel extends Model
         return $grouped;
     }
 
-    public function countSubmissionsForAssignment(int $assignmentId, int $userId): int
+    public function countSubmissionsForAssignment($assignmentId, $userId)
     {
         return $this->where('AssignmentID', $assignmentId)
             ->where('userID', $userId)
             ->countAllResults();
     }
 
-    public function getCountsByAssignment(array $assignmentIds): array
+    public function getCountsByAssignment($assignmentIds)
     {
         if (empty($assignmentIds)) {
             return [];
@@ -59,7 +59,7 @@ class SubmissionModel extends Model
         return $mapped;
     }
 
-    public function getDetailsByAssignment(int $assignmentId): array
+    public function getDetailsByAssignment($assignmentId)
     {
         return $this->select('
                 submissions.submissionID,
@@ -77,6 +77,29 @@ class SubmissionModel extends Model
             ->join('materials', 'materials.id = submissions.materialID', 'left')
             ->join('assignmentAttempts', 'assignmentAttempts.submissionID = submissions.submissionID', 'left')
             ->where('submissions.AssignmentID', $assignmentId)
+            ->orderBy('submissions.submissionDate', 'DESC')
+            ->findAll();
+    }
+
+    public function getDetailsByAssignmentForStudent($assignmentId,$userId)
+    {
+        return $this->select('
+                submissions.submissionID,
+                submissions.userID,
+                submissions.AssignmentID,
+                submissions.materialID,
+                submissions.submissionDate,
+                users.name AS studentName,
+                users.email AS studentEmail,
+                materials.file_name AS submissionFile,
+                materials.id AS submissionMaterialId,
+                assignmentAttempts.attemptNumber
+            ')
+            ->join('users', 'users.userID = submissions.userID', 'left')
+            ->join('materials', 'materials.id = submissions.materialID', 'left')
+            ->join('assignmentAttempts', 'assignmentAttempts.submissionID = submissions.submissionID', 'left')
+            ->where('submissions.AssignmentID', $assignmentId)
+            ->where('submissions.userID', $userId)
             ->orderBy('submissions.submissionDate', 'DESC')
             ->findAll();
     }
