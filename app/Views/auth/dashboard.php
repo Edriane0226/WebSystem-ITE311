@@ -4,7 +4,7 @@
     
         <div class="row">
             <?php if( $role == 'student' ): ?>
-                <div class="col-md-8">
+                <div class="col-md-10">
                     <div class="card mt-5">
                         <div class="card-body">
                             <h4 class="card-title">Available Courses</h4>
@@ -54,58 +54,7 @@
                     </div>
                 </div>
 
-                <div class="col-md-4">
-                <h4 class="mt-5">Download Materials</h4>
-
-                    <?php foreach ($enrollments as $enrolled): ?>
-                        <?php if ($enrolled['enrollmentStatus'] == 2 || $enrolled['enrollmentStatus'] == 3) continue;?>
-                        <?php if (!empty($enrolled['materials'])): ?>
-                            <div class="card mt-3">
-                                <div class="card-body">
-                                    <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
-                                    <?php if (!empty($enrolled['startDate']) || !empty($enrolled['endDate'])): ?>
-                                        <p class="text-muted small mb-2">
-                                            <?php if (!empty($enrolled['startDate'])): ?>
-                                                Starts: <?= date('M j, Y', strtotime($enrolled['startDate'])) ?>
-                                            <?php endif; ?>
-                                            <?php if (!empty($enrolled['endDate'])): ?>
-                                                <br>Ends: <?= date('M j, Y', strtotime($enrolled['endDate'])) ?>
-                                            <?php endif; ?>
-                                        </p>
-                                    <?php endif; ?>
-                                    <ul class="list-group list-group-flush">
-                                        <?php foreach ($enrolled['materials'] as $material): ?>
-                                            <li class="list-group-item d-flex justify-content-between align-items-center">
-                                                <?= $material['file_name'] ?>
-                                                <a href="<?= base_url('materials/download/' . $material['id']) ?>" 
-                                                class="btn btn-secondary btn-sm rounded-pill">
-                                                    Download
-                                                </a>
-                                            </li>
-                                        <?php endforeach; ?>
-                                    </ul>
-                                </div>
-                            </div>
-                        <?php else: ?>
-                            <div class="card mt-3">
-                                <div class="card-body">
-                                    <h4 class="card-title"><?= $enrolled['courseTitle'] ?></h4>
-                                    <?php if (!empty($enrolled['startDate']) || !empty($enrolled['endDate'])): ?>
-                                        <p class="text-muted small mb-2">
-                                            <?php if (!empty($enrolled['startDate'])): ?>
-                                                Starts: <?= date('M j, Y', strtotime($enrolled['startDate'])) ?>
-                                            <?php endif; ?>
-                                            <?php if (!empty($enrolled['endDate'])): ?>
-                                                <br>Ends: <?= date('M j, Y', strtotime($enrolled['endDate'])) ?>
-                                            <?php endif; ?>
-                                        </p>
-                                    <?php endif; ?>
-                                    <p class="text-muted mb-0">No materials uploaded yet.</p>
-                                </div>
-                            </div>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
-                </div>
+                
 
 
                 <div class="col-md-8">
@@ -119,7 +68,7 @@
                                     <div class="card mt-5 position-relative">
                                         <div class="card-body">
                                             <h4 class="card-title"><?= $enrolled['courseTitle']?></h4>
-                                            <h6 class="card-subtitle mb-2 text-muted">Term 1</h6>
+                                            <h6 class="card-subtitle mb-2 text-muted"><?= $enrolled['courseCode']?></h6>
                                             <p><?= $enrolled['courseDescription'] ?></p>
                                             <?php if (!empty($enrolled['startDate']) || !empty($enrolled['endDate'])): ?>
                                                 <p class="text-muted small mb-0">

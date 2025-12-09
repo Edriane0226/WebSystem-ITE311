@@ -434,56 +434,7 @@
 
     const addUserForm = document.getElementById('studentForm');
     const addUserValidationAlert = document.getElementById('addUserValidationAlert');
-    if (addUserForm && addUserValidationAlert) {
-        addUserForm.addEventListener('submit', function (event) {
-            addUserValidationAlert.classList.add('d-none');
-            addUserValidationAlert.innerHTML = '';
-
-            const firstNameInput = addUserForm.elements['firstName'];
-            const lastNameInput = addUserForm.elements['lastName'];
-            const emailInput = addUserForm.elements['email'];
-            const passwordInput = addUserForm.elements['password'];
-            const roleSelect = addUserForm.elements['role'];
-
-            const firstName = firstNameInput.value.trim();
-            const lastName = lastNameInput.value.trim();
-            const email = emailInput.value.trim();
-            const password = passwordInput.value;
-            const roleValue = roleSelect.value.trim();
-            const namePattern = /^[A-Za-z][A-Za-z\s'-]*$/;
-            const errors = [];
-
-            firstNameInput.value = firstName;
-            lastNameInput.value = lastName;
-            emailInput.value = email;
-
-            if (firstName.length < 2 || !namePattern.test(firstName)) {
-                errors.push('Enter a valid first name (letters, spaces, apostrophes, hyphens).');
-            }
-
-            if (lastName.length < 2 || !namePattern.test(lastName)) {
-                errors.push('Enter a valid last name (letters, spaces, apostrophes, hyphens).');
-            }
-
-            if (email.length === 0 || !/^\S+@\S+\.\S+$/.test(email)) {
-                errors.push('Enter a valid email address.');
-            }
-
-            if (password.length < 6) {
-                errors.push('Password must be at least 6 characters long.');
-            }
-
-            if (!roleValue) {
-                errors.push('Select a role for the new user.');
-            }
-
-            if (errors.length) {
-                event.preventDefault();
-                addUserValidationAlert.innerHTML = errors.map(err => `<div>${err}</div>`).join('');
-                addUserValidationAlert.classList.remove('d-none');
-            }
-        });
-    }
+    
 
     // Delete user function
     function deleteStudent(userId) {

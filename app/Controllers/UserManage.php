@@ -100,11 +100,45 @@ class UserManage extends BaseController
         }
 
         $rules = [
-            'firstName' => 'required|min_length[2]|max_length[50]',
-            'lastName' => 'required|min_length[2]|max_length[50]',
-            'email' => 'required|valid_email|is_unique[users.email]',
-            'password' => 'required|min_length[6]',
-            'role' => 'required|integer|is_not_unique[roles.roleID]'
+            'firstName' => [
+                'rules' => 'required|min_length[2]|max_length[50]',
+                'errors' => [
+                    'required' => 'First name is required.',
+                    'min_length' => 'First name must be at least 2 characters long.',
+                    'max_length' => 'First name cannot exceed 50 characters.',
+                ],
+            ],
+            'lastName' => [
+                'rules' => 'required|min_length[2]|max_length[50]',
+                'errors' => [
+                    'required' => 'Last name is required.',
+                    'min_length' => 'Last name must be at least 2 characters long.',
+                    'max_length' => 'Last name cannot exceed 50 characters.',
+                ],
+            ],
+            'email' => [
+                'rules' => 'required|valid_email|is_unique[users.email]',
+                'errors' => [
+                    'required' => 'Email address is required.',
+                    'valid_email' => 'Please provide a valid email address.',
+                    'is_unique' => 'That email address is already registered.',
+                ],
+            ],
+            'password' => [
+                'rules' => 'required|min_length[6]',
+                'errors' => [
+                    'required' => 'Password is required.',
+                    'min_length' => 'Password must be at least 6 characters long.',
+                ],
+            ],
+            'role' => [
+                'rules' => 'required|integer|is_not_unique[roles.roleID]',
+                'errors' => [
+                    'required' => 'Role selection is required.',
+                    'integer' => 'Role value must be a valid selection.',
+                    'is_not_unique' => 'Selected role does not exist.',
+                ],
+            ],
         ];
 
         if (!$this->validate($rules)) {
@@ -151,10 +185,37 @@ class UserManage extends BaseController
         $userID = $this->request->getPost('userID');
         
         $rules = [
-            'firstName' => 'required|min_length[2]|max_length[50]',
-            'lastName' => 'required|min_length[2]|max_length[50]',
-            'email' => "required|valid_email|is_unique[users.email,userID,{$userID}]",
-            'role' => 'permit_empty|integer|is_not_unique[roles.roleID]'
+            'firstName' => [
+                'rules' => 'required|min_length[2]|max_length[50]',
+                'errors' => [
+                    'required' => 'First name is required.',
+                    'min_length' => 'First name must be at least 2 characters long.',
+                    'max_length' => 'First name cannot exceed 50 characters.',
+                ],
+            ],
+            'lastName' => [
+                'rules' => 'required|min_length[2]|max_length[50]',
+                'errors' => [
+                    'required' => 'Last name is required.',
+                    'min_length' => 'Last name must be at least 2 characters long.',
+                    'max_length' => 'Last name cannot exceed 50 characters.',
+                ],
+            ],
+            'email' => [
+                'rules' => "required|valid_email|is_unique[users.email,userID,{$userID}]",
+                'errors' => [
+                    'required' => 'Email address is required.',
+                    'valid_email' => 'Please provide a valid email address.',
+                    'is_unique' => 'That email address is already registered to another user.',
+                ],
+            ],
+            'role' => [
+                'rules' => 'permit_empty|integer|is_not_unique[roles.roleID]',
+                'errors' => [
+                    'integer' => 'Role value must be a valid selection.',
+                    'is_not_unique' => 'Selected role does not exist.',
+                ],
+            ],
         ];
 
         if (!$this->validate($rules)) {
