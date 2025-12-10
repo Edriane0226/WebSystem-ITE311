@@ -90,7 +90,7 @@ class Assignments extends Controller
 
         $rules = [
             'title' => 'required|string|min_length[3]|max_length[255]',
-            'assignment_file' => 'uploaded[assignment_file]|max_size[assignment_file,102400]|ext_in[assignment_file,pdf,doc,docx,ppt,pptx,txt,zip,rar]',
+            'assignment_file' => 'uploaded[assignment_file]|max_size[assignment_file,102400]|ext_in[assignment_file,pdf,ppt,pptx]',
             'instructions' => 'permit_empty|string',
             'allowedAttempts' => 'permit_empty|integer|greater_than_equal_to[1]|less_than_equal_to[9]',
             'dueDate' => 'permit_empty',
