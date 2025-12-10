@@ -25,8 +25,10 @@ Class Course extends BaseController
         }
 
         $enrollmentModel = new EnrollmentModel();
+        $courseModel = new CourseModel();
         $user_id = session()->get('userID');
         $course_id = base64_decode($this->request->getPost('course_id'));
+        $course = $courseModel->find($course_id);
         
         if ($enrollmentModel->isAlreadyEnrolled($user_id, $course_id)) {
             return $this->response->setJSON(['success' => false,
@@ -43,7 +45,16 @@ Class Course extends BaseController
 
         //Insert Notification after ma enroll para sa student
         $notif = new NotificationModel();
-    $notif->createNotification($user_id, 'Your enrollment request has been submitted and is pending approval.');
+        $notif->createNotification($user_id, 'Your enrollment request has been submitted and is pending approval.');
+
+        if ($course && !empty($course['teacherID'])) {
+            $teacherId = (int) $course['teacherID'];
+            if ($teacherId !== (int) $user_id) {
+                $studentName = session()->get('name') ?: 'A student';
+                $courseTitle = $course['courseTitle'] ?? 'your course';
+                $notif->createNotification($teacherId, sprintf('%s requested to enroll in %s.', $studentName, $courseTitle));
+            }
+        }
 
         
         return $this->response->setJSON(['success' => true, 

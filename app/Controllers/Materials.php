@@ -3,6 +3,8 @@
 namespace App\Controllers;
 use App\Models\MaterialModel;
 use App\Models\CourseModel;
+use App\Models\EnrollmentModel;
+use App\Models\NotificationModel;
 
 class Materials extends BaseController
 {
@@ -35,29 +37,55 @@ class Materials extends BaseController
 
             $validation =  \Config\Services::validation();
             $validation->setRules([
-                //Check if the uploaded file is valid, max size 100MB, and allowed file types
-                'material_file' => 'uploaded[material_file]|max_size[material_file,102400]|ext_in[material_file,pdf,ppt,pptx]'
+                'material_file' => [
+                    'label' => 'Course material',
+                    'rules' => 'uploaded[material_file]|max_size[material_file,102400]|ext_in[material_file,pdf,ppt,pptx]',
+                    'errors' => [
+                        'uploaded' => 'Please choose a material file before uploading.',
+                        'max_size' => 'Course material must not exceed 100MB.',
+                        'ext_in' => 'Only PDF and PowerPoint files (PDF, PPT, PPTX) are allowed.',
+                    ],
+                ],
             ]);
+
             if (!$validation->withRequest($this->request)->run()) {
-                return redirect()->back()->with('error', $validation->getError('material_file'));
+                $feedback = $validation->getError('material_file') ?: 'Unable to upload the material because the file did not pass validation.';
+                return redirect()->back()->withInput()->with('error', $feedback);
             }
-            if ($file->isValid()) {
+
+            if ($file && $file->isValid()) {
+                $materialsDir = WRITEPATH . 'materials/uploads';
+                if (!is_dir($materialsDir) && !mkdir($materialsDir, 0755, true)) {
+                    return redirect()->back()->with('error', 'Failed to prepare storage directory.');
+                }
+
                 $newName = $file->getRandomName();
-                $file->move(WRITEPATH . 'materials/uploads', $newName);
+                if (!$file->move($materialsDir, $newName)) {
+                    return redirect()->back()->with('error', 'Failed to store the uploaded file.');
+                }
 
                 $materialModel->insert([
                     'course_id'  => $course_id,
                     'materialCategoryID' => 1,
                     'file_name'  => $file->getClientName(),
-                    'file_path'  => WRITEPATH . 'materials/uploads/' . $newName,
+                    'file_path'  => rtrim($materialsDir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $newName,
                     'uploaded_at' => date('Y-m-d H:i:s')
                 ]);
+
+                $uploaderName = session()->get('name') ?: 'Your instructor';
+                $courseTitle = $course['courseTitle'] ?? 'your course';
+                $materialName = $file->getClientName();
+                $this->notifyCourseStudents(
+                    (int) $course_id,
+                    sprintf('%s uploaded a new module "%s" in %s.', $uploaderName, $materialName, $courseTitle),
+                    [(int) session()->get('userID')]
+                );
 
                 return redirect()->to(base_url('/course/' . $course_id . '/modules'))
                                  ->with('success', 'Material uploaded successfully.');
             }
 
-            return redirect()->back()->with('error', 'Failed to upload file.');
+            return redirect()->back()->withInput()->with('error', 'The uploaded file is invalid or could not be processed.');
         }
 
         return view('templates/header', ['role' => $role]) . view('materials/upload', [
@@ -110,5 +138,34 @@ class Materials extends BaseController
         }
 
         return redirect()->back()->with('error', 'Material not found.');
+    }
+
+    private function notifyCourseStudents(int $courseId, string $message, array $excludeUserIds = []): void
+    {
+        $enrollmentModel = new EnrollmentModel();
+        $studentIds = $enrollmentModel->select('user_id')
+            ->where('course_id', $courseId)
+            ->whereIn('enrollmentStatus', [
+                EnrollmentModel::STATUS_ENROLLED,
+                EnrollmentModel::STATUS_PENDING,
+            ])
+            ->findColumn('user_id');
+
+        if (empty($studentIds)) {
+            return;
+        }
+
+        $notificationModel = new NotificationModel();
+        $excludeLookup = [];
+        foreach ($excludeUserIds as $excludeId) {
+            $excludeLookup[(int) $excludeId] = true;
+        }
+
+        foreach (array_unique(array_map('intval', $studentIds)) as $studentId) {
+            if (isset($excludeLookup[$studentId])) {
+                continue;
+            }
+            $notificationModel->createNotification($studentId, $message);
+        }
     }
 }

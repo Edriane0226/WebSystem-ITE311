@@ -26,7 +26,7 @@
                     <?php endif; ?>
 
                     <?php if($canUpload): ?>
-                        <form action="<?= base_url('materials/upload/' . $course_id) ?>" method="post" enctype="multipart/form-data" class="mb-3">
+                        <form action="<?= base_url('/admin/course/' . $course_id . '/upload') ?>" method="post" enctype="multipart/form-data" class="mb-3">
                             <?= csrf_field() ?>
                             <div class="mb-3">
                                 <label class="form-label">Choose File</label>

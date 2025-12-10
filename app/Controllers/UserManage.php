@@ -7,6 +7,7 @@ use App\Models\CourseModel;
 use App\Models\EnrollmentModel;
 use App\Models\EnrollmentStatusModel;
 use App\Models\RoleModel;
+use App\Models\NotificationModel;
 
 class UserManage extends BaseController
 {
@@ -434,8 +435,23 @@ class UserManage extends BaseController
             return $this->response->setJSON(['success' => false, 'message' => 'Not authorized for this enrollment']);
         }
 
+        $previousStatus = (int) ($enrollment['enrollmentStatus'] ?? 0);
+
         try {
             $enrollmentModel->updateEnrollmentStatus($enrollmentID, $statusID);
+
+            if ((int) $statusID === EnrollmentModel::STATUS_ENROLLED && $previousStatus !== EnrollmentModel::STATUS_ENROLLED) {
+                $courseModel = new CourseModel();
+                $course = $courseModel->find((int) ($enrollment['course_id'] ?? 0));
+                $courseTitle = $course['courseTitle'] ?? 'the course';
+
+                $notificationModel = new NotificationModel();
+                $notificationModel->createNotification(
+                    (int) $enrollment['user_id'],
+                    sprintf('Your enrollment request for %s has been approved.', $courseTitle)
+                );
+            }
+
             return $this->response->setJSON(['success' => true, 'message' => 'Enrollment status updated']);
         } catch (\Exception $e) {
             return $this->response->setJSON(['success' => false, 'message' => 'Failed to update enrollment: ' . $e->getMessage()]);
@@ -480,6 +496,9 @@ class UserManage extends BaseController
             ->where('course_id', $courseId)
             ->first();
 
+        $previousStatus = $existing ? (int) ($existing['enrollmentStatus'] ?? 0) : null;
+        $becameEnrolled = false;
+
         try {
             if ($existing) {
                 $updateData = [
@@ -504,6 +523,10 @@ class UserManage extends BaseController
                 ]);
             }
 
+            if ($statusId === EnrollmentModel::STATUS_ENROLLED && $previousStatus !== EnrollmentModel::STATUS_ENROLLED) {
+                $becameEnrolled = true;
+            }
+
             $message = 'Enrollment updated.';
             if ($statusId === 1) {
                 $message = 'Enrollment approved.';
@@ -511,6 +534,15 @@ class UserManage extends BaseController
                 $message = 'Enrollment declined.';
             } elseif ($statusId === 4) {
                 $message = 'Enrollment set to pending.';
+            }
+
+            if ($becameEnrolled) {
+                $notificationModel = new NotificationModel();
+                $courseTitle = $course['courseTitle'] ?? 'your course';
+                $notificationModel->createNotification(
+                    $studentId,
+                    sprintf('Your enrollment request for %s has been approved.', $courseTitle)
+                );
             }
 
             return $this->response->setJSON(['success' => true, 'message' => $message]);

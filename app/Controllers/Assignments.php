@@ -7,6 +7,7 @@ use App\Models\AssignmentModel;
 use App\Models\CourseModel;
 use App\Models\EnrollmentModel;
 use App\Models\MaterialModel;
+use App\Models\NotificationModel;
 use App\Models\SubmissionModel;
 use App\Models\UserModel;
 use CodeIgniter\Controller;
@@ -84,20 +85,44 @@ class Assignments extends Controller
 
         $courseId = (int) $courseID;
         $courseModel = new CourseModel();
-        if (!$courseModel->find($courseId)) {
+        $courseDetails = $courseModel->getCourseWithDetails($courseId);
+        if (!$courseDetails) {
             return redirect()->to('/course/search')->with('error', 'Course not found.');
         }
 
         $rules = [
-            'title' => 'required|string|min_length[3]|max_length[255]',
-            'assignment_file' => 'uploaded[assignment_file]|max_size[assignment_file,102400]|ext_in[assignment_file,pdf,ppt,pptx]',
+            'title' => [
+                'rules' => 'required|string|min_length[3]|max_length[255]',
+                'errors' => [
+                    'required' => 'Please provide a title for the assignment.',
+                    'min_length' => 'Assignment titles must be at least 3 characters long.',
+                    'max_length' => 'Assignment titles may not exceed 255 characters.',
+                ],
+            ],
+            'assignment_file' => [
+                'rules' => 'uploaded[assignment_file]|max_size[assignment_file,102400]|ext_in[assignment_file,pdf,ppt,pptx]',
+                'errors' => [
+                    'uploaded' => 'Please choose an assignment file before uploading.',
+                    'max_size' => 'Assignments must not exceed 100MB.',
+                    'ext_in' => 'Only PDF and PowerPoint files (PDF, PPT, PPTX) are allowed for assignments.',
+                ],
+            ],
             'instructions' => 'permit_empty|string',
-            'allowedAttempts' => 'permit_empty|integer|greater_than_equal_to[1]|less_than_equal_to[9]',
+            'allowedAttempts' => [
+                'rules' => 'permit_empty|integer|greater_than_equal_to[1]|less_than_equal_to[9]',
+                'errors' => [
+                    'integer' => 'Allowed attempts must be a whole number.',
+                    'greater_than_equal_to' => 'Allowed attempts must be at least 1.',
+                    'less_than_equal_to' => 'Allowed attempts may not exceed 9.',
+                ],
+            ],
             'dueDate' => 'permit_empty',
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            $errors = array_filter((array) $this->validator->getErrors());
+            $feedback = reset($errors) ?: 'Unable to upload the assignment because some fields are invalid.';
+            return redirect()->back()->withInput()->with('error', $feedback);
         }
 
         $file = $this->request->getFile('assignment_file');
@@ -165,6 +190,14 @@ class Assignments extends Controller
             'isClosed' => 0,
             'autoClose' => $autoCloseRequested ? 1 : 0,
         ]);
+
+        $posterName = session()->get('name') ?: 'Your instructor';
+        $courseTitle = $courseDetails['courseTitle'] ?? 'your course';
+        $this->notifyCourseStudents(
+            $courseId,
+            sprintf('%s posted a new assignment "%s" in %s.', $posterName, $title, $courseTitle),
+            [(int) session()->get('userID')]
+        );
 
         return redirect()->to('/course/' . $courseId . '/assignments')
             ->with('message', 'Assignment uploaded successfully.');
@@ -348,6 +381,9 @@ class Assignments extends Controller
             return redirect()->back()->with('error', 'Assignment not found for this course.');
         }
 
+        $courseDetails = (new CourseModel())->getCourseWithDetails($courseId);
+        $courseTitle = $courseDetails['courseTitle'] ?? 'your course';
+
         if (empty($assignment['isClosed']) && $this->shouldAutoClose($assignment)) {
             $assignmentModel->update($assignmentId, ['isClosed' => 1]);
             $assignment['isClosed'] = 1;
@@ -364,11 +400,20 @@ class Assignments extends Controller
         }
 
         $rules = [
-            'submission_file' => 'uploaded[submission_file]|max_size[submission_file,102400]|ext_in[submission_file,pdf,ppt,pptx]'
+            'submission_file' => [
+                'rules' => 'uploaded[submission_file]|max_size[submission_file,102400]|ext_in[submission_file,pdf,ppt,pptx]',
+                'errors' => [
+                    'uploaded' => 'Please select a file before submitting your assignment.',
+                    'max_size' => 'Submission files must not exceed 100MB.',
+                    'ext_in' => 'Only PDF and PowerPoint files (PDF, PPT, PPTX) are allowed for submissions.',
+                ],
+            ],
         ];
 
         if (!$this->validate($rules)) {
-            return redirect()->back()->withInput()->with('errors', $this->validator->getErrors());
+            $errors = array_filter((array) $this->validator->getErrors());
+            $feedback = reset($errors) ?: 'Unable to upload the submission because the file did not pass validation.';
+            return redirect()->back()->withInput()->with('error', $feedback);
         }
 
         $submissionModel = new SubmissionModel();
@@ -423,6 +468,11 @@ class Assignments extends Controller
                 'attemptDate' => date('Y-m-d H:i:s'),
             ]);
         }
+
+    $studentName = session()->get('name') ?: 'A student';
+    $assignmentTitle = $assignment['title'] ?? 'an assignment';
+    $messageForTeacher = sprintf('%s submitted "%s" in %s.', $studentName, $assignmentTitle, $courseTitle);
+    $this->notifyCourseTeacher($courseDetails, $messageForTeacher);
 
         return redirect()->to('/course/' . $courseId . '/assignments')
             ->with('message', 'Assignment submitted successfully.');
@@ -563,5 +613,48 @@ class Assignments extends Controller
         } catch (\Exception $exception) {
             return false;
         }
+    }
+
+    private function notifyCourseStudents(int $courseId, string $message, array $excludeUserIds = []): void
+    {
+        $enrollmentModel = new EnrollmentModel();
+        $studentIds = $enrollmentModel->select('user_id')
+            ->where('course_id', $courseId)
+            ->whereIn('enrollmentStatus', [
+                EnrollmentModel::STATUS_ENROLLED,
+                EnrollmentModel::STATUS_PENDING,
+            ])
+            ->findColumn('user_id');
+
+        if (empty($studentIds)) {
+            return;
+        }
+
+        $notificationModel = new NotificationModel();
+        $excludeLookup = [];
+        foreach ($excludeUserIds as $excludeId) {
+            $excludeLookup[(int) $excludeId] = true;
+        }
+
+        foreach (array_unique(array_map('intval', $studentIds)) as $studentId) {
+            if (isset($excludeLookup[$studentId])) {
+                continue;
+            }
+            $notificationModel->createNotification($studentId, $message);
+        }
+    }
+
+    private function notifyCourseTeacher(?array $courseDetails, string $message): void
+    {
+        if (empty($courseDetails)) {
+            return;
+        }
+
+        $teacherId = isset($courseDetails['teacherID']) ? (int) $courseDetails['teacherID'] : 0;
+        if ($teacherId <= 0) {
+            return;
+        }
+
+        (new NotificationModel())->createNotification($teacherId, $message);
     }
 }
