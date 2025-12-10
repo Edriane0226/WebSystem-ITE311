@@ -364,7 +364,7 @@ class Assignments extends Controller
         }
 
         $rules = [
-            'submission_file' => 'uploaded[submission_file]|max_size[submission_file,102400]|ext_in[submission_file,pdf,doc,docx,ppt,pptx,txt,zip,rar]'
+            'submission_file' => 'uploaded[submission_file]|max_size[submission_file,102400]|ext_in[submission_file,pdf,ppt,pptx]'
         ];
 
         if (!$this->validate($rules)) {

@@ -151,8 +151,9 @@
                                     $roleName = isset($user['role_name']) ? strtolower($user['role_name']) : 'student';
                                     $canManageEnrollment = $roleName === 'student';
                                     $canEditUser = $isAdmin;
+                                    $courseIdList = trim((string) ($user['teacherCourseIds'] ?? ''));
                                 ?>
-                                <tr>
+                                <tr data-teacher-course-ids="<?= esc($courseIdList, 'attr') ?>">
                                     <td class="ps-4">
                                         <span class="fw-bold"><?= esc($user['userID']) ?></span>
                                     </td>
@@ -198,7 +199,7 @@
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr>
+                            <tr data-empty-placeholder="true">
                                 <td colspan="<?= $columnCount ?>" class="text-center py-5">
                                     <div class="text-muted">
                                         <i class="bi bi-people fa-3x mb-3"></i>
@@ -377,16 +378,78 @@
         return div.innerHTML;
     }
 
-    // Client-side search 
-    document.getElementById('searchInput').addEventListener('keyup', function() {
-        const filter = this.value.toLowerCase();
-        const rows = document.querySelectorAll('#studentsTable tbody tr');
-        
+    const searchInput = document.getElementById('searchInput');
+    const courseFilter = document.getElementById('courseFilter');
+    const studentsTableBody = document.querySelector('#studentsTable tbody');
+
+    function ensureTeacherEmptyRow() {
+        if (!studentsTableBody) {
+            return null;
+        }
+
+        let emptyRow = studentsTableBody.querySelector('[data-empty-placeholder="true"]');
+        if (!emptyRow) {
+            emptyRow = document.createElement('tr');
+            emptyRow.dataset.emptyPlaceholder = 'true';
+            const columnCount = studentsTableBody.closest('table')?.querySelectorAll('thead th').length || 1;
+            const cell = document.createElement('td');
+            cell.colSpan = columnCount;
+            cell.className = 'text-center py-4 text-muted';
+            cell.innerHTML = '<i class="bi bi-people mb-2 d-block"></i>No students match your filters.';
+            emptyRow.appendChild(cell);
+            emptyRow.style.display = 'none';
+            studentsTableBody.appendChild(emptyRow);
+        }
+
+        return emptyRow;
+    }
+
+    function applyTeacherStudentFilters() {
+        if (!studentsTableBody) {
+            return;
+        }
+
+        const searchValue = searchInput ? searchInput.value.trim().toLowerCase() : '';
+        const selectedCourse = courseFilter ? courseFilter.value.trim() : '';
+
+        const rows = Array.from(studentsTableBody.querySelectorAll('tr')).filter(row => !row.dataset.emptyPlaceholder);
+        let visibleCount = 0;
+
         rows.forEach(row => {
-            const text = row.textContent.toLowerCase();
-            row.style.display = text.includes(filter) ? '' : 'none';
+            const rowText = row.textContent.toLowerCase();
+            const matchesSearch = !searchValue || rowText.indexOf(searchValue) !== -1;
+
+            let matchesCourse = true;
+            if (selectedCourse) {
+                const rawCourseIds = row.getAttribute('data-teacher-course-ids') || '';
+                const courseIds = rawCourseIds.split(',').map(function (value) {
+                    return value.trim();
+                }).filter(Boolean);
+                matchesCourse = courseIds.includes(selectedCourse);
+            }
+
+            const shouldShow = matchesSearch && matchesCourse;
+            row.style.display = shouldShow ? '' : 'none';
+            if (shouldShow) {
+                visibleCount += 1;
+            }
         });
-    });
+
+        const emptyRow = ensureTeacherEmptyRow();
+        if (emptyRow) {
+            emptyRow.style.display = visibleCount === 0 ? '' : 'none';
+        }
+    }
+
+    if (searchInput) {
+        searchInput.addEventListener('keyup', applyTeacherStudentFilters);
+    }
+
+    if (courseFilter) {
+        courseFilter.addEventListener('change', applyTeacherStudentFilters);
+    }
+
+    applyTeacherStudentFilters();
 
     <?php if ($userRole === 'admin'): ?>
     // Edit user function

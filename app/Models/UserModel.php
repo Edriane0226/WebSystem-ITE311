@@ -79,17 +79,37 @@ class UserModel extends Model
 
     public function getStudentsByTeacherCourses($teacherId)
     {
-    return $this->select('users.userID, users.name, users.email, COUNT(DISTINCT enrollments.course_id) AS enrolledCourses')
-                    ->join('enrollments', 'enrollments.user_id = users.userID', 'inner')
-                    ->join('courses', 'courses.courseID = enrollments.course_id', 'inner')
-                    ->where('courses.teacherID', $teacherId)
+        $teacherId = (int) $teacherId;
+
+        $allowedStatuses = [
+            EnrollmentModel::STATUS_ENROLLED,
+            EnrollmentModel::STATUS_PENDING,
+            EnrollmentModel::STATUS_COMPLETED,
+            EnrollmentModel::STATUS_DROPPED,
+        ];
+
+        $statusList = implode(', ', array_map('intval', $allowedStatuses));
+
+        return $this->select('users.userID, users.name, users.email')
+                    ->select(
+                        "COALESCE(COUNT(DISTINCT CASE
+                            WHEN courses.teacherID = {$teacherId}
+                                AND enrollments.enrollmentStatus IN ({$statusList})
+                            THEN courses.courseID
+                        END), 0) AS enrolledCourses",
+                        false
+                    )
+                    ->select(
+                        "GROUP_CONCAT(DISTINCT CASE
+                            WHEN courses.teacherID = {$teacherId}
+                                AND enrollments.enrollmentStatus IN ({$statusList})
+                            THEN courses.courseID
+                        END) AS teacherCourseIds",
+                        false
+                    )
+                    ->join('enrollments', 'enrollments.user_id = users.userID', 'left')
+                    ->join('courses', 'courses.courseID = enrollments.course_id', 'left')
                     ->where('users.role', 3)
-                    ->whereIn('enrollments.enrollmentStatus', [
-                        EnrollmentModel::STATUS_ENROLLED,
-                        EnrollmentModel::STATUS_PENDING,
-                        EnrollmentModel::STATUS_COMPLETED,
-                        EnrollmentModel::STATUS_DROPPED,
-                    ])
                     ->groupBy('users.userID, users.name, users.email')
                     ->orderBy('users.name')
                     ->findAll();

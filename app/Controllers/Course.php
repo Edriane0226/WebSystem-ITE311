@@ -59,22 +59,58 @@ Class Course extends BaseController
             return redirect()->to('login');
         }
 
-        $searchTerm = $this->request->getGet('search_term');
+        $searchTerm = trim((string) $this->request->getGet('search_term'));
+        $context = (string) $this->request->getGet('context');
 
         $courseModel = new CourseModel();
-        
-        if (!empty($searchTerm)) {
-           $courseModel->like('courseTitle', $searchTerm);
-           $courseModel->orLike('courseDescription', $searchTerm);
+        $builder = $courseModel->builder();
+        $builder->select('courses.*, users.name as teacherName, coursestatus.statusName, schoolYear.schoolYear, schoolYear.Semester, semester.semesterName, courseOfferings.startDate, courseOfferings.endDate, courseOfferings.Schedule, time.timeSlot, courseOfferings.offeringID');
+        $builder->join('users', 'courses.teacherID = users.userID', 'left');
+        $builder->join('coursestatus', 'courses.statusID = coursestatus.statusID', 'left');
+        $builder->join('schoolYear', 'courses.schoolYearID = schoolYear.schoolYearID', 'left');
+        $builder->join('semester', 'semester.semesterID = schoolYear.Semester', 'left');
+        $builder->join('courseOfferings', 'courseOfferings.courseID = courses.courseID', 'left');
+        $builder->join('time', 'time.timeID = courseOfferings.Schedule', 'left');
+
+        if ($searchTerm !== '') {
+            $builder->groupStart()
+                ->like('courses.courseTitle', $searchTerm)
+                ->orLike('courses.courseCode', $searchTerm)
+                ->orLike('courses.courseDescription', $searchTerm)
+                ->orLike('users.name', $searchTerm)
+            ->groupEnd();
         }
 
-        $courses = $courseModel->findAll();
+        $session = session();
+        $role = $session->get('role');
+
+        switch ($context) {
+            case 'teacher-dashboard':
+                if ($role === 'teacher') {
+                    $builder->where('courses.teacherID', $session->get('userID'));
+                }
+                break;
+            case 'student-dashboard':
+            case 'admin-dashboard':
+            case 'courses-index':
+            default:
+                // No additional constraints
+                break;
+        }
+
+        $builder->orderBy('courses.courseTitle', 'ASC');
+
+        $courses = $builder->get()->getResultArray();
 
         if ($this->request->isAJAX()) {
-            return $this->response->setJSON(['courses' => $courses]);
+            return $this->response->setJSON([
+                'courses' => $courses,
+                'csrfHash' => csrf_hash(),
+            ]);
         }
-        $role = session()->get('role');
-        return view('templates/header', ['role' => $role]) . view('courses/index', ['courses' => $courses, 'searchTerm' => $searchTerm]);
+
+        return view('templates/header', ['role' => $role])
+            . view('courses/index', ['courses' => $courses, 'searchTerm' => $searchTerm]);
     }
     // add ons for lab 9 
     public function details($id)
