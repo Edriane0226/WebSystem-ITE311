@@ -133,7 +133,7 @@
 								<?php if ($role === 'student'): ?>
 									<?php if ($isClosed): ?>
 										<span class="badge bg-dark align-self-center">Submissions closed</span>
-									<?php elseif($allowedAttempts && $studentAttemptsCount < $allowedAttempts): ?>
+									<?php elseif( !$allowedAttempts || $allowedAttempts && $studentAttemptsCount < $allowedAttempts): ?>
 										<button class="btn btn-primary btn-sm" type="button" data-bs-toggle="collapse"
 											data-bs-target="#submit-assignment-<?= $assignmentId ?>" aria-expanded="false">
 											Submit / Resubmit
