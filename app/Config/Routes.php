@@ -53,6 +53,7 @@ $routes->get('/materials/download/(:num)', 'Materials::download/$1');
 //Laboratory Exercise 8 Notifications
 $routes->get('/notifications', 'Notifications::get');
 $routes->post('/notifications/mark_read/(:num)', 'Notifications::mark_as_read/$1');
+$routes->post('/notifications/send', 'Notifications::send');
 
 //Laboratory Exercise 9
 $routes->get('/course/search', 'Course::search');

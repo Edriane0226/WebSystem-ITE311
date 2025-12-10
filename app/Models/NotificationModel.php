@@ -35,4 +35,33 @@ class NotificationModel extends Model {
         ];
         return $this->insert($data);
     }
+
+    public function createNotificationsForUsers(array $userIds, string $message): int
+    {
+        $userIds = array_values(array_unique(array_map('intval', $userIds)));
+        if (empty($userIds) || $message === '') {
+            return 0;
+        }
+
+        $timestamp = date('Y-m-d H:i:s');
+        $batch = [];
+
+        foreach ($userIds as $userId) {
+            if ($userId <= 0) {
+                continue;
+            }
+            $batch[] = [
+                'user_id' => $userId,
+                'message' => $message,
+                'is_read' => 0,
+                'created_at' => $timestamp,
+            ];
+        }
+
+        if (empty($batch)) {
+            return 0;
+        }
+
+        return $this->insertBatch($batch);
+    }
 }

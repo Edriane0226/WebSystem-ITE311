@@ -1,6 +1,24 @@
 <div class="container p-3">
+        <?php
+        $successMessage = session()->getFlashdata('success');
+        $errorMessage = session()->getFlashdata('error');
+        ?>
         <h3>Dashboard</h3>
         <h4 class="mt-3 text-muted">Hello, <?= $name ?>!</h4>
+
+        <?php if (!empty($successMessage)): ?>
+            <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                <?= esc($successMessage) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
+
+        <?php if (!empty($errorMessage)): ?>
+            <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                <?= esc($errorMessage) ?>
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        <?php endif; ?>
     
         <div class="row">
             <?php if( $role == 'student' ): ?>
@@ -146,7 +164,38 @@
                 </div>
 
             <?php elseif( $role == 'admin' ): ?>
-                
+                <?php $selectedNotificationTarget = old('target', 'all'); ?>
+
+                <div class="col-12">
+                    <div class="card mt-4">
+                        <div class="card-body">
+                            <h4 class="card-title">Send Notification</h4>
+                            <form action="<?= base_url('notifications/send'); ?>" method="post">
+                                <?= csrf_field(); ?>
+                                <div class="row g-3">
+                                    <div class="col-md-4">
+                                        <label for="notification_target" class="form-label">Audience</label>
+                                        <select name="target" id="notification_target" class="form-select form-select-sm" required>
+                                            <option value="all" <?= $selectedNotificationTarget === 'all' ? 'selected' : ''; ?>>All users</option>
+                                            <option value="admin" <?= $selectedNotificationTarget === 'admin' ? 'selected' : ''; ?>>Admins</option>
+                                            <option value="teacher" <?= $selectedNotificationTarget === 'teacher' ? 'selected' : ''; ?>>Teachers</option>
+                                            <option value="student" <?= $selectedNotificationTarget === 'student' ? 'selected' : ''; ?>>Students</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <label for="notification_message" class="form-label">Message</label>
+                                        <textarea name="message" id="notification_message" class="form-control" rows="3" maxlength="500" required><?= esc(old('message', '')) ?></textarea>
+                                        <div class="form-text">Maximum 500 characters.</div>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <button type="submit" class="btn btn-primary">Send Notification</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
                 <h2 class="mt-3">Statistics</h2>
                 <div class="col-md-6">
                     <div class="card mt-2">
