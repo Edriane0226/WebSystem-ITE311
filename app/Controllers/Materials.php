@@ -112,16 +112,41 @@ class Materials extends BaseController
         $materialModel = new MaterialModel();
         $material = $materialModel->find($material_id);
 
-        if ($material) {
-            if (is_file($material['file_path'])) {
-                unlink($material['file_path']);
-            }
-
-            $materialModel->delete($material_id);
-            return redirect()->back()->with('success', 'Material deleted successfully.');
+        if (!$material) {
+            return redirect()->back()->with('error', 'Material not found.');
         }
 
-        return redirect()->back()->with('error', 'Material not found.');
+        try {
+            if ($materialModel->delete($material_id) === false) {
+                $deletionErrors = $materialModel->errors();
+                $errorMessage = is_array($deletionErrors) ? implode('; ', array_filter($deletionErrors)) : 'Unknown validation error';
+
+                log_message('error', 'Failed to delete material record with ID {id}: {errors}', [
+                    'id'     => $material_id,
+                    'errors' => $errorMessage,
+                ]);
+
+                return redirect()->back()->with('error', 'Failed to update the material record.');
+            }
+        } catch (\Throwable $exception) {
+            log_message('error', 'Exception deleting material ID {id}: {message}', [
+                'id'      => $material_id,
+                'message' => $exception->getMessage(),
+            ]);
+
+            return redirect()->back()->with('error', 'Failed to delete the material.');
+        }
+
+        if (!empty($material['file_path']) && is_file($material['file_path'])) {
+            if (!@unlink($material['file_path'])) {
+                log_message('warning', 'Failed to delete file for material ID {id} at path {path}', [
+                    'id'   => $material_id,
+                    'path' => $material['file_path'],
+                ]);
+            }
+        }
+
+        return redirect()->back()->with('success', 'Material deleted successfully.');
     }
 
     public function download($material_id)
