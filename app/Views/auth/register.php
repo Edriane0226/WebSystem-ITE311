@@ -103,30 +103,44 @@
   }
 
   function drawCaptcha(code) {
-      const canvas = document.getElementById("captchaCanvas");
-      const ctx = canvas.getContext("2d");
+    const canvas = document.getElementById("captchaCanvas");
+    const ctx = canvas.getContext("2d");
 
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      ctx.fillStyle = "#f2f2f2";
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.fillStyle = "#f2f2f2";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      ctx.font = "20px Arial";
+    ctx.font = "20px Arial";
 
-      for (let i = 0; i < code.length; i++) {
-          ctx.save();
-          ctx.translate(30 + i * 25, 40);
-          ctx.rotate((Math.random() - 0.5) * 0.5);
-          ctx.fillStyle = getRandomColor();
-          ctx.fillText(code[i], 0, 0);
-          ctx.restore();
-      }
-  }
+    for (let i = 0; i < code.length; i++) {
+        ctx.save();
 
-  function getRandomColor() {
-      return "rgb(" +
-          Math.floor(Math.random() * 150) + "," +
-          Math.floor(Math.random() * 150) + "," +
-          Math.floor(Math.random() * 150) + ")";
+        //Move to letter position
+        ctx.translate(20 + i * 30, 40);
+
+        // Slight wavy distortion
+        const dx = Math.random() * 2;
+        const dy = Math.random() * 2;
+
+        // Random dark color
+        ctx.fillStyle = "#aeaeaeff";
+
+        // Draw letter slightly off-center
+        ctx.fillText(code[i], dx, dy);
+
+        ctx.restore();
+    }
+
+    // Add random lines
+    for (let i = 0; i < 5; i++) {
+        ctx.strokeStyle = "#aeaeaeff";
+        ctx.beginPath();
+        ctx.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+        ctx.stroke();
+    }
+
+    ctx.filter = "blur(500px)";
   }
 
   generateCaptcha();
