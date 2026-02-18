@@ -95,3 +95,6 @@ $routes->delete('/students/unenroll/(:num)', 'UserManage::unenroll/$1');
 $routes->post('/students/updateEnrollmentStatus', 'UserManage::updateEnrollmentStatus');
 $routes->post('/students/createTeacherEnrollment', 'UserManage::createTeacherEnrollment');
 $routes->get('/students/by-course/(:num)', 'UserManage::getStudentsByCourse/$1');
+
+
+$routes->get('generate-captcha', 'Auth::generateCaptcha');

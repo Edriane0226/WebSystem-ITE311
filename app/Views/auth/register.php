@@ -6,6 +6,14 @@
       <?php if(isset($validation)): ?>
         <div class="alert alert-danger"><?= $validation->listErrors()?></div>
       <?php endif;?>
+
+       <!-- ADD THIS -->
+    <?php if(session()->getFlashdata('error')): ?>
+        <div class="alert alert-danger">
+            <?= session()->getFlashdata('error') ?>
+        </div>
+    <?php endif; ?>
+
     </div>
 
     <div class="col-md-6 d-flex flex-column justify-content-center p-5 bg-white">
@@ -42,6 +50,24 @@
               <label class="form-label">Confirm Password</label>
               <input type="password" name="password_confirm" class="form-control" required>
           </div>
+
+          <!-- CAPTCHA -->
+          <div class="mb-3 text-center">
+              <canvas id="captchaCanvas" width="200" height="70"></canvas>
+          </div>
+
+          <div class="mb-3">
+              <input type="text" name="captcha_input" id="captchaInput" 
+                    class="form-control" placeholder="Type the Letters and Numbers you see" required>
+          </div>
+
+          
+
+          <div class="text-center mb-3">
+              <button type="button" onclick="generateCaptcha()" class="btn btn-secondary btn-sm">
+                  Refresh CAPTCHA
+              </button>
+          </div>
           <!-- <div class="mb-3">
               <label class="form-label">Category</label>
               <select name="role" class="form-control">
@@ -63,3 +89,45 @@
 </div>
 </body>
 </html>
+
+<script>
+  let captchaCode = "";
+
+  function generateCaptcha() {
+      fetch("<?= base_url('generate-captcha') ?>")
+          .then(response => response.json())
+          .then(data => {
+              captchaCode = data.captcha;
+              drawCaptcha(captchaCode);
+          });
+  }
+
+  function drawCaptcha(code) {
+      const canvas = document.getElementById("captchaCanvas");
+      const ctx = canvas.getContext("2d");
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = "#f2f2f2";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.font = "20px Arial";
+
+      for (let i = 0; i < code.length; i++) {
+          ctx.save();
+          ctx.translate(30 + i * 25, 40);
+          ctx.rotate((Math.random() - 0.5) * 0.5);
+          ctx.fillStyle = getRandomColor();
+          ctx.fillText(code[i], 0, 0);
+          ctx.restore();
+      }
+  }
+
+  function getRandomColor() {
+      return "rgb(" +
+          Math.floor(Math.random() * 150) + "," +
+          Math.floor(Math.random() * 150) + "," +
+          Math.floor(Math.random() * 150) + ")";
+  }
+
+  generateCaptcha();
+</script>

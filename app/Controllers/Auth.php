@@ -24,7 +24,16 @@ class Auth extends BaseController
             'password'  => 'required|min_length[6]',
             'password_confirm' => 'matches[password]'
         ];
-    
+
+        // CAPTCHA validation
+        $captchaInput = $this->request->getVar('captcha_input');
+        $captchaSession = session()->get('captcha');
+
+        if ($captchaInput !== $captchaSession) {
+            return redirect()->back()
+                ->with('error', 'Wrong CAPTCHA, please try again.')
+                ->withInput();
+        }
 
         if ($this->validate($rules)) {
         // Iinsert na sa Users Table
@@ -41,7 +50,7 @@ class Auth extends BaseController
         
         return redirect()->to('login')->with('success', 'Registration Successful. Please login.');
         } else {
-            return view('auth/register', ['validation' => $this->validator]);
+            return  view('templates/header') . view('auth/register', ['validation' => $this->validator]);
         }
       }
       return  view('templates/header') . view('auth/register');
@@ -53,8 +62,7 @@ class Auth extends BaseController
 
         if ($this->request->getMethod() == 'POST') {
             $session = session();
-            $userModel = new UserModel();
-            
+            $userModel = new UserModel();       
             $rules = [
                 'email'    => 'required|valid_email',
                 'password' => 'required|min_length[6]',
@@ -62,6 +70,15 @@ class Auth extends BaseController
 
             if (!$this->validate($rules)) {
                 return  view('templates/header') . view('auth/login', ['validation' => $this->validator]);
+            }
+
+            $captchaInput = $this->request->getVar('captcha_input');
+            $captchaSession = session()->get('captcha');
+
+            if ($captchaInput !== $captchaSession) {
+                return redirect()->back()
+                    ->with('error', 'Wrong CAPTCHA, please try again.')
+                    ->withInput();
             }
 
             $user = $userModel->where('email', $this->request->getVar('email'))->first();
@@ -148,4 +165,12 @@ class Auth extends BaseController
         Models: https://codeigniter.com/user_guide/models/model.html
         Helpers: https://codeigniter.com/user_guide/helpers/index.html
     */
+
+    public function generateCaptcha()
+    {
+        $code = substr(str_shuffle("ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"), 0, 6);
+        session()->set('captcha', $code);
+
+        return $this->response->setJSON(['captcha' => $code]);
+    }
 }
